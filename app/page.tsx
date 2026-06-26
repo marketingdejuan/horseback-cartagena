@@ -1,102 +1,217 @@
-import React from 'react';
-import { Metadata } from 'next';
-import { 
-  Compass, 
-  MapPin, 
-  Clock, 
-  Star, 
-  MessageCircle, 
-  Home, 
-  Image as ImageIcon, 
-  Info,
-  CheckCircle2,
-  Globe,
-  HelpCircle,
-  Users,
-  Play
-} from 'lucide-react';
+"use client";
 
-export const metadata: Metadata = {
-  title: 'Cabalgata Medellín | Expertos en Rutas a Caballo',
-  description: 'Vive la mejor experiencia de cabalgata en Medellín. Rutas seguras, caballos bien cuidados y paisajes inolvidables en Caldas, Antioquia.',
-  keywords: 'cabalgata Medellín, horseback riding Medellin, turismo ecuestre Antioquia, paseos a caballo',
+import React, { useState, useEffect } from 'react';
+import { Settings, Image as ImageIcon, Map, Lock, User, LogOut, Plus, Trash2, Save, LayoutDashboard } from 'lucide-react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+
+export default function AdminDashboard() {
+const [isAuthenticated, setIsAuthenticated] = useState(false);
+const [password, setPassword] = useState('');
+const [loginError, setLoginError] = useState(false);
+const [isSaving, setIsSaving] = useState(false);
+const [activeTab, setActiveTab] = useState('general');
+
+const [siteData, setSiteData] = useState({
+heroTitle: 'Cargando...',
+heroDescription: 'Cargando...',
+whatsappNumber: '',
+sessions: []
+});
+
+useEffect(() => {
+if (isAuthenticated) {
+const fetchData = async () => {
+try {
+const docRef = doc(db, "configuracion", "general");
+const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setSiteData(docSnap.data());
+      } else {
+        setSiteData({
+          heroTitle: 'Descubre Medellín a Caballo',
+          heroDescription: 'Vive una experiencia inolvidable recorriendo los mejores paisajes.',
+          whatsappNumber: '+573001234567',
+          sessions: [
+            { id: 1, title: 'Ruta Mirador del Valle', price: '120.000', duration: '2 horas' }
+          ]
+        });
+      }
+    } catch (error) {
+      console.error("Error al cargar datos:", error);
+    }
+  };
+  fetchData();
+}
+
+
+}, [isAuthenticated]);
+
+const handleSaveToDB = async () => {
+setIsSaving(true);
+try {
+const docRef = doc(db, "configuracion", "general");
+await setDoc(docRef, siteData);
+alert("¡Cambios guardados en Firebase con éxito! 🚀");
+} catch (error) {
+console.error("Error al guardar:", error);
+alert("Hubo un error al guardar. Revisa la consola.");
+} finally {
+setIsSaving(false);
+}
 };
 
-export default function MobileFirstHome() {
-  const siteConfig = {
-    whatsappLink: "https://wa.me/573147094325?text=Hola!%20Vengo%20de%20la%20p%C3%A1gina%20web%20y%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20las%20cabalgatas.",
-  };
+const handleLogin = (e: any) => {
+e.preventDefault();
+if (password === 'admin') {
+setIsAuthenticated(true);
+setLoginError(false);
+} else {
+setLoginError(true);
+}
+};
 
-  return (
-    <div className="min-h-screen bg-stone-50 text-stone-800 font-sans pb-24 selection:bg-amber-200">
-      
-      {/* Header */}
-      <header className="relative h-[60vh] w-full bg-stone-900 rounded-b-3xl overflow-hidden shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-transparent z-10" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1553284965-83fd3e82fa52?q=80&w=800')] bg-cover bg-center opacity-80" />
-        
-        <div className="absolute bottom-0 left-0 w-full p-6 z-20">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="bg-amber-500 text-stone-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-              #1 En Caldas
-            </span>
-          </div>
-          <h1 className="text-4xl font-black text-white leading-tight mb-2">Cabalgatas en Medellín</h1>
-          <p className="text-stone-200 text-sm flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Caldas, Antioquia</p>
+const handleInputChange = (e: any, field: string) => {
+setSiteData({ ...siteData, [field]: e.target.value });
+};
+
+const addSession = () => {
+const newSession = { id: Date.now(), title: 'Nueva Ruta', price: '0', duration: '0 horas' };
+setSiteData({ ...siteData, sessions: [...siteData.sessions, newSession] });
+};
+
+const removeSession = (id: number) => {
+setSiteData({ ...siteData, sessions: siteData.sessions.filter((s: any) => s.id !== id) });
+};
+
+const updateSession = (id: number, field: string, value: string) => {
+const updatedSessions = siteData.sessions.map((session: any) => {
+if (session.id === id) {
+return { ...session, [field]: value };
+}
+return session;
+});
+setSiteData({ ...siteData, sessions: updatedSessions });
+};
+
+if (!isAuthenticated) {
+return (
+
+
+
+
+
+
+Acceso Colaboradores
+
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+            placeholder="Escribe 'admin' para entrar"
+          />
+          {loginError && <p className="text-red-500 text-sm mt-1">Contraseña incorrecta.</p>}
         </div>
-      </header>
-
-      {}
-      <section className="px-6 py-10">
-        <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-amber-500"/> Nuestra Galería</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {/* REPLACE THESE URLS WITH YOUR OWN CONTENT */}
-          <img src="cabalgatasmedellin-celebracion-de-cumpleanos.jpeg" alt="Cabalgata" className="w-full h-32 object-cover rounded-xl shadow-md" />
-          <img src="https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=400" alt="Paisaje" className="w-full h-32 object-cover rounded-xl shadow-md" />
-          <img src="https://images.unsplash.com/photo-1534777367033-28956923b7e7?q=80&w=400" alt="Experiencia" className="w-full h-32 object-cover rounded-xl shadow-md" />
-          <div className="w-full h-32 bg-stone-200 rounded-xl flex items-center justify-center text-stone-400 font-bold border-2 border-dashed border-stone-300">
-            Más fotos...
-          </div>
-        </div>
-      </section>
-
-      {}
-      <section className="px-6 py-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Play className="w-5 h-5 text-amber-500"/> Mira la experiencia</h2>
-        <div className="aspect-video bg-stone-900 rounded-2xl overflow-hidden shadow-xl relative group cursor-pointer">
-            <div className="absolute inset-0 flex items-center justify-center">
-                <button className="bg-white/20 backdrop-blur-md p-4 rounded-full text-white group-hover:scale-110 transition-transform">
-                    <Play className="w-10 h-10 fill-current" />
-                </button>
-            </div>
-            <img src="https://images.unsplash.com/photo-1553284965-83fd3e82fa52?q=80&w=800" alt="Video cover" className="w-full h-full object-cover opacity-60" />
-        </div>
-      </section>
-
-      {}
-      <section className="px-6 py-6">
-        <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><Star className="w-5 h-5 text-amber-500 fill-current"/> Lo que dicen nuestros clientes</h2>
-        <div className="space-y-4">
-          <div className="bg-stone-100 p-4 rounded-xl text-sm italic text-stone-600 border-l-4 border-amber-500">
-            "Una experiencia inolvidable. Los caballos están muy bien cuidados y el paisaje es increíble. 100% recomendado."
-            <p className="font-bold text-stone-800 mt-2 not-italic text-xs">- Valentina R.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-6 py-3 pb-8 z-50">
-        <div className="flex justify-between items-center max-w-md mx-auto">
-          <button className="flex flex-col items-center gap-1 text-amber-600"><Home className="w-6 h-6" /><span className="text-[10px] font-bold">Inicio</span></button>
-          <div className="relative -top-6">
-            <a href={siteConfig.whatsappLink} className="flex items-center justify-center w-16 h-16 bg-emerald-500 rounded-full shadow-lg text-white hover:bg-emerald-600 animate-bounce">
-              <MessageCircle className="w-8 h-8" />
-            </a>
-          </div>
-          <button className="flex flex-col items-center gap-1 text-stone-400"><Info className="w-6 h-6" /><span className="text-[10px] font-bold">Info</span></button>
-        </div>
-      </nav>
-
+        <button type="submit" className="w-full bg-green-600 text-white p-3 rounded-lg font-medium hover:bg-green-700">
+          Ingresar al Panel
+        </button>
+      </form>
     </div>
-  );
+  </div>
+);
+
+
+}
+
+return (
+
+
+
+
+ Panel Admin
+
+
+
+<button onClick={() => setActiveTab('general')} className={w-full flex items-center gap-3 p-3 rounded-lg ${activeTab === 'general' ? 'bg-green-600 text-white' : 'hover:bg-slate-800'}}>
+ Textos Principales
+
+<button onClick={() => setActiveTab('sessions')} className={w-full flex items-center gap-3 p-3 rounded-lg ${activeTab === 'sessions' ? 'bg-green-600 text-white' : 'hover:bg-slate-800'}}>
+ Rutas y Precios
+
+
+
+
+  <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+    <div className="max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <h1 className="text-2xl font-bold text-gray-800">Gestión de Contenido</h1>
+        <button 
+          onClick={handleSaveToDB}
+          disabled={isSaving}
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" />
+          {isSaving ? 'Guardando...' : 'Guardar en Base de Datos'}
+        </button>
+      </div>
+
+      {activeTab === 'general' && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Título Principal (Hero)</label>
+            <input type="text" value={siteData.heroTitle} onChange={(e) => handleInputChange(e, 'heroTitle')} className="w-full p-3 border border-gray-300 rounded-lg" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción (Subtítulo)</label>
+            <textarea value={siteData.heroDescription} onChange={(e) => handleInputChange(e, 'heroDescription')} rows="3" className="w-full p-3 border border-gray-300 rounded-lg" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Número de WhatsApp</label>
+            <input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange(e, 'whatsappNumber')} className="w-full p-3 border border-gray-300 rounded-lg" />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'sessions' && (
+        <div className="space-y-6">
+          <div className="flex justify-end">
+            <button onClick={addSession} className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800">
+              <Plus className="w-4 h-4" /> Agregar Ruta
+            </button>
+          </div>
+          {siteData.sessions.map((session: any) => (
+            <div key={session.id} className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4 border border-gray-100">
+              <div className="flex-1 grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Ruta</label>
+                  <input type="text" value={session.title} onChange={(e) => updateSession(session.id, 'title', e.target.value)} className="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Precio</label>
+                  <input type="text" value={session.price} onChange={(e) => updateSession(session.id, 'price', e.target.value)} className="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Duración</label>
+                  <input type="text" value={session.duration} onChange={(e) => updateSession(session.id, 'duration', e.target.value)} className="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+              </div>
+              <button onClick={() => removeSession(session.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </main>
+</div>
+
+
+);
 }
