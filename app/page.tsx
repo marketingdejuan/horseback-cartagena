@@ -1,33 +1,3 @@
-"use client";
-import React, { useEffect, useState } from 'react';
-import { MapPin, Star, MessageCircle, Info, Home, Map } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
-
-export default function ClientePage() {
-const [data, setData] = useState(null);
-
-// Escuchar la base de datos en tiempo real
-useEffect(() => {
-const docRef = doc(db, "configuracion", "general");
-const unsubscribe = onSnapshot(docRef, (docSnap) => {
-if (docSnap.exists()) {
-setData(docSnap.data());
-}
-});
-return () => unsubscribe();
-}, []);
-
-if (!data) {
-return Cargando experiencia...;
-}
-
-const waLink = https://wa.me/${data.whatsappNumber}?text=Hola,%20me%20gustaría%20información%20sobre%20las%20cabalgatas;
-
-return (
-// pb-20 es VITAL para que la barra inferior no tape el contenido del final
-
-
   {/* 1. HERO SECTION */}
   <section id="inicio" className="relative h-[70vh] bg-stone-900 rounded-b-[2.5rem] overflow-hidden flex items-end p-6 md:p-12">
     <img 
@@ -133,7 +103,3 @@ return (
   </nav>
 
 </div>
-
-
-);
-}
