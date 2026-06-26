@@ -1,4 +1,4 @@
-  {/* 1. HERO SECTION */}
+{/* 1. HERO SECTION */}
   <section id="inicio" className="relative h-[70vh] bg-stone-900 rounded-b-[2.5rem] overflow-hidden flex items-end p-6 md:p-12">
     <img 
       src={data.gallery && data.gallery.length > 0 ? data.gallery[0] : 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} 
