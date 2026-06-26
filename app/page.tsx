@@ -1,7 +1,7 @@
-{/* 1. HERO SECTION */}
+ {/* 1. HERO SECTION */}
   <section id="inicio" className="relative h-[70vh] bg-stone-900 rounded-b-[2.5rem] overflow-hidden flex items-end p-6 md:p-12">
     <img 
-      src={data.gallery && data.gallery.length > 0 ? data.gallery[0] : 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} 
+      src={data.gallery && data.gallery.length > 0 ? data.gallery[0] : "https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800"} 
       alt="Cabalgata" 
       className="absolute inset-0 w-full h-full object-cover opacity-60"
     />
@@ -19,6 +19,7 @@
     </div>
   </section>
 
+  /* STREAMING_CHUNK:Generando la sección de información y rutas...*/
   <main className="max-w-4xl mx-auto px-4 md:px-0 mt-8 space-y-12">
     
     {/* 2. SOBRE NOSOTROS */}
@@ -54,16 +55,18 @@
       </div>
     </section>
 
+    /* STREAMING_CHUNK:Procesando la galería de imágenes...*/
     {/* 4. GALERÍA */}
     <section id="galeria">
       <h2 className="text-2xl font-bold text-stone-800 mb-6 px-2">Galería</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {data.gallery?.slice(1).map((url: string, index: number) => (
-          <img key={index} src={url} alt={`Cabalgata ${index}`} className="w-full h-32 md:h-48 object-cover rounded-xl shadow-sm" />
+          <img key={index} src={url} alt={"Cabalgata " + index} className="w-full h-32 md:h-48 object-cover rounded-xl shadow-sm" />
         ))}
       </div>
     </section>
 
+    /* STREAMING_CHUNK:Insertando los testimonios y la navegación móvil...*/
     {/* 5. TESTIMONIOS */}
     <section id="testimonios" className="pb-8">
       <h2 className="text-2xl font-bold text-stone-800 mb-6 px-2">Lo que dicen</h2>
