@@ -51,7 +51,7 @@ export default function MobileFirstHome() {
         <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-amber-500"/> Nuestra Galería</h2>
         <div className="grid grid-cols-2 gap-3">
           {/* REPLACE THESE URLS WITH YOUR OWN CONTENT */}
-          <img src="cabalgatasmedellin-celebracion-de-cumpleanos.jpg" alt="Cabalgata" className="w-full h-32 object-cover rounded-xl shadow-md" />
+          <img src="cabalgatasmedellin-celebracion-de-cumpleanos.jpeg" alt="Cabalgata" className="w-full h-32 object-cover rounded-xl shadow-md" />
           <img src="https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=400" alt="Paisaje" className="w-full h-32 object-cover rounded-xl shadow-md" />
           <img src="https://images.unsplash.com/photo-1534777367033-28956923b7e7?q=80&w=400" alt="Experiencia" className="w-full h-32 object-cover rounded-xl shadow-md" />
           <div className="w-full h-32 bg-stone-200 rounded-xl flex items-center justify-center text-stone-400 font-bold border-2 border-dashed border-stone-300">
