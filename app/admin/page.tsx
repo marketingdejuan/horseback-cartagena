@@ -11,7 +11,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Estructura de datos completa de la web
+  // Estructura de datos por defecto para evitar errores si Firestore está vacío
   const [siteData, setSiteData] = useState({
     heroTitle: 'Descubre Medellín a Caballo',
     heroSubtitle: 'Vive una experiencia inolvidable recorriendo los mejores paisajes.',
@@ -28,15 +28,27 @@ export default function AdminDashboard() {
     ]
   });
 
-  // Cargar datos de Firebase al entrar
+  // Cargar datos de Firebase al autenticarse
   useEffect(() => {
     if (isAuthenticated) {
       const fetchData = async () => {
-        const docRef = doc(db, "configuracion", "general");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          // Combinamos los datos de Firebase con nuestra estructura base por si faltan campos
-          setSiteData({ ...siteData, ...docSnap.data() });
+        try {
+          const docRef = doc(db, "configuracion", "general");
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setSiteData({
+              heroTitle: data.heroTitle || '',
+              heroSubtitle: data.heroSubtitle || '',
+              aboutText: data.aboutText || '',
+              whatsappNumber: data.whatsappNumber || '',
+              routes: data.routes || [],
+              gallery: data.gallery || [],
+              reviews: data.reviews || []
+            });
+          }
+        } catch (error) {
+          console.error("Error cargando configuración:", error);
         }
       };
       fetchData();
@@ -67,32 +79,77 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- Funciones de actualización de estado ---
-  const handleInputChange = (field: string, value: string) => setSiteData({ ...siteData, [field]: value });
+  // Manejadores de cambios
+  const handleInputChange = (field: string, value: string) => {
+    setSiteData(prev => ({ ...prev, [field]: value }));
+  };
   
   // Rutas
-  const addRoute = () => setSiteData({ ...siteData, routes: [...siteData.routes, { id: Date.now(), title: 'Nueva Ruta', price: '0', duration: '1 hora' }] });
-  const updateRoute = (id: number, field: string, value: string) => {
-    setSiteData({ ...siteData, routes: siteData.routes.map(r => r.id === id ? { ...r, [field]: value } : r) });
+  const addRoute = () => {
+    setSiteData(prev => ({
+      ...prev,
+      routes: [...prev.routes, { id: Date.now(), title: 'Nueva Ruta', price: '0', duration: '1 hora' }]
+    }));
   };
-  const removeRoute = (id: number) => setSiteData({ ...siteData, routes: siteData.routes.filter(r => r.id !== id) });
+
+  const updateRoute = (id: number, field: string, value: string) => {
+    setSiteData(prev => ({
+      ...prev,
+      routes: prev.routes.map(r => r.id === id ? { ...r, [field]: value } : r)
+    }));
+  };
+
+  const removeRoute = (id: number) => {
+    setSiteData(prev => ({
+      ...prev,
+      routes: prev.routes.filter(r => r.id !== id)
+    }));
+  };
 
   // Galería
-  const addGalleryImage = () => setSiteData({ ...siteData, gallery: [...siteData.gallery, 'URL de la imagen...'] });
-  const updateGalleryImage = (index: number, value: string) => {
-    const newGallery = [...siteData.gallery];
-    newGallery[index] = value;
-    setSiteData({ ...siteData, gallery: newGallery });
+  const addGalleryImage = () => {
+    setSiteData(prev => ({
+      ...prev,
+      gallery: [...prev.gallery, '']
+    }));
   };
-  const removeGalleryImage = (index: number) => setSiteData({ ...siteData, gallery: siteData.gallery.filter((_, i) => i !== index) });
+
+  const updateGalleryImage = (index: number, value: string) => {
+    setSiteData(prev => {
+      const newGallery = [...prev.gallery];
+      newGallery[index] = value;
+      return { ...prev, gallery: newGallery };
+    });
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setSiteData(prev => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index)
+    }));
+  };
 
   // Testimonios
-  const addReview = () => setSiteData({ ...siteData, reviews: [...siteData.reviews, { id: Date.now(), name: 'Nombre', text: 'Comentario...', rating: 5 }] });
-  const updateReview = (id: number, field: string, value: string) => {
-    setSiteData({ ...siteData, reviews: siteData.reviews.map(r => r.id === id ? { ...r, [field]: value } : r) });
+  const addReview = () => {
+    setSiteData(prev => ({
+      ...prev,
+      reviews: [...prev.reviews, { id: Date.now(), name: 'Nombre', text: 'Comentario...', rating: 5 }]
+    }));
   };
-  const removeReview = (id: number) => setSiteData({ ...siteData, reviews: siteData.reviews.filter(r => r.id !== id) });
 
+  const updateReview = (id: number, field: string, value: string) => {
+    setSiteData(prev => ({
+      ...prev,
+      reviews: prev.reviews.map(r => r.id === id ? { ...r, [field]: value } : r)
+    }));
+  };
+
+  const removeReview = (id: number) => {
+    setSiteData(prev => ({
+      ...prev,
+      reviews: prev.reviews.filter(r => r.id !== id)
+    }));
+  };
 
   // --- LOGIN ---
   if (!isAuthenticated) {
@@ -146,12 +203,17 @@ export default function AdminDashboard() {
             </button>
           ))}
         </nav>
+        <div className="p-4 border-t border-stone-800">
+          <button onClick={() => setIsAuthenticated(false)} className="w-full flex items-center gap-3 p-3 text-red-400 hover:bg-stone-800 rounded-lg transition-colors">
+            <LogOut className="w-5 h-5" /> Cerrar Sesión
+          </button>
+        </div>
       </aside>
 
       {/* Contenido Principal */}
       <main className="flex-1 p-4 md:p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm">
+          <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border">
             <h1 className="text-2xl font-bold text-stone-800 capitalize">Gestión: {activeTab}</h1>
             <button onClick={saveToFirebase} disabled={isSaving} className="flex items-center gap-2 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-bold shadow-md">
               <Save className="w-5 h-5" /> {isSaving ? 'Guardando...' : 'Guardar Cambios'}
@@ -159,9 +221,9 @@ export default function AdminDashboard() {
           </div>
 
           {activeTab === 'general' && (
-            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6 border">
               <div>
-                <label className="font-bold text-stone-700">Título Principal</label>
+                <label className="font-bold text-stone-700">Título Principal (Hero)</label>
                 <input type="text" value={siteData.heroTitle} onChange={(e) => handleInputChange('heroTitle', e.target.value)} className="w-full p-3 border rounded-lg mt-1" />
               </div>
               <div>
@@ -173,7 +235,7 @@ export default function AdminDashboard() {
                 <textarea value={siteData.aboutText} onChange={(e) => handleInputChange('aboutText', e.target.value)} className="w-full p-3 border rounded-lg mt-1" rows={4} />
               </div>
               <div>
-                <label className="font-bold text-stone-700">Número de WhatsApp (ej. 57300...)</label>
+                <label className="font-bold text-stone-700">Número de WhatsApp (ej. 573001234567)</label>
                 <input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full p-3 border rounded-lg mt-1" />
               </div>
             </div>
@@ -181,15 +243,27 @@ export default function AdminDashboard() {
 
           {activeTab === 'routes' && (
             <div className="space-y-4">
-              <button onClick={addRoute} className="bg-stone-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus className="w-4 h-4"/> Agregar Ruta</button>
+              <div className="flex justify-between items-center">
+                <p className="text-stone-500 text-sm">Gestiona las rutas que ofreces a los clientes.</p>
+                <button onClick={addRoute} className="bg-stone-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus className="w-4 h-4"/> Agregar Ruta</button>
+              </div>
               {siteData.routes.map((route) => (
                 <div key={route.id} className="bg-white p-4 rounded-xl shadow-sm border flex gap-4 items-center">
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                    <input type="text" value={route.title} onChange={(e) => updateRoute(route.id, 'title', e.target.value)} className="p-2 border rounded" placeholder="Nombre" />
-                    <input type="text" value={route.price} onChange={(e) => updateRoute(route.id, 'price', e.target.value)} className="p-2 border rounded" placeholder="Precio" />
-                    <input type="text" value={route.duration} onChange={(e) => updateRoute(route.id, 'duration', e.target.value)} className="p-2 border rounded" placeholder="Duración" />
+                    <div>
+                      <label className="text-xs text-stone-400 font-bold block">Nombre de la Ruta</label>
+                      <input type="text" value={route.title} onChange={(e) => updateRoute(route.id, 'title', e.target.value)} className="p-2 border rounded w-full mt-1" placeholder="Nombre" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-stone-400 font-bold block">Precio (COP)</label>
+                      <input type="text" value={route.price} onChange={(e) => updateRoute(route.id, 'price', e.target.value)} className="p-2 border rounded w-full mt-1" placeholder="Ej. 120.000" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-stone-400 font-bold block">Duración</label>
+                      <input type="text" value={route.duration} onChange={(e) => updateRoute(route.id, 'duration', e.target.value)} className="p-2 border rounded w-full mt-1" placeholder="Ej. 2 horas" />
+                    </div>
                   </div>
-                  <button onClick={() => removeRoute(route.id)} className="text-red-500 p-2"><Trash2 className="w-5 h-5"/></button>
+                  <button onClick={() => removeRoute(route.id)} className="text-red-500 p-2 mt-4"><Trash2 className="w-5 h-5"/></button>
                 </div>
               ))}
             </div>
@@ -197,11 +271,18 @@ export default function AdminDashboard() {
 
           {activeTab === 'gallery' && (
             <div className="space-y-4">
-               <button onClick={addGalleryImage} className="bg-stone-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus className="w-4 h-4"/> Agregar Imagen (URL)</button>
-               {siteData.gallery.map((url, index) => (
+              <div className="flex justify-between items-center">
+                <p className="text-stone-500 text-sm">Agrega URLs de imágenes de Unsplash o de tu servidor. La primera foto será el fondo del banner principal.</p>
+                <button onClick={addGalleryImage} className="bg-stone-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus className="w-4 h-4"/> Agregar Imagen</button>
+              </div>
+              {siteData.gallery.map((url, index) => (
                 <div key={index} className="bg-white p-4 rounded-xl shadow-sm border flex gap-4 items-center">
-                  <img src={url} alt="preview" className="w-16 h-16 object-cover rounded-lg bg-stone-100" />
-                  <input type="text" value={url} onChange={(e) => updateGalleryImage(index, e.target.value)} className="flex-1 p-2 border rounded" placeholder="https://..." />
+                  {url ? (
+                    <img src={url} alt="preview" className="w-16 h-16 object-cover rounded-lg bg-stone-100" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-lg bg-stone-100 border border-dashed flex items-center justify-center text-stone-300"><ImageIcon className="w-6 h-6" /></div>
+                  )}
+                  <input type="text" value={url} onChange={(e) => updateGalleryImage(index, e.target.value)} className="flex-1 p-2 border rounded" placeholder="https://images.unsplash.com/photo-..." />
                   <button onClick={() => removeGalleryImage(index)} className="text-red-500 p-2"><Trash2 className="w-5 h-5"/></button>
                 </div>
               ))}
@@ -210,7 +291,10 @@ export default function AdminDashboard() {
 
           {activeTab === 'reviews' && (
             <div className="space-y-4">
-              <button onClick={addReview} className="bg-stone-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus className="w-4 h-4"/> Agregar Testimonio</button>
+              <div className="flex justify-between items-center">
+                <p className="text-stone-500 text-sm">Añade testimonios de clientes para dar confianza.</p>
+                <button onClick={addReview} className="bg-stone-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus className="w-4 h-4"/> Agregar Testimonio</button>
+              </div>
               {siteData.reviews.map((review) => (
                 <div key={review.id} className="bg-white p-4 rounded-xl shadow-sm border flex flex-col gap-2">
                    <div className="flex justify-between items-center">
