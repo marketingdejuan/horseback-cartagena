@@ -2,13 +2,12 @@ import './globals.css';
 import Script from 'next/script';
 import { Metadata } from 'next';
 
-/* STREAMING_CHUNK:Configurando Metadata Open Graph... */
 export const metadata: Metadata = {
-title: 'Cabalgatas en Caldas | Recorridos Ecológicos a Caballo',
-description: 'Conectando jinetes principiantes y expertos con los paisajes montañosos del sur del Valle de Aburrá. ¡Reserva hoy!',
+title: 'Cabalgatas en Caldas, Antioquia | Recorridos Ecológicos a Caballo',
+description: 'Conectando jinetes principiantes y expertos con los paisajes montañosos del sur del Valle de Aburrá. ¡Reserva tu cabalgata hoy!',
 openGraph: {
 title: 'Cabalgatas Ecológicas en Caldas | Reservas Disponibles',
-description: 'A 30 mins de Medellín. 100% Parqueadero Privado. Caballos mansos y briosos.',
+description: 'A 30 mins de Medellín. 100% Parqueadero Privado. Caballos mansos y briosos para todos los niveles.',
 url: 'https://cabalgatamedellin.com',
 siteName: 'Cabalgatas Medellín',
 images: [
@@ -29,10 +28,9 @@ children,
 }: {
 children: React.ReactNode
 }) {
-/* STREAMING_CHUNK:Inyectando Schema JSON-LD y Analytics... */
 const jsonLd = {
 "@context": "https://schema.org",
-"@type": "SportsActivityLocation",
+"@type": ["SportsActivityLocation", "TouristAttraction"],
 "name": "Cabalgatas Medellín - Pesebrera Caldas",
 "description": "Recorridos ecológicos a caballo por senderos y ríos en Caldas, Antioquia.",
 "address": {
@@ -48,17 +46,7 @@ const jsonLd = {
 return (
 
 
-<Script
-strategy="afterInteractive"
-src={https://www.googletagmanager.com/gtag/js?id=G-GHH9Y226MV}
-/>
-
-{window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-GHH9Y226MV');}
-
-<script
-type="application/ld+json"
-dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-/>
+<Script id="json-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
 
 {children}
