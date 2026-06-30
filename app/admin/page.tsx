@@ -19,7 +19,7 @@ export default function AdminDashboard() {
   const [imageAlt, setImageAlt] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  const [siteData, setSiteData] = useState({
+  const [siteData, setSiteData] = useState<any>({
     heroTitle: 'Cabalgatas en Caldas, Antioquia',
     heroSubtitle: 'Conectando jinetes principiantes y expertos con los paisajes montañosos del sur del Valle de Aburrá.',
     whatsappNumber: '573000000000',
