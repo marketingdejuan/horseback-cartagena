@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, CheckCircle, Star } from 'lucide-react';
+import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, CheckCircle, Star, Camera } from 'lucide-react';
 import { db, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
@@ -28,15 +28,11 @@ export default function AdminDashboard() {
     navLabel1: 'Inicio', navLabel1En: 'Home',
     navLabel2: 'Cotizar', navLabel2En: 'Quote',
     navLabel3: 'FAQ', navLabel3En: 'FAQ',
-    basePrice: 100000,
-    guidePrice: 80000,
-    depositPercent: 50,
-    cancelHours: 48,
-    promoActive: true,
-    horses: [],
-    faqs: [],
-    mediaLibrary: [],
-    reviews: [] 
+    basePrice: 100000, guidePrice: 80000,
+    depositPercent: 50, cancelHours: 48, promoActive: true,
+    horses: [], faqs: [], mediaLibrary: [], reviews: [],
+    heroMedia: [], // NUEVO: Fotos/Videos del banner principal
+    gallery: [] // NUEVO: Galería tipo carrusel
   });
 
   useEffect(() => {
@@ -50,39 +46,35 @@ export default function AdminDashboard() {
             ...prev, 
             ...data,
             mediaLibrary: data.mediaLibrary || [],
-            reviews: data.reviews || []
+            reviews: data.reviews || [],
+            heroMedia: data.heroMedia || [],
+            gallery: data.gallery || []
           }));
         }
       };
       fetchData();
     }
   }, [isAuthenticated]);
+
   const saveToFirebase = async () => {
-    setIsSaving(true);
-    setMensajeGuardado('');
+    setIsSaving(true); setMensajeGuardado('');
     try {
       const docRef = doc(db, "configuracion", "general");
       await setDoc(docRef, siteData);
       setMensajeGuardado('✅ ¡Cambios Guardados en Vivo!');
-    } catch (error) {
-      setMensajeGuardado('❌ Error al guardar.');
-    }
-    setIsSaving(false);
-    setTimeout(() => setMensajeGuardado(''), 4000);
+    } catch (error) { setMensajeGuardado('❌ Error al guardar.'); }
+    setIsSaving(false); setTimeout(() => setMensajeGuardado(''), 4000);
   };
 
   const handleLogin = (e: any) => {
     e.preventDefault();
-    if (password === 'admin') {
-      setIsAuthenticated(true);
-      setLoginError(false);
-    } else {
-      setLoginError(true);
-    }
+    if (password === 'admin') { setIsAuthenticated(true); setLoginError(false); } 
+    else { setLoginError(true); }
   };
 
   const handleInputChange = (field: string, value: any) => setSiteData((prev: any) => ({ ...prev, [field]: value }));
 
+  // CRUD Básicos
   const addHorse = () => setSiteData((prev: any) => ({ ...prev, horses: [...prev.horses, { id: Date.now(), name: 'Nuevo', type: 'Manso', photo: '', status: 'Activo' }] }));
   const updateHorse = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.map((h: any) => h.id === id ? { ...h, [field]: value } : h) }));
   const removeHorse = (id: number) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.filter((h: any) => h.id !== id) }));
@@ -95,21 +87,32 @@ export default function AdminDashboard() {
   const updateReview = (id: number, field: string, value: any) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.map((r: any) => r.id === id ? { ...r, [field]: value } : r) }));
   const removeReview = (id: number) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.filter((r: any) => r.id !== id) }));
 
+  // NUEVOS CRUD: Hero y Galería
+  const addHeroMedia = () => {
+    if (siteData.heroMedia?.length >= 3) { alert("Máximo 3 elementos en el Banner Principal."); return; }
+    setSiteData((prev: any) => ({ ...prev, heroMedia: [...(prev.heroMedia || []), { id: Date.now(), url: '' }] }));
+  };
+  const updateHeroMedia = (id: number, url: string) => setSiteData((prev: any) => ({ ...prev, heroMedia: prev.heroMedia.map((h: any) => h.id === id ? { ...h, url } : h) }));
+  const removeHeroMedia = (id: number) => setSiteData((prev: any) => ({ ...prev, heroMedia: prev.heroMedia.filter((h: any) => h.id !== id) }));
+
+  const addGalleryItem = () => setSiteData((prev: any) => ({ ...prev, gallery: [...(prev.gallery || []), { id: Date.now(), url: '', title: 'Título SEO', titleEn: 'SEO Title', desc: 'Descripción...', descEn: 'Description...' }] }));
+  const updateGalleryItem = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, gallery: prev.gallery.map((g: any) => g.id === id ? { ...g, [field]: value } : g) }));
+  const removeGalleryItem = (id: number) => setSiteData((prev: any) => ({ ...prev, gallery: prev.gallery.filter((g: any) => g.id !== id) }));
+
+  // Subida de Imágenes
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (event) => {
-      setPreviewImage(event.target?.result as string);
-    };
+    reader.onload = (event) => { setPreviewImage(event.target?.result as string); };
     reader.readAsDataURL(file);
   };
+
   const processAndUploadImage = async () => {
     if (!previewImage) return;
     setIsUploading(true);
     try {
-      const img = new Image();
-      img.src = previewImage;
+      const img = new Image(); img.src = previewImage;
       await new Promise((resolve) => { img.onload = resolve; });
 
       const canvas = document.createElement('canvas');
@@ -118,8 +121,7 @@ export default function AdminDashboard() {
       if (uploadTarget === 'caballo') { targetW = 800; targetH = 800; }
 
       const scale = Math.max(targetW / img.width, targetH / img.height);
-      const scaledW = img.width * scale;
-      const scaledH = img.height * scale;
+      const scaledW = img.width * scale; const scaledH = img.height * scale;
       canvas.width = targetW; canvas.height = targetH;
       const ctx = canvas.getContext('2d');
       const dx = (targetW - scaledW) / 2; const dy = (targetH - scaledH) / 2;
@@ -136,20 +138,12 @@ export default function AdminDashboard() {
       setPreviewImage(null); setImageAlt('');
       if (fileInputRef.current) fileInputRef.current.value = '';
       alert("✅ Imagen comprimida y subida con éxito.");
-    } catch (error) {
-      alert("❌ Hubo un error subiendo la imagen.");
-    }
+    } catch (error) { alert("❌ Hubo un error subiendo la imagen."); }
     setIsUploading(false);
   };
 
-  const copyToClipboard = (url: string) => {
-    navigator.clipboard.writeText(url);
-    alert("URL copiada. Pégala en el panel de Caballos o Textos.");
-  };
-
-  const removeMedia = (id: number) => {
-    setSiteData((prev: any) => ({ ...prev, mediaLibrary: prev.mediaLibrary.filter((m: any) => m.id !== id) }));
-  };
+  const copyToClipboard = (url: string) => { navigator.clipboard.writeText(url); alert("URL copiada. Pégala donde necesites."); };
+  const removeMedia = (id: number) => { setSiteData((prev: any) => ({ ...prev, mediaLibrary: prev.mediaLibrary.filter((m: any) => m.id !== id) })); };
 
   if (!isAuthenticated) {
     return (
@@ -168,6 +162,7 @@ export default function AdminDashboard() {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col md:flex-row">
       <aside className="w-full md:w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-10">
@@ -178,10 +173,11 @@ export default function AdminDashboard() {
           {[
             { id: 'comercial', icon: DollarSign, label: 'Precios y Reglas' },
             { id: 'multimedia', icon: ImagePlus, label: 'Multimedia SEO' },
+            { id: 'galeria', icon: Camera, label: 'Galería de Fotos' }, // NUEVO
             { id: 'caballos', icon: Users, label: 'Directorio Equino' },
             { id: 'reviews', icon: Star, label: 'Reseñas Bilingües' },
             { id: 'faq', icon: MessageSquare, label: 'FAQ Bilingüe' },
-            { id: 'general', icon: Settings, label: 'Textos y Menús' },
+            { id: 'general', icon: Settings, label: 'Textos y Hero' },
           ].map((item) => (
             <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 p-3 rounded-lg font-medium transition-colors ${activeTab === item.id ? 'bg-amber-600 text-white' : 'hover:bg-stone-800'}`}>
               <item.icon className="w-5 h-5" /> {item.label}
@@ -211,9 +207,8 @@ export default function AdminDashboard() {
                     <div>
                       <label className="font-bold text-stone-700 block mb-1">1. ¿Dónde se usará?</label>
                       <select value={uploadTarget} onChange={(e) => setUploadTarget(e.target.value)} className="w-full p-3 border-2 rounded-xl bg-stone-50 outline-none focus:border-amber-500 font-bold text-stone-600">
-                        <option value="hero">Banner Principal (1920x1080)</option>
+                        <option value="hero">Banner Principal / Galería (1920x1080)</option>
                         <option value="caballo">Tarjeta de Caballo (800x800)</option>
-                        <option value="galeria">Galería General (1200x800)</option>
                       </select>
                     </div>
                     <div>
@@ -221,15 +216,9 @@ export default function AdminDashboard() {
                       <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileSelect} className="w-full p-2 border-2 border-dashed rounded-xl bg-stone-50 cursor-pointer" />
                     </div>
                     {previewImage && (
-                      <div>
-                        <label className="font-bold text-stone-700 block mb-1">3. Metadatos SEO</label>
-                        <input type="text" value={imageAlt} onChange={(e) => setImageAlt(e.target.value)} className="w-full p-3 border-2 rounded-xl" placeholder="Ej: Caballo blanco trotando" />
-                      </div>
-                    )}
-                    {previewImage && (
-                       <button onClick={processAndUploadImage} disabled={isUploading} className="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 font-bold py-3 rounded-xl flex justify-center items-center gap-2 shadow-lg">
-                         {isUploading ? 'Procesando...' : <><ImagePlus className="w-5 h-5"/> Comprimir y Subir a la Nube</>}
-                       </button>
+                      <button onClick={processAndUploadImage} disabled={isUploading} className="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 font-bold py-3 rounded-xl flex justify-center items-center gap-2 shadow-lg">
+                        {isUploading ? 'Procesando...' : <><ImagePlus className="w-5 h-5"/> Comprimir y Subir a la Nube</>}
+                      </button>
                     )}
                   </div>
                   <div className="bg-stone-100 rounded-xl flex items-center justify-center p-4 border border-stone-200 min-h-[250px]">
@@ -248,7 +237,6 @@ export default function AdminDashboard() {
                           <button onClick={() => copyToClipboard(media.url)} className="bg-white text-stone-900 text-xs font-bold px-3 py-1 rounded flex items-center gap-1 hover:bg-amber-400"><Copy className="w-3 h-3"/> Copiar URL</button>
                           <button onClick={() => removeMedia(media.id)} className="text-red-400 text-xs flex items-center gap-1 hover:text-red-300"><Trash2 className="w-3 h-3"/> Eliminar</button>
                         </div>
-                        <div className="absolute top-0 left-0 bg-stone-900/60 text-white text-[10px] px-2 py-1 rounded-br-lg">{media.target}</div>
                       </div>
                     ))}
                   </div>
@@ -257,13 +245,42 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {activeTab === 'galeria' && (
+            <div className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-4">
+                <p className="text-sm text-amber-800 font-medium">💡 Sube fotos desde "Multimedia SEO", copia la URL y pégala aquí. Agrega títulos atractivos para mejorar el SEO.</p>
+              </div>
+              <button onClick={addGalleryItem} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir a Galería</button>
+              
+              {siteData.gallery?.map((item: any) => (
+                <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-4 relative flex flex-col md:flex-row gap-6">
+                  <button onClick={() => removeGalleryItem(item.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100 z-10"><Trash2 className="w-4 h-4"/></button>
+                  <div className="w-full md:w-1/3 shrink-0">
+                    <img src={item.url || 'https://via.placeholder.com/300x200'} alt="Galeria" className="w-full h-32 md:h-full object-cover rounded-xl bg-stone-100 border" />
+                    <input type="text" value={item.url} onChange={(e) => updateGalleryItem(item.id, 'url', e.target.value)} className="w-full p-2 border rounded-lg mt-2 text-xs" placeholder="URL de la imagen..." />
+                  </div>
+                  <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-stone-500">🇨🇴 Español</label>
+                      <input type="text" value={item.title} onChange={(e) => updateGalleryItem(item.id, 'title', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold outline-none focus:border-amber-500" placeholder="Título SEO..." />
+                      <textarea value={item.desc} onChange={(e) => updateGalleryItem(item.id, 'desc', e.target.value)} className="w-full p-2 border rounded-lg text-sm outline-none focus:border-amber-500" placeholder="Descripción corta..." rows={2} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-blue-600">🇺🇸 Inglés</label>
+                      <input type="text" value={item.titleEn} onChange={(e) => updateGalleryItem(item.id, 'titleEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold outline-none focus:border-blue-500 bg-blue-50/30" placeholder="SEO Title..." />
+                      <textarea value={item.descEn} onChange={(e) => updateGalleryItem(item.id, 'descEn', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg text-sm outline-none focus:border-blue-500 bg-blue-50/30" placeholder="Short description..." rows={2} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {activeTab === 'comercial' && (
              <div className="bg-white rounded-xl shadow-sm p-6 border space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div><label className="font-bold text-stone-700">Precio Base x Jinete</label><input type="number" value={siteData.basePrice} onChange={(e) => handleInputChange('basePrice', Number(e.target.value))} className="w-full p-3 border-2 rounded-xl mt-1 font-bold text-lg" /></div>
                 <div><label className="font-bold text-stone-700">Costo Guía (Lun-Vie)</label><input type="number" value={siteData.guidePrice} onChange={(e) => handleInputChange('guidePrice', Number(e.target.value))} className="w-full p-3 border-2 rounded-xl mt-1 font-bold text-lg" /></div>
-                <div><label className="font-bold text-stone-700">% Abono Requerido</label><input type="number" value={siteData.depositPercent} onChange={(e) => handleInputChange('depositPercent', Number(e.target.value))} className="w-full p-3 border-2 rounded-xl mt-1 font-bold text-lg" /></div>
-                <div><label className="font-bold text-stone-700">Horas Cancelación</label><input type="number" value={siteData.cancelHours} onChange={(e) => handleInputChange('cancelHours', Number(e.target.value))} className="w-full p-3 border-2 rounded-xl mt-1 font-bold text-lg" /></div>
               </div>
               <div className="flex items-center gap-3 pt-4 border-t">
                 <input type="checkbox" checked={siteData.promoActive} onChange={(e) => handleInputChange('promoActive', e.target.checked)} className="w-6 h-6" />
@@ -295,46 +312,22 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
+
           {activeTab === 'reviews' && (
             <div className="space-y-4">
-              <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-4">
-                <p className="text-sm text-amber-800 font-medium">💡 <b>Tip Bilingüe:</b> Pega la reseña original y luego su traducción al inglés. ¡Esto es oro para el SEO en USA!</p>
-              </div>
               <button onClick={addReview} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Reseña</button>
-              
               {siteData.reviews?.map((review: any) => (
                 <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-4 relative">
                   <button onClick={() => removeReview(review.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100"><Trash2 className="w-4 h-4"/></button>
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-12">
-                    <div>
-                      <label className="text-xs font-bold text-stone-500">Nombre del Cliente</label>
-                      <input type="text" value={review.author} onChange={(e) => updateReview(review.id, 'author', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold text-stone-800 outline-none focus:border-amber-500" />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-stone-500">Estrellas</label>
-                      <select value={review.rating} onChange={(e) => updateReview(review.id, 'rating', Number(e.target.value))} className="w-full p-2 border-b-2 border-stone-200 font-bold text-amber-500 outline-none">
-                        <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
-                        <option value={4}>⭐⭐⭐⭐ (4)</option>
-                      </select>
-                    </div>
+                    <div><label className="text-xs font-bold text-stone-500">Nombre del Cliente</label><input type="text" value={review.author} onChange={(e) => updateReview(review.id, 'author', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold text-stone-800 outline-none focus:border-amber-500" /></div>
+                    <div><label className="text-xs font-bold text-stone-500">Estrellas</label><select value={review.rating} onChange={(e) => updateReview(review.id, 'rating', Number(e.target.value))} className="w-full p-2 border-b-2 border-stone-200 font-bold text-amber-500 outline-none"><option value={5}>⭐⭐⭐⭐⭐ (5)</option><option value={4}>⭐⭐⭐⭐ (4)</option></select></div>
                   </div>
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
-                    <div>
-                      <label className="text-xs font-bold text-stone-500 flex items-center gap-1">🇨🇴 Reseña (Español)</label>
-                      <textarea value={review.text} onChange={(e) => updateReview(review.id, 'text', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 outline-none focus:border-amber-500 mt-1" rows={3} />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-blue-600 flex items-center gap-1">🇺🇸 Reseña (Inglés)</label>
-                      <textarea value={review.textEn || ''} onChange={(e) => updateReview(review.id, 'textEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl text-stone-600 outline-none focus:border-blue-500 mt-1 bg-blue-50/30" rows={3} />
-                    </div>
+                    <div><label className="text-xs font-bold text-stone-500 flex items-center gap-1">🇨🇴 Reseña (Español)</label><textarea value={review.text} onChange={(e) => updateReview(review.id, 'text', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 mt-1" rows={3} /></div>
+                    <div><label className="text-xs font-bold text-blue-600 flex items-center gap-1">🇺🇸 Reseña (Inglés)</label><textarea value={review.textEn || ''} onChange={(e) => updateReview(review.id, 'textEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl bg-blue-50/30 mt-1" rows={3} /></div>
                   </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-stone-500">URL Video/Post (Instagram, TikTok, YouTube) - Opcional</label>
-                    <input type="text" value={review.videoUrl} onChange={(e) => updateReview(review.id, 'videoUrl', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 text-blue-600 text-sm outline-none focus:border-blue-500" placeholder="https://instagram.com/reel/..." />
-                  </div>
+                  <div><label className="text-xs font-bold text-stone-500">URL Video/Post (Opcional)</label><input type="text" value={review.videoUrl} onChange={(e) => updateReview(review.id, 'videoUrl', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 text-blue-600 text-sm" placeholder="https://instagram.com/reel/..." /></div>
                 </div>
               ))}
             </div>
@@ -347,16 +340,8 @@ export default function AdminDashboard() {
                 <div key={faq.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-4 relative">
                   <button onClick={() => removeFaq(faq.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100 z-10"><Trash2 className="w-4 h-4"/></button>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-10">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-stone-500">🇨🇴 Español</label>
-                      <input type="text" value={faq.q} onChange={(e) => updateFaq(faq.id, 'q', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold text-stone-800 outline-none focus:border-amber-500" placeholder="Pregunta..." />
-                      <textarea value={faq.a} onChange={(e) => updateFaq(faq.id, 'a', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 outline-none focus:border-amber-500" placeholder="Respuesta..." rows={3} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-blue-600">🇺🇸 Inglés</label>
-                      <input type="text" value={faq.qEn || ''} onChange={(e) => updateFaq(faq.id, 'qEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold text-stone-800 outline-none focus:border-blue-500 bg-blue-50/30" placeholder="Question..." />
-                      <textarea value={faq.aEn || ''} onChange={(e) => updateFaq(faq.id, 'aEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl text-stone-600 outline-none focus:border-blue-500 bg-blue-50/30" placeholder="Answer..." rows={3} />
-                    </div>
+                    <div className="space-y-2"><label className="text-xs font-bold text-stone-500">🇨🇴 Español</label><input type="text" value={faq.q} onChange={(e) => updateFaq(faq.id, 'q', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold" placeholder="Pregunta..." /><textarea value={faq.a} onChange={(e) => updateFaq(faq.id, 'a', e.target.value)} className="w-full p-3 border rounded-xl" rows={3} /></div>
+                    <div className="space-y-2"><label className="text-xs font-bold text-blue-600">🇺🇸 Inglés</label><input type="text" value={faq.qEn || ''} onChange={(e) => updateFaq(faq.id, 'qEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold bg-blue-50/30" placeholder="Question..." /><textarea value={faq.aEn || ''} onChange={(e) => updateFaq(faq.id, 'aEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl bg-blue-50/30" rows={3} /></div>
                   </div>
                 </div>
               ))}
@@ -365,6 +350,24 @@ export default function AdminDashboard() {
 
           {activeTab === 'general' && (
             <div className="bg-white rounded-xl shadow-sm p-6 border space-y-8">
+              
+              <div className="space-y-4 bg-stone-50 p-4 rounded-xl border border-stone-200">
+                <h3 className="font-bold text-lg text-stone-800 flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2"><ImagePlus className="w-5 h-5"/> Medios del Hero (Máx 3)</div>
+                  <button onClick={addHeroMedia} className="bg-stone-900 text-white px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1"><Plus className="w-4 h-4"/> Añadir Foto/Video</button>
+                </h3>
+                <p className="text-xs text-stone-500">Pega URLs de imágenes o videos (.mp4). Si pones varios, el banner rotará automáticamente cada 5 segundos.</p>
+                <div className="space-y-3">
+                  {siteData.heroMedia?.map((media: any, i: number) => (
+                    <div key={media.id} className="flex gap-2 items-center">
+                      <span className="font-bold text-stone-400">{i + 1}.</span>
+                      <input type="text" value={media.url} onChange={(e) => updateHeroMedia(media.id, e.target.value)} className="flex-1 p-2 border rounded-lg text-sm font-mono" placeholder="https://..." />
+                      <button onClick={() => removeHeroMedia(media.id)} className="text-red-500 p-2 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4"/></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="space-y-6">
                 <h3 className="font-bold text-lg border-b pb-2 text-stone-800">Textos Principales (Hero)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -375,27 +378,8 @@ export default function AdminDashboard() {
                   </div>
                   <div className="space-y-4 bg-blue-50/30 p-4 rounded-xl border border-blue-100">
                     <label className="font-bold block text-blue-600 border-b border-blue-200 pb-1">🇺🇸 Versión Inglés</label>
-                    <div><label className="text-xs font-bold text-blue-500">SEO Title (H1)</label><input type="text" value={siteData.heroTitleEn || ''} onChange={(e) => handleInputChange('heroTitleEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold focus:border-blue-500 outline-none bg-transparent" /></div>
-                    <div><label className="text-xs font-bold text-blue-500">Hero Subtitle</label><textarea value={siteData.heroSubtitleEn || ''} onChange={(e) => handleInputChange('heroSubtitleEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl focus:border-blue-500 outline-none bg-white" rows={3} /></div>
-                  </div>
-                </div>
-                <div className="pt-4 border-t"><label className="font-bold block mb-1 text-stone-700">Número de WhatsApp (Universal)</label><input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full md:w-1/2 p-3 border-2 rounded-xl font-mono text-lg" placeholder="573000000000" /></div>
-              </div>
-              
-              <div className="space-y-4 bg-stone-50 p-4 rounded-xl border border-stone-200">
-                <h3 className="font-bold text-lg border-b border-stone-200 pb-2 text-stone-800 flex items-center gap-2"><LayoutDashboard className="w-5 h-5"/> Textos: Botones del Menú Móvil</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label className="font-bold text-stone-500 text-sm">🇨🇴 Español</label>
-                    <input type="text" value={siteData.navLabel1 || ''} onChange={(e) => handleInputChange('navLabel1', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 1 (Inicio)" />
-                    <input type="text" value={siteData.navLabel2 || ''} onChange={(e) => handleInputChange('navLabel2', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 2 (Cotizar)" />
-                    <input type="text" value={siteData.navLabel3 || ''} onChange={(e) => handleInputChange('navLabel3', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 3 (FAQ)" />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="font-bold text-blue-600 text-sm">🇺🇸 Inglés</label>
-                    <input type="text" value={siteData.navLabel1En || ''} onChange={(e) => handleInputChange('navLabel1En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 1 (Home)" />
-                    <input type="text" value={siteData.navLabel2En || ''} onChange={(e) => handleInputChange('navLabel2En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 2 (Quote)" />
-                    <input type="text" value={siteData.navLabel3En || ''} onChange={(e) => handleInputChange('navLabel3En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 3 (FAQ)" />
+                    <div><label className="text-xs font-bold text-blue-500">SEO Title (H1)</label><input type="text" value={siteData.heroTitleEn || ''} onChange={(e) => handleInputChange('heroTitleEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold bg-transparent" /></div>
+                    <div><label className="text-xs font-bold text-blue-500">Hero Subtitle</label><textarea value={siteData.heroSubtitleEn || ''} onChange={(e) => handleInputChange('heroSubtitleEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl bg-white" rows={3} /></div>
                   </div>
                 </div>
               </div>
@@ -406,3 +390,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+```
