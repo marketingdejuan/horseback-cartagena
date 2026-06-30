@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadTarget, setUploadTarget] = useState('caballo'); 
- const [imageAlt, setImageAlt] = useState('');
+  const [imageAlt, setImageAlt] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const [siteData, setSiteData] = useState<any>({
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setSiteData(prev => ({ 
+          setSiteData((prev: any) => ({ 
             ...prev, 
             ...data,
             mediaLibrary: data.mediaLibrary || [] 
@@ -77,15 +77,15 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => setSiteData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: string, value: any) => setSiteData((prev: any) => ({ ...prev, [field]: value }));
 
-  const addHorse = () => setSiteData(prev => ({ ...prev, horses: [...prev.horses, { id: Date.now(), name: 'Nuevo', type: 'Manso', photo: '', status: 'Activo' }] }));
-  const updateHorse = (id: number, field: string, value: string) => setSiteData(prev => ({ ...prev, horses: prev.horses.map(h => (h as any).id === id ? { ...h, [field]: value } : h) }));
-  const removeHorse = (id: number) => setSiteData(prev => ({ ...prev, horses: prev.horses.filter(h => (h as any).id !== id) }));
+  const addHorse = () => setSiteData((prev: any) => ({ ...prev, horses: [...prev.horses, { id: Date.now(), name: 'Nuevo', type: 'Manso', photo: '', status: 'Activo' }] }));
+  const updateHorse = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.map((h: any) => h.id === id ? { ...h, [field]: value } : h) }));
+  const removeHorse = (id: number) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.filter((h: any) => h.id !== id) }));
 
-  const addFaq = () => setSiteData(prev => ({ ...prev, faqs: [...prev.faqs, { id: Date.now(), q: 'Nueva Pregunta', a: 'Respuesta' }] }));
-  const updateFaq = (id: number, field: string, value: string) => setSiteData(prev => ({ ...prev, faqs: prev.faqs.map(f => (f as any).id === id ? { ...f, [field]: value } : f) }));
-  const removeFaq = (id: number) => setSiteData(prev => ({ ...prev, faqs: prev.faqs.filter(f => (f as any).id !== id) }));
+  const addFaq = () => setSiteData((prev: any) => ({ ...prev, faqs: [...prev.faqs, { id: Date.now(), q: 'Nueva Pregunta', a: 'Respuesta' }] }));
+  const updateFaq = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.map((f: any) => f.id === id ? { ...f, [field]: value } : f) }));
+  const removeFaq = (id: number) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.filter((f: any) => f.id !== id) }));
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
         target: uploadTarget
       };
 
-      setSiteData(prev => ({ ...prev, mediaLibrary: [newMedia, ...(prev.mediaLibrary || [])] }));
+      setSiteData((prev: any) => ({ ...prev, mediaLibrary: [newMedia, ...(prev.mediaLibrary || [])] }));
       setPreviewImage(null);
       setImageAlt('');
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -159,7 +159,7 @@ export default function AdminDashboard() {
   };
 
   const removeMedia = (id: number) => {
-    setSiteData(prev => ({ ...prev, mediaLibrary: prev.mediaLibrary.filter((m: any) => m.id !== id) }));
+    setSiteData((prev: any) => ({ ...prev, mediaLibrary: prev.mediaLibrary.filter((m: any) => m.id !== id) }));
   };
   if (!isAuthenticated) {
     return (
