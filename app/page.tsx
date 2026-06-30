@@ -48,7 +48,7 @@ export default function ClientePage() {
   const totalCalculado = (jinetes * precioBase) + recargoGuia;
   const abonoRequerido = totalCalculado * (porcentajeAbono / 100);
 
-  // --- NUEVOS ENLACES INTELIGENTES DE WHATSAPP ---
+  // --- ENLACES INTELIGENTES DE WHATSAPP ---
   const numeroWa = data.whatsappNumber || "573000000000";
   
   const textoCotizador = "Hola, quiero reservar el " + (fecha || 'próximo fin de semana') + " para " + jinetes + " personas (" + duracion + "). Necesito " + mansos + " caballos mansos y " + briosos + " briosos. Sonido: " + sonido + ". Mi cotización dio $" + totalCalculado.toLocaleString('es-CO') + ". ¿Tienen disponibilidad?";
@@ -72,6 +72,18 @@ export default function ClientePage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-32 md:pb-12">
+      
+      {/* --- SELECTOR DE IDIOMA (BILINGÜE) --- */}
+      <div className="absolute top-6 right-6 z-50 flex gap-2 bg-stone-900/50 p-1.5 rounded-full backdrop-blur-md border border-white/20 shadow-xl">
+        <a href="/" className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm transition-transform hover:scale-110">
+          <img src="https://flagcdn.com/w40/co.png" alt="Español" className="w-full h-full object-cover"/>
+        </a>
+        <a href="/en" className="w-8 h-8 rounded-full overflow-hidden border-2 border-transparent opacity-60 hover:opacity-100 transition-all hover:scale-110 grayscale hover:grayscale-0">
+          <img src="https://flagcdn.com/w40/us.png" alt="English" className="w-full h-full object-cover"/>
+        </a>
+      </div>
+      {/* ------------------------------------- */}
+
       {/* HERO SECTION */}
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-between">
         <img src={data.mediaLibrary?.[0]?.url || "https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=1920"} alt="Fondo Cabalgata" className="absolute inset-0 w-full h-full object-cover opacity-50" />
@@ -135,6 +147,7 @@ export default function ClientePage() {
                  </select>
               </div>
             </div>
+
             <div className="bg-stone-900 rounded-2xl p-6 text-white flex flex-col justify-between border border-stone-700">
               <div>
                 <h3 className="text-stone-400 font-bold mb-4 uppercase text-sm">Cotización Exacta</h3>
@@ -161,7 +174,6 @@ export default function ClientePage() {
                 </div>
               </div>
 
-              {/* Botón Inteligente 1: Cotizador */}
               <a href={linkCotizador} target="_blank" rel="noreferrer" className="mt-8 block w-full bg-green-500 hover:bg-green-600 text-center text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-green-500/30">
                 <MessageCircle className="w-5 h-5"/> Enviar cotización por WhatsApp
               </a>
@@ -202,7 +214,6 @@ export default function ClientePage() {
                 </div>
                 <div className="p-4 text-center flex-1 flex flex-col justify-between">
                   <h3 className="font-extrabold text-stone-800 text-lg mb-3">{horse.name}</h3>
-                  {/* Botón Inteligente 2: Caballo Específico */}
                   <a href={getLinkCaballo(horse.name)} target="_blank" rel="noreferrer" className="bg-green-50 text-green-700 hover:bg-green-500 hover:text-white border border-green-200 font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2 text-sm transition-colors">
                     <MessageCircle className="w-4 h-4"/> ¡Lo quiero!
                   </a>
@@ -211,6 +222,7 @@ export default function ClientePage() {
             ))}
           </div>
         </section>
+
         <section className="bg-amber-50 rounded-3xl p-6 md:p-8 border border-amber-100 flex flex-col md:flex-row items-center gap-8">
           <div className="bg-amber-100 p-6 rounded-full text-amber-600 shrink-0"><Music className="w-12 h-12" /></div>
           <div>
@@ -240,7 +252,6 @@ export default function ClientePage() {
           </div>
           
           <div className="mt-8 text-center">
-            {/* Botón Inteligente 3: Dudas FAQ */}
             <a href={linkFaq} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-3 px-6 rounded-xl transition-colors border border-stone-200">
               <MessageCircle className="w-5 h-5 text-green-500"/> Tengo otra duda
             </a>
@@ -248,7 +259,7 @@ export default function ClientePage() {
         </section>
       </main>
 
-      {/* Botón Inteligente 4: GANCHO FLOTANTE WHATSAPP (DESKTOP) */}
+      {/* BOTÓN FLOTANTE WHATSAPP (DESKTOP) */}
       <a href={linkGancho} target="_blank" rel="noreferrer" className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:bg-green-600 hover:scale-110 transition-transform z-50 hidden md:flex items-center justify-center group">
         <MessageCircle className="w-8 h-8" />
         <span className="absolute right-full mr-4 bg-stone-900 text-white px-3 py-1 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-bold">
@@ -256,7 +267,7 @@ export default function ClientePage() {
         </span>
       </a>
 
-      {/* BARRA INFERIOR FIJA (MÓVIL) - También usa el linkGancho */}
+      {/* BARRA INFERIOR FIJA (MÓVIL) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-6 py-3 pb-safe z-50 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:hidden">
         <a href="#inicio" className="flex flex-col items-center text-stone-400 hover:text-amber-600">
           <Home className="w-6 h-6 mb-1" />
