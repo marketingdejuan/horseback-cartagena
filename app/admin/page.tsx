@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadTarget, setUploadTarget] = useState('caballo'); 
   const [imageAlt, setImageAlt] = useState('');
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [siteData, setSiteData] = useState<any>({| null>(null);
 
   const [siteData, setSiteData] = useState<any>({
     heroTitle: 'Cabalgatas en Caldas, Antioquia',
