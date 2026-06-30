@@ -17,8 +17,6 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadTarget, setUploadTarget] = useState('caballo'); 
   const [imageAlt, setImageAlt] = useState('');
-  const [siteData, setSiteData] = useState<any>({| null>(null);
-
   const [siteData, setSiteData] = useState<any>({
     heroTitle: 'Cabalgatas en Caldas, Antioquia',
     heroSubtitle: 'Conectando jinetes principiantes y expertos con los paisajes montañosos del sur del Valle de Aburrá.',
