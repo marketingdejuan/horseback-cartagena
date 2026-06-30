@@ -21,11 +21,13 @@ export default function AdminDashboard() {
 
   const [siteData, setSiteData] = useState<any>({
     heroTitle: 'Cabalgatas en Caldas, Antioquia',
+    heroTitleEn: 'Ecological Horseback Riding near Medellin',
     heroSubtitle: 'Conectando jinetes principiantes y expertos con los paisajes montañosos del sur del Valle de Aburrá.',
+    heroSubtitleEn: 'Connecting beginners and experts with the stunning mountain landscapes of the Aburrá Valley.',
     whatsappNumber: '573000000000',
-    navLabel1: 'Inicio',
-    navLabel2: 'Cotizar',
-    navLabel3: 'FAQ',
+    navLabel1: 'Inicio', navLabel1En: 'Home',
+    navLabel2: 'Cotizar', navLabel2En: 'Quote',
+    navLabel3: 'FAQ', navLabel3En: 'FAQ',
     basePrice: 100000,
     guidePrice: 80000,
     depositPercent: 50,
@@ -85,11 +87,11 @@ export default function AdminDashboard() {
   const updateHorse = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.map((h: any) => h.id === id ? { ...h, [field]: value } : h) }));
   const removeHorse = (id: number) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.filter((h: any) => h.id !== id) }));
 
-  const addFaq = () => setSiteData((prev: any) => ({ ...prev, faqs: [...prev.faqs, { id: Date.now(), q: 'Nueva Pregunta', a: 'Respuesta' }] }));
+  const addFaq = () => setSiteData((prev: any) => ({ ...prev, faqs: [...prev.faqs, { id: Date.now(), q: 'Nueva Pregunta', a: 'Respuesta', qEn: '', aEn: '' }] }));
   const updateFaq = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.map((f: any) => f.id === id ? { ...f, [field]: value } : f) }));
   const removeFaq = (id: number) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.filter((f: any) => f.id !== id) }));
 
-  const addReview = () => setSiteData((prev: any) => ({ ...prev, reviews: [...(prev.reviews || []), { id: Date.now(), author: 'Nombre Cliente', text: 'Me encantó la experiencia...', rating: 5, videoUrl: '' }] }));
+  const addReview = () => setSiteData((prev: any) => ({ ...prev, reviews: [...(prev.reviews || []), { id: Date.now(), author: 'Nombre Cliente', text: 'Me encantó...', textEn: 'I loved it...', rating: 5, videoUrl: '' }] }));
   const updateReview = (id: number, field: string, value: any) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.map((r: any) => r.id === id ? { ...r, [field]: value } : r) }));
   const removeReview = (id: number) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.filter((r: any) => r.id !== id) }));
 
@@ -101,7 +103,8 @@ export default function AdminDashboard() {
       setPreviewImage(event.target?.result as string);
     };
     reader.readAsDataURL(file);
-  };const processAndUploadImage = async () => {
+  };
+  const processAndUploadImage = async () => {
     if (!previewImage) return;
     setIsUploading(true);
     try {
@@ -176,8 +179,8 @@ export default function AdminDashboard() {
             { id: 'comercial', icon: DollarSign, label: 'Precios y Reglas' },
             { id: 'multimedia', icon: ImagePlus, label: 'Multimedia SEO' },
             { id: 'caballos', icon: Users, label: 'Directorio Equino' },
-            { id: 'reviews', icon: Star, label: 'Reseñas & Social Proof' },
-            { id: 'faq', icon: MessageSquare, label: 'FAQ SEO' },
+            { id: 'reviews', icon: Star, label: 'Reseñas Bilingües' },
+            { id: 'faq', icon: MessageSquare, label: 'FAQ Bilingüe' },
             { id: 'general', icon: Settings, label: 'Textos y Menús' },
           ].map((item) => (
             <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 p-3 rounded-lg font-medium transition-colors ${activeTab === item.id ? 'bg-amber-600 text-white' : 'hover:bg-stone-800'}`}>
@@ -295,12 +298,12 @@ export default function AdminDashboard() {
           {activeTab === 'reviews' && (
             <div className="space-y-4">
               <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-4">
-                <p className="text-sm text-amber-800 font-medium">💡 <b>Tip SEO:</b> Copia aquí tus mejores reseñas de Google. Si el cliente subió un Reel a Instagram o TikTok, pega el enlace en "URL Video/Post" para que los visitantes puedan verlo.</p>
+                <p className="text-sm text-amber-800 font-medium">💡 <b>Tip Bilingüe:</b> Pega la reseña original y luego su traducción al inglés. ¡Esto es oro para el SEO en USA!</p>
               </div>
               <button onClick={addReview} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Reseña</button>
               
               {siteData.reviews?.map((review: any) => (
-                <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-3 relative">
+                <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-4 relative">
                   <button onClick={() => removeReview(review.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100"><Trash2 className="w-4 h-4"/></button>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-12">
@@ -317,9 +320,15 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   
-                  <div>
-                    <label className="text-xs font-bold text-stone-500">Comentario / Reseña</label>
-                    <textarea value={review.text} onChange={(e) => updateReview(review.id, 'text', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 outline-none focus:border-amber-500" rows={2} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+                    <div>
+                      <label className="text-xs font-bold text-stone-500 flex items-center gap-1">🇨🇴 Reseña (Español)</label>
+                      <textarea value={review.text} onChange={(e) => updateReview(review.id, 'text', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 outline-none focus:border-amber-500 mt-1" rows={3} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-blue-600 flex items-center gap-1">🇺🇸 Reseña (Inglés)</label>
+                      <textarea value={review.textEn || ''} onChange={(e) => updateReview(review.id, 'textEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl text-stone-600 outline-none focus:border-blue-500 mt-1 bg-blue-50/30" rows={3} />
+                    </div>
                   </div>
 
                   <div>
@@ -333,14 +342,22 @@ export default function AdminDashboard() {
 
           {activeTab === 'faq' && (
             <div className="space-y-4">
-              <button onClick={addFaq} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Pregunta</button>
+              <button onClick={addFaq} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Pregunta Bilingüe</button>
               {siteData.faqs?.map((faq: any) => (
-                <div key={faq.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                  <div className="flex justify-between">
-                    <input type="text" value={faq.q} onChange={(e) => updateFaq(faq.id, 'q', e.target.value)} className="p-2 border-b-2 border-stone-200 w-full font-bold text-stone-800 text-lg outline-none focus:border-amber-500" placeholder="Pregunta..." />
-                    <button onClick={() => removeFaq(faq.id)} className="text-red-500 ml-4"><Trash2 className="w-5 h-5"/></button>
+                <div key={faq.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-4 relative">
+                  <button onClick={() => removeFaq(faq.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100 z-10"><Trash2 className="w-4 h-4"/></button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-10">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-stone-500">🇨🇴 Español</label>
+                      <input type="text" value={faq.q} onChange={(e) => updateFaq(faq.id, 'q', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold text-stone-800 outline-none focus:border-amber-500" placeholder="Pregunta..." />
+                      <textarea value={faq.a} onChange={(e) => updateFaq(faq.id, 'a', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 outline-none focus:border-amber-500" placeholder="Respuesta..." rows={3} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-blue-600">🇺🇸 Inglés</label>
+                      <input type="text" value={faq.qEn || ''} onChange={(e) => updateFaq(faq.id, 'qEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold text-stone-800 outline-none focus:border-blue-500 bg-blue-50/30" placeholder="Question..." />
+                      <textarea value={faq.aEn || ''} onChange={(e) => updateFaq(faq.id, 'aEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl text-stone-600 outline-none focus:border-blue-500 bg-blue-50/30" placeholder="Answer..." rows={3} />
+                    </div>
                   </div>
-                  <textarea value={faq.a} onChange={(e) => updateFaq(faq.id, 'a', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 outline-none focus:border-amber-500" placeholder="Respuesta..." rows={3} />
                 </div>
               ))}
             </div>
@@ -348,18 +365,38 @@ export default function AdminDashboard() {
 
           {activeTab === 'general' && (
             <div className="bg-white rounded-xl shadow-sm p-6 border space-y-8">
-              <div className="space-y-4">
-                <h3 className="font-bold text-lg border-b pb-2 text-stone-800">Textos y Contacto</h3>
-                <div><label className="font-bold block mb-1 text-stone-700">Título SEO (H1)</label><input type="text" value={siteData.heroTitle} onChange={(e) => handleInputChange('heroTitle', e.target.value)} className="w-full p-3 border-2 rounded-xl font-bold" /></div>
-                <div><label className="font-bold block mb-1 text-stone-700">Subtítulo Hero</label><textarea value={siteData.heroSubtitle} onChange={(e) => handleInputChange('heroSubtitle', e.target.value)} className="w-full p-3 border-2 rounded-xl" rows={2} /></div>
-                <div><label className="font-bold block mb-1 text-stone-700">Número de WhatsApp (Sin +)</label><input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full p-3 border-2 rounded-xl font-mono text-lg" placeholder="573000000000" /></div>
+              <div className="space-y-6">
+                <h3 className="font-bold text-lg border-b pb-2 text-stone-800">Textos Principales (Hero)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <label className="font-bold block text-stone-500 border-b pb-1">🇨🇴 Versión Español</label>
+                    <div><label className="text-xs font-bold text-stone-500">Título SEO (H1)</label><input type="text" value={siteData.heroTitle} onChange={(e) => handleInputChange('heroTitle', e.target.value)} className="w-full p-2 border-b-2 font-bold focus:border-amber-500 outline-none" /></div>
+                    <div><label className="text-xs font-bold text-stone-500">Subtítulo Hero</label><textarea value={siteData.heroSubtitle} onChange={(e) => handleInputChange('heroSubtitle', e.target.value)} className="w-full p-3 border rounded-xl focus:border-amber-500 outline-none" rows={3} /></div>
+                  </div>
+                  <div className="space-y-4 bg-blue-50/30 p-4 rounded-xl border border-blue-100">
+                    <label className="font-bold block text-blue-600 border-b border-blue-200 pb-1">🇺🇸 Versión Inglés</label>
+                    <div><label className="text-xs font-bold text-blue-500">SEO Title (H1)</label><input type="text" value={siteData.heroTitleEn || ''} onChange={(e) => handleInputChange('heroTitleEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold focus:border-blue-500 outline-none bg-transparent" /></div>
+                    <div><label className="text-xs font-bold text-blue-500">Hero Subtitle</label><textarea value={siteData.heroSubtitleEn || ''} onChange={(e) => handleInputChange('heroSubtitleEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl focus:border-blue-500 outline-none bg-white" rows={3} /></div>
+                  </div>
+                </div>
+                <div className="pt-4 border-t"><label className="font-bold block mb-1 text-stone-700">Número de WhatsApp (Universal)</label><input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full md:w-1/2 p-3 border-2 rounded-xl font-mono text-lg" placeholder="573000000000" /></div>
               </div>
+              
               <div className="space-y-4 bg-stone-50 p-4 rounded-xl border border-stone-200">
-                <h3 className="font-bold text-lg border-b border-stone-200 pb-2 text-stone-800 flex items-center gap-2"><LayoutDashboard className="w-5 h-5"/> Textos: Barra Inferior (Móvil)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div><label className="font-bold block mb-1 text-stone-500 text-sm">Botón 1 (Izquierda)</label><input type="text" value={siteData.navLabel1 || ''} onChange={(e) => handleInputChange('navLabel1', e.target.value)} className="w-full p-2 border-2 rounded-lg font-bold" placeholder="Ej: Inicio" /></div>
-                  <div><label className="font-bold block mb-1 text-stone-500 text-sm">Botón 2 (Centro-Izq)</label><input type="text" value={siteData.navLabel2 || ''} onChange={(e) => handleInputChange('navLabel2', e.target.value)} className="w-full p-2 border-2 rounded-lg font-bold" placeholder="Ej: Cotizar" /></div>
-                  <div><label className="font-bold block mb-1 text-stone-500 text-sm">Botón 3 (Derecha)</label><input type="text" value={siteData.navLabel3 || ''} onChange={(e) => handleInputChange('navLabel3', e.target.value)} className="w-full p-2 border-2 rounded-lg font-bold" placeholder="Ej: Info / FAQ" /></div>
+                <h3 className="font-bold text-lg border-b border-stone-200 pb-2 text-stone-800 flex items-center gap-2"><LayoutDashboard className="w-5 h-5"/> Textos: Botones del Menú Móvil</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="font-bold text-stone-500 text-sm">🇨🇴 Español</label>
+                    <input type="text" value={siteData.navLabel1 || ''} onChange={(e) => handleInputChange('navLabel1', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 1 (Inicio)" />
+                    <input type="text" value={siteData.navLabel2 || ''} onChange={(e) => handleInputChange('navLabel2', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 2 (Cotizar)" />
+                    <input type="text" value={siteData.navLabel3 || ''} onChange={(e) => handleInputChange('navLabel3', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 3 (FAQ)" />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="font-bold text-blue-600 text-sm">🇺🇸 Inglés</label>
+                    <input type="text" value={siteData.navLabel1En || ''} onChange={(e) => handleInputChange('navLabel1En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 1 (Home)" />
+                    <input type="text" value={siteData.navLabel2En || ''} onChange={(e) => handleInputChange('navLabel2En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 2 (Quote)" />
+                    <input type="text" value={siteData.navLabel3En || ''} onChange={(e) => handleInputChange('navLabel3En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 3 (FAQ)" />
+                  </div>
                 </div>
               </div>
             </div>

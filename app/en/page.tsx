@@ -57,7 +57,13 @@ export default function EnglishPage() {
      return "https://wa.me/" + numeroWa + "?text=" + encodeURIComponent(texto);
   };
 
-  const totalReviews = (data.reviews?.length || 0) + 124;return (
+  const totalReviews = (data.reviews?.length || 0) + 124;
+
+  // Lógica Inteligente: Muestra la versión en Inglés. Si está vacía, usa la de Español para no romper la página.
+  const nav1 = data.navLabel1En || data.navLabel1 || "Home";
+  const nav2 = data.navLabel2En || data.navLabel2 || "Quote";
+  const nav3 = data.navLabel3En || data.navLabel3 || "FAQ";
+  return (
     <div className="min-h-screen bg-stone-50 font-sans pb-32 md:pb-12">
       
       {/* SCHEMA MARKUP PARA GOOGLE (Estrellas Amarillas) */}
@@ -99,8 +105,8 @@ export default function EnglishPage() {
         )}
         
         <div className="relative z-10 w-full max-w-4xl mx-auto px-6 pb-12 text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">Ecological Horseback Riding near Medellin</h1>
-          <p className="text-stone-200 text-lg md:text-xl max-w-2xl font-medium">Connecting beginners and experts with the stunning mountain landscapes of the Aburrá Valley.</p>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitleEn || data.heroTitle || "Ecological Horseback Riding near Medellin"}</h1>
+          <p className="text-stone-200 text-lg md:text-xl max-w-2xl font-medium">{data.heroSubtitleEn || data.heroSubtitle || "Connecting beginners and experts with the stunning mountain landscapes of the Aburrá Valley."}</p>
         </div>
       </section>
 
@@ -243,7 +249,8 @@ export default function EnglishPage() {
                     <div className="flex text-amber-400 mb-3">
                       {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                     </div>
-                    <p className="text-stone-600 italic mb-4 text-sm leading-relaxed">"{review.text}"</p>
+                    {/* Consumo inteligente: Muestra texto en inglés, si está vacío muestra español */}
+                    <p className="text-stone-600 italic mb-4 text-sm leading-relaxed">"{review.textEn || review.text}"</p>
                   </div>
                   
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-stone-100">
@@ -276,13 +283,14 @@ export default function EnglishPage() {
           <div className="space-y-4 max-w-3xl mx-auto">
             {data.faqs?.map((faq: any) => (
               <details key={faq.id} className="group bg-white rounded-xl border border-stone-200 cursor-pointer overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                {/* Consumo Inteligente FAQ */}
                 <summary className="flex justify-between items-center font-bold p-5 text-stone-800 hover:bg-stone-50">
-                  {faq.q}
+                  {faq.qEn || faq.q}
                   <span className="transition group-open:rotate-180 text-amber-500">
                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                   </span>
                 </summary>
-                <div className="text-stone-600 px-5 pb-5 bg-stone-50 pt-2 border-t">{faq.a}</div>
+                <div className="text-stone-600 px-5 pb-5 bg-stone-50 pt-2 border-t">{faq.aEn || faq.a}</div>
               </details>
             ))}
           </div>
@@ -305,11 +313,11 @@ export default function EnglishPage() {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-6 py-3 pb-safe z-50 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:hidden">
         <a href="#inicio" className="flex flex-col items-center text-stone-400 hover:text-amber-600">
           <Home className="w-6 h-6 mb-1" />
-          <span className="text-[10px] font-bold">Home</span>
+          <span className="text-[10px] font-bold">{nav1}</span>
         </a>
         <a href="#cotizador" className="flex flex-col items-center text-stone-400 hover:text-amber-600">
           <Calendar className="w-6 h-6 mb-1" />
-          <span className="text-[10px] font-bold">Quote</span>
+          <span className="text-[10px] font-bold">{nav2}</span>
         </a>
         <a href={linkGancho} target="_blank" rel="noreferrer" className="relative -top-5 flex flex-col items-center">
           <div className="bg-green-500 text-white p-4 rounded-full shadow-lg shadow-green-500/40 active:scale-95 transition-transform">
@@ -318,7 +326,7 @@ export default function EnglishPage() {
         </a>
         <a href="#faq" className="flex flex-col items-center text-stone-400 hover:text-amber-600">
           <Info className="w-6 h-6 mb-1" />
-          <span className="text-[10px] font-bold">FAQ</span>
+          <span className="text-[10px] font-bold">{nav3}</span>
         </a>
       </nav>
 
