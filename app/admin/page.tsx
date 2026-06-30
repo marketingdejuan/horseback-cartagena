@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, CheckCircle } from 'lucide-react';
+import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, CheckCircle, Star } from 'lucide-react';
 import { db, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
@@ -33,7 +33,8 @@ export default function AdminDashboard() {
     promoActive: true,
     horses: [],
     faqs: [],
-    mediaLibrary: [] 
+    mediaLibrary: [],
+    reviews: [] 
   });
 
   useEffect(() => {
@@ -46,7 +47,8 @@ export default function AdminDashboard() {
           setSiteData((prev: any) => ({ 
             ...prev, 
             ...data,
-            mediaLibrary: data.mediaLibrary || [] 
+            mediaLibrary: data.mediaLibrary || [],
+            reviews: data.reviews || []
           }));
         }
       };
@@ -87,43 +89,37 @@ export default function AdminDashboard() {
   const updateFaq = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.map((f: any) => f.id === id ? { ...f, [field]: value } : f) }));
   const removeFaq = (id: number) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.filter((f: any) => f.id !== id) }));
 
+  const addReview = () => setSiteData((prev: any) => ({ ...prev, reviews: [...(prev.reviews || []), { id: Date.now(), author: 'Nombre Cliente', text: 'Me encantó la experiencia...', rating: 5, videoUrl: '' }] }));
+  const updateReview = (id: number, field: string, value: any) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.map((r: any) => r.id === id ? { ...r, [field]: value } : r) }));
+  const removeReview = (id: number) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.filter((r: any) => r.id !== id) }));
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (event) => {
       setPreviewImage(event.target?.result as string);
     };
     reader.readAsDataURL(file);
-  };
-  const processAndUploadImage = async () => {
+  };const processAndUploadImage = async () => {
     if (!previewImage) return;
     setIsUploading(true);
-
     try {
       const img = new Image();
       img.src = previewImage;
-      
-      await new Promise((resolve) => {
-        img.onload = resolve;
-      });
+      await new Promise((resolve) => { img.onload = resolve; });
 
       const canvas = document.createElement('canvas');
-      let targetW = 1200; 
-      let targetH = 800;
+      let targetW = 1200; let targetH = 800;
       if (uploadTarget === 'hero') { targetW = 1920; targetH = 1080; }
       if (uploadTarget === 'caballo') { targetW = 800; targetH = 800; }
 
       const scale = Math.max(targetW / img.width, targetH / img.height);
       const scaledW = img.width * scale;
       const scaledH = img.height * scale;
-      
-      canvas.width = targetW;
-      canvas.height = targetH;
+      canvas.width = targetW; canvas.height = targetH;
       const ctx = canvas.getContext('2d');
-      const dx = (targetW - scaledW) / 2;
-      const dy = (targetH - scaledH) / 2;
+      const dx = (targetW - scaledW) / 2; const dy = (targetH - scaledH) / 2;
       ctx?.drawImage(img, dx, dy, scaledW, scaledH);
       
       const webpDataUrl = canvas.toDataURL('image/webp', 0.8);
@@ -132,24 +128,14 @@ export default function AdminDashboard() {
       await uploadString(storageRef, webpDataUrl, 'data_url');
       const downloadUrl = await getDownloadURL(storageRef);
 
-      const newMedia = {
-        id: Date.now(),
-        url: downloadUrl,
-        alt: imageAlt || 'Cabalgata Caldas',
-        target: uploadTarget
-      };
-
+      const newMedia = { id: Date.now(), url: downloadUrl, alt: imageAlt || 'Cabalgata Caldas', target: uploadTarget };
       setSiteData((prev: any) => ({ ...prev, mediaLibrary: [newMedia, ...(prev.mediaLibrary || [])] }));
-      setPreviewImage(null);
-      setImageAlt('');
+      setPreviewImage(null); setImageAlt('');
       if (fileInputRef.current) fileInputRef.current.value = '';
       alert("✅ Imagen comprimida y subida con éxito.");
-
     } catch (error) {
-      console.error("Error procesando imagen:", error);
       alert("❌ Hubo un error subiendo la imagen.");
     }
-    
     setIsUploading(false);
   };
 
@@ -161,6 +147,7 @@ export default function AdminDashboard() {
   const removeMedia = (id: number) => {
     setSiteData((prev: any) => ({ ...prev, mediaLibrary: prev.mediaLibrary.filter((m: any) => m.id !== id) }));
   };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center p-4">
@@ -178,7 +165,6 @@ export default function AdminDashboard() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col md:flex-row">
       <aside className="w-full md:w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-10">
@@ -190,6 +176,7 @@ export default function AdminDashboard() {
             { id: 'comercial', icon: DollarSign, label: 'Precios y Reglas' },
             { id: 'multimedia', icon: ImagePlus, label: 'Multimedia SEO' },
             { id: 'caballos', icon: Users, label: 'Directorio Equino' },
+            { id: 'reviews', icon: Star, label: 'Reseñas & Social Proof' },
             { id: 'faq', icon: MessageSquare, label: 'FAQ SEO' },
             { id: 'general', icon: Settings, label: 'Textos y Menús' },
           ].map((item) => (
@@ -211,6 +198,7 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
+
           {activeTab === 'multimedia' && (
             <div className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm p-6 border space-y-6">
@@ -284,7 +272,7 @@ export default function AdminDashboard() {
           {activeTab === 'caballos' && (
             <div className="space-y-4">
               <button onClick={addHorse} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Nuevo Caballo</button>
-              {siteData.horses.map((horse: any) => (
+              {siteData.horses?.map((horse: any) => (
                 <div key={horse.id} className="bg-white p-4 rounded-xl shadow-sm border flex flex-col md:flex-row gap-4 items-center">
                   <img src={horse.photo || 'https://via.placeholder.com/150'} alt="Caballo" className="w-24 h-24 object-cover rounded-xl bg-stone-100" />
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
@@ -304,11 +292,49 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
+          {activeTab === 'reviews' && (
+            <div className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-4">
+                <p className="text-sm text-amber-800 font-medium">💡 <b>Tip SEO:</b> Copia aquí tus mejores reseñas de Google. Si el cliente subió un Reel a Instagram o TikTok, pega el enlace en "URL Video/Post" para que los visitantes puedan verlo.</p>
+              </div>
+              <button onClick={addReview} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Reseña</button>
+              
+              {siteData.reviews?.map((review: any) => (
+                <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-3 relative">
+                  <button onClick={() => removeReview(review.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100"><Trash2 className="w-4 h-4"/></button>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-12">
+                    <div>
+                      <label className="text-xs font-bold text-stone-500">Nombre del Cliente</label>
+                      <input type="text" value={review.author} onChange={(e) => updateReview(review.id, 'author', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold text-stone-800 outline-none focus:border-amber-500" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-stone-500">Estrellas</label>
+                      <select value={review.rating} onChange={(e) => updateReview(review.id, 'rating', Number(e.target.value))} className="w-full p-2 border-b-2 border-stone-200 font-bold text-amber-500 outline-none">
+                        <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
+                        <option value={4}>⭐⭐⭐⭐ (4)</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs font-bold text-stone-500">Comentario / Reseña</label>
+                    <textarea value={review.text} onChange={(e) => updateReview(review.id, 'text', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 outline-none focus:border-amber-500" rows={2} />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-stone-500">URL Video/Post (Instagram, TikTok, YouTube) - Opcional</label>
+                    <input type="text" value={review.videoUrl} onChange={(e) => updateReview(review.id, 'videoUrl', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 text-blue-600 text-sm outline-none focus:border-blue-500" placeholder="https://instagram.com/reel/..." />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {activeTab === 'faq' && (
             <div className="space-y-4">
               <button onClick={addFaq} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Pregunta</button>
-              {siteData.faqs.map((faq: any) => (
+              {siteData.faqs?.map((faq: any) => (
                 <div key={faq.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-3">
                   <div className="flex justify-between">
                     <input type="text" value={faq.q} onChange={(e) => updateFaq(faq.id, 'q', e.target.value)} className="p-2 border-b-2 border-stone-200 w-full font-bold text-stone-800 text-lg outline-none focus:border-amber-500" placeholder="Pregunta..." />
