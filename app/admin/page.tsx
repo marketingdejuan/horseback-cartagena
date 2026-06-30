@@ -1,9 +1,113 @@
-"use client";import React, { useState, useEffect, useRef } from 'react';import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, CheckCircle } from 'lucide-react';import { db, storage } from '../../lib/firebase';import { doc, getDoc, setDoc } from 'firebase/firestore';import { ref, uploadString, getDownloadURL } from 'firebase/storage';export default function AdminDashboard() {const [isAuthenticated, setIsAuthenticated] = useState(false);const [password, setPassword] = useState('');const [loginError, setLoginError] = useState(false);const [activeTab, setActiveTab] = useState('comercial');const [isSaving, setIsSaving] = useState(false);const [mensajeGuardado, setMensajeGuardado] = useState('');// Estados del Gestor Multimediaconst fileInputRef = useRef(null);const [isUploading, setIsUploading] = useState(false);const [uploadTarget, setUploadTarget] = useState('caballo');const [imageAlt, setImageAlt] = useState('');const [previewImage, setPreviewImage] = useState<string | null>(null);const [siteData, setSiteData] = useState({heroTitle: 'Cabalgatas en Caldas, Antioquia',heroSubtitle: 'Conectando jinetes principiantes y expertos con los paisajes montañosos del sur del Valle de Aburrá.',whatsappNumber: '573000000000',navLabel1: 'Inicio',navLabel2: 'Cotizar',navLabel3: 'FAQ',basePrice: 100000,guidePrice: 80000,depositPercent: 50,cancelHours: 48,promoActive: true,horses: [],faqs: [],mediaLibrary: []});useEffect(() => {if (isAuthenticated) {const fetchData = async () => {const docRef = doc(db, "configuracion", "general");const docSnap = await getDoc(docRef);if (docSnap.exists()) {const data = docSnap.data();setSiteData(prev => ({...prev,...data,mediaLibrary: data.mediaLibrary || []}));}};fetchData();}}, [isAuthenticated]);const saveToFirebase = async () => {setIsSaving(true);setMensajeGuardado('');try {const docRef = doc(db, "configuracion", "general");await setDoc(docRef, siteData);setMensajeGuardado('✅ ¡Cambios Guardados en Vivo!');} catch (error) {setMensajeGuardado('❌ Error al guardar.');}setIsSaving(false);setTimeout(() => setMensajeGuardado(''), 4000);};const handleLogin = (e: any) => {e.preventDefault();if (password === 'admin') {setIsAuthenticated(true);setLoginError(false);} else {setLoginError(true);}};const handleInputChange = (field: string, value: any) => setSiteData(prev => ({ ...prev, [field]: value }));const addHorse = () => setSiteData(prev => ({ ...prev, horses: [...prev.horses, { id: Date.now(), name: 'Nuevo', type: 'Manso', photo: '', status: 'Activo' }] }));const updateHorse = (id: number, field: string, value: string) => setSiteData(prev => ({ ...prev, horses: prev.horses.map(h => (h as any).id === id ? { ...h, [field]: value } : h) }));const removeHorse = (id: number) => setSiteData(prev => ({ ...prev, horses: prev.horses.filter(h => (h as any).id !== id) }));const addFaq = () => setSiteData(prev => ({ ...prev, faqs: [...prev.faqs, { id: Date.now(), q: 'Nueva Pregunta', a: 'Respuesta' }] }));const updateFaq = (id: number, field: string, value: string) => setSiteData(prev => ({ ...prev, faqs: prev.faqs.map(f => (f as any).id === id ? { ...f, [field]: value } : f) }));const removeFaq = (id: number) => setSiteData(prev => ({ ...prev, faqs: prev.faqs.filter(f => (f as any).id !== id) }));// --- MOTOR DE PROCESAMIENTO DE IMÁGENES ---const handleFileSelect = (e: React.ChangeEvent) => {const file = e.target.files?.[0];if (!file) return;const reader = new FileReader();
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
+import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, CheckCircle } from 'lucide-react';
+import { db, storage } from '../../lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+
+export default function AdminDashboard() {
+const [isAuthenticated, setIsAuthenticated] = useState(false);
+const [password, setPassword] = useState('');
+const [loginError, setLoginError] = useState(false);
+const [activeTab, setActiveTab] = useState('comercial');
+const [isSaving, setIsSaving] = useState(false);
+const [mensajeGuardado, setMensajeGuardado] = useState('');
+
+// Estados del Gestor Multimedia
+const fileInputRef = useRef(null);
+const [isUploading, setIsUploading] = useState(false);
+const [uploadTarget, setUploadTarget] = useState('caballo');
+const [imageAlt, setImageAlt] = useState('');
+const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+const [siteData, setSiteData] = useState({
+heroTitle: 'Cabalgatas en Caldas, Antioquia',
+heroSubtitle: 'Conectando jinetes principiantes y expertos con los paisajes montañosos del sur del Valle de Aburrá.',
+whatsappNumber: '573000000000',
+navLabel1: 'Inicio',
+navLabel2: 'Cotizar',
+navLabel3: 'FAQ',
+basePrice: 100000,
+guidePrice: 80000,
+depositPercent: 50,
+cancelHours: 48,
+promoActive: true,
+horses: [],
+faqs: [],
+mediaLibrary: []
+});
+
+useEffect(() => {
+if (isAuthenticated) {
+const fetchData = async () => {
+const docRef = doc(db, "configuracion", "general");
+const docSnap = await getDoc(docRef);
+if (docSnap.exists()) {
+const data = docSnap.data();
+setSiteData(prev => ({
+...prev,
+...data,
+mediaLibrary: data.mediaLibrary || []
+}));
+}
+};
+fetchData();
+}
+}, [isAuthenticated]);
+
+const saveToFirebase = async () => {
+setIsSaving(true);
+setMensajeGuardado('');
+try {
+const docRef = doc(db, "configuracion", "general");
+await setDoc(docRef, siteData);
+setMensajeGuardado('✅ ¡Cambios Guardados en Vivo!');
+} catch (error) {
+setMensajeGuardado('❌ Error al guardar.');
+}
+setIsSaving(false);
+setTimeout(() => setMensajeGuardado(''), 4000);
+};
+
+const handleLogin = (e: any) => {
+e.preventDefault();
+if (password === 'admin') {
+setIsAuthenticated(true);
+setLoginError(false);
+} else {
+setLoginError(true);
+}
+};
+
+const handleInputChange = (field: string, value: any) => setSiteData(prev => ({ ...prev, [field]: value }));
+
+const addHorse = () => setSiteData(prev => ({ ...prev, horses: [...prev.horses, { id: Date.now(), name: 'Nuevo', type: 'Manso', photo: '', status: 'Activo' }] }));
+const updateHorse = (id: number, field: string, value: string) => setSiteData(prev => ({ ...prev, horses: prev.horses.map(h => (h as any).id === id ? { ...h, [field]: value } : h) }));
+const removeHorse = (id: number) => setSiteData(prev => ({ ...prev, horses: prev.horses.filter(h => (h as any).id !== id) }));
+
+const addFaq = () => setSiteData(prev => ({ ...prev, faqs: [...prev.faqs, { id: Date.now(), q: 'Nueva Pregunta', a: 'Respuesta' }] }));
+const updateFaq = (id: number, field: string, value: string) => setSiteData(prev => ({ ...prev, faqs: prev.faqs.map(f => (f as any).id === id ? { ...f, [field]: value } : f) }));
+const removeFaq = (id: number) => setSiteData(prev => ({ ...prev, faqs: prev.faqs.filter(f => (f as any).id !== id) }));
+
+// --- MOTOR DE PROCESAMIENTO DE IMÁGENES ---
+const handleFileSelect = (e: React.ChangeEvent) => {
+const file = e.target.files?.[0];
+if (!file) return;
+
+const reader = new FileReader();
 reader.onload = (event) => {
   setPreviewImage(event.target?.result as string);
 };
 reader.readAsDataURL(file);
-};const processAndUploadImage = async () => {if (!previewImage) return;setIsUploading(true);try {
+
+
+};
+
+const processAndUploadImage = async () => {
+if (!previewImage) return;
+setIsUploading(true);
+
+try {
   const img = new Image();
   img.src = previewImage;
   
@@ -53,7 +157,59 @@ reader.readAsDataURL(file);
 }
 
 setIsUploading(false);
-};const copyToClipboard = (url: string) => {navigator.clipboard.writeText(url);alert("URL copiada. Pégala en el panel de Caballos o Textos.");};const removeMedia = (id: number) => {setSiteData(prev => ({ ...prev, mediaLibrary: prev.mediaLibrary.filter((m: any) => m.id !== id) }));};if (!isAuthenticated) {return (Acceso Operativo<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="Contraseña Maestra" />{loginError && Contraseña incorrecta.}Ingresar);}return ( CRM Admin{[{ id: 'comercial', icon: DollarSign, label: 'Precios y Reglas' },{ id: 'multimedia', icon: ImagePlus, label: 'Multimedia SEO' },{ id: 'caballos', icon: Users, label: 'Directorio Equino' },{ id: 'faq', icon: MessageSquare, label: 'FAQ SEO' },{ id: 'general', icon: Settings, label: 'Textos y Menús' },].map((item) => (<button key={item.id} onClick={() => setActiveTab(item.id)} className={w-full flex items-center gap-3 p-3 rounded-lg font-medium transition-colors ${activeTab === item.id ? 'bg-amber-600 text-white' : 'hover:bg-stone-800'}}><item.icon className="w-5 h-5" /> {item.label}))}  <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-32 md:pb-8">
+
+
+};
+
+const copyToClipboard = (url: string) => {
+navigator.clipboard.writeText(url);
+alert("URL copiada. Pégala en el panel de Caballos o Textos.");
+};
+
+const removeMedia = (id: number) => {
+setSiteData(prev => ({ ...prev, mediaLibrary: prev.mediaLibrary.filter((m: any) => m.id !== id) }));
+};
+
+if (!isAuthenticated) {
+return (
+
+
+
+
+Acceso Operativo
+
+
+<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="Contraseña Maestra" />
+{loginError && Contraseña incorrecta.}
+Ingresar
+
+
+
+);
+}
+
+return (
+
+
+
+ CRM Admin
+
+
+{[
+{ id: 'comercial', icon: DollarSign, label: 'Precios y Reglas' },
+{ id: 'multimedia', icon: ImagePlus, label: 'Multimedia SEO' },
+{ id: 'caballos', icon: Users, label: 'Directorio Equino' },
+{ id: 'faq', icon: MessageSquare, label: 'FAQ SEO' },
+{ id: 'general', icon: Settings, label: 'Textos y Menús' },
+].map((item) => (
+<button key={item.id} onClick={() => setActiveTab(item.id)} className={w-full flex items-center gap-3 p-3 rounded-lg font-medium transition-colors ${activeTab === item.id ? 'bg-amber-600 text-white' : 'hover:bg-stone-800'}}>
+<item.icon className="w-5 h-5" /> {item.label}
+
+))}
+
+
+
+  <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-32 md:pb-8">
     <div className="max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 bg-white p-4 rounded-xl shadow-sm border gap-4 sticky top-0 z-20">
         <h1 className="text-2xl font-bold text-stone-800 capitalize">Módulo: {activeTab}</h1>
@@ -199,4 +355,7 @@ setIsUploading(false);
     </div>
   </main>
 </div>
-);}
+
+
+);
+}

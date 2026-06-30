@@ -1,4 +1,79 @@
-"use client";import React, { useEffect, useState } from 'react';import { MapPin, MessageCircle, Calendar, ShieldCheck, Music, CheckCircle, Home, Info } from 'lucide-react';import { db } from '../lib/firebase';import { doc, onSnapshot } from 'firebase/firestore';export default function ClientePage() {const [data, setData] = useState(null);// Estado del Cotizador Interactivoconst [fecha, setFecha] = useState('');const [jinetes, setJinetes] = useState(2);const [duracion, setDuracion] = useState('2 Horas');const [mansos, setMansos] = useState(1);const [briosos, setBriosos] = useState(1);const [sonido, setSonido] = useState('Burroteca con música');// Conexión a Firebase en tiempo realuseEffect(() => {const docRef = doc(db, "configuracion", "general");const unsubscribe = onSnapshot(docRef, (docSnap) => {if (docSnap.exists()) {setData(docSnap.data());}});return () => unsubscribe();}, []);if (!data) {return (Preparando caballos...);}// Lógica Matemática de Preciosconst precioBase = data.basePrice || 100000;const precioGuia = data.guidePrice || 80000;const porcentajeAbono = data.depositPercent || 50;let recargoGuia = 0;if (fecha) {const dateObj = new Date(fecha + 'T12:00:00');const diaSemana = dateObj.getDay();// Si es Lunes (1) a Viernes (5), se cobra el guíaif (diaSemana >= 1 && diaSemana <= 5) {recargoGuia = precioGuia;}}const totalCalculado = (jinetes * precioBase) + recargoGuia;const abonoRequerido = totalCalculado * (porcentajeAbono / 100);// Generador de Link de WhatsAppconst numeroWa = data.whatsappNumber || "573000000000";const textoMensaje = "Hola, quiero reservar el " + (fecha || 'próximo fin de semana') + " para " + jinetes + " personas (" + duracion + "). Necesito " + mansos + " caballos mansos y " + briosos + " briosos. Sonido: " + sonido + ". Mi cotización dio $" + totalCalculado.toLocaleString('es-CO') + ". ¿Tienen disponibilidad?";const linkReserva = "https://wa.me/" + numeroWa + "?text=" + encodeURIComponent(textoMensaje);// Labels dinámicos de la barra de navegaciónconst nav1 = data.navLabel1 || "Inicio";const nav2 = data.navLabel2 || "Cotizar";const nav3 = data.navLabel3 || "FAQ";return ({/* HERO SECTION */}<imgsrc={data.mediaLibrary?.[0]?.url || "https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=1920"}alt="Fondo Cabalgata"className="absolute inset-0 w-full h-full object-cover opacity-50"/>    {data.promoActive && (
+"use client";
+import React, { useEffect, useState } from 'react';
+import { MapPin, MessageCircle, Calendar, ShieldCheck, Music, CheckCircle, Home, Info } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
+
+export default function ClientePage() {
+const [data, setData] = useState(null);
+
+// Estado del Cotizador Interactivo
+const [fecha, setFecha] = useState('');
+const [jinetes, setJinetes] = useState(2);
+const [duracion, setDuracion] = useState('2 Horas');
+const [mansos, setMansos] = useState(1);
+const [briosos, setBriosos] = useState(1);
+const [sonido, setSonido] = useState('Burroteca con música');
+
+// Conexión a Firebase en tiempo real
+useEffect(() => {
+const docRef = doc(db, "configuracion", "general");
+const unsubscribe = onSnapshot(docRef, (docSnap) => {
+if (docSnap.exists()) {
+setData(docSnap.data());
+}
+});
+return () => unsubscribe();
+}, []);
+
+if (!data) {
+return (
+
+Preparando caballos...
+
+);
+}
+
+// Lógica Matemática de Precios
+const precioBase = data.basePrice || 100000;
+const precioGuia = data.guidePrice || 80000;
+const porcentajeAbono = data.depositPercent || 50;
+
+let recargoGuia = 0;
+if (fecha) {
+const dateObj = new Date(fecha + 'T12:00:00');
+const diaSemana = dateObj.getDay();
+// Si es Lunes (1) a Viernes (5), se cobra el guía
+if (diaSemana >= 1 && diaSemana <= 5) {
+recargoGuia = precioGuia;
+}
+}
+
+const totalCalculado = (jinetes * precioBase) + recargoGuia;
+const abonoRequerido = totalCalculado * (porcentajeAbono / 100);
+
+// Generador de Link de WhatsApp
+const numeroWa = data.whatsappNumber || "573000000000";
+const textoMensaje = "Hola, quiero reservar el " + (fecha || 'próximo fin de semana') + " para " + jinetes + " personas (" + duracion + "). Necesito " + mansos + " caballos mansos y " + briosos + " briosos. Sonido: " + sonido + ". Mi cotización dio $" + totalCalculado.toLocaleString('es-CO') + ". ¿Tienen disponibilidad?";
+const linkReserva = "https://wa.me/" + numeroWa + "?text=" + encodeURIComponent(textoMensaje);
+
+// Labels dinámicos de la barra de navegación
+const nav1 = data.navLabel1 || "Inicio";
+const nav2 = data.navLabel2 || "Cotizar";
+const nav3 = data.navLabel3 || "FAQ";
+
+return (
+
+{/* HERO SECTION */}
+
+<img
+src={data.mediaLibrary?.[0]?.url || "https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=1920"}
+alt="Fondo Cabalgata"
+className="absolute inset-0 w-full h-full object-cover opacity-50"
+/>
+
+
+    {data.promoActive && (
       <div className="relative z-10 w-full bg-amber-500/90 text-stone-900 py-2 px-4 flex justify-center text-xs md:text-sm font-bold tracking-wide text-center">
         <ShieldCheck className="w-4 h-4 mr-2 hidden md:block" /> +1,200 jinetes seguros este año • 100% Parqueadero Privado • A 30 mins de Medellín
       </div>
@@ -209,4 +284,7 @@
   </nav>
 
 </div>
-);}
+
+
+);
+}
