@@ -5,7 +5,6 @@ import { db, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 
-/* STREAMING_CHUNK: Inicializando estado y variables principales... */
 export default function AdminDashboard() {
 const [isAuthenticated, setIsAuthenticated] = useState(false);
 const [password, setPassword] = useState('');
@@ -32,7 +31,6 @@ metaTitle: 'Cabalgatas', metaTitleEn: 'Horseback', metaDescription: '...', metaD
 urgencyText: '🔥 Quedan pocos cupos', urgencyTextEn: '🔥 Few spots left', enableExitIntent: true
 });
 
-/* STREAMING_CHUNK: Cargando datos desde Firebase y guardado unificado... */
 useEffect(() => {
 if (isAuthenticated) {
 const fetchData = async () => {
@@ -55,7 +53,7 @@ setIsSaving(false); setTimeout(() => setMensajeGuardado(''), 4000);
 
 const handleInputChange = (field: string, value: any) => setSiteData((prev: any) => ({ ...prev, [field]: value }));
 
-/* STREAMING_CHUNK: Configurando lógica de procesamiento de imágenes y metadatos... */
+// Funciones de Imágenes
 const handleFileSelect = (e: React.ChangeEvent) => {
 const file = e.target.files?.[0];
 if (!file) return;
@@ -82,7 +80,7 @@ let width = img.width; let height = img.height;
   const ctx = canvas.getContext('2d');
   ctx?.drawImage(img, 0, 0, width, height);
   
-  const webpDataUrl = canvas.toDataURL('image/webp', 0.85); // Compresión de alta calidad
+  const webpDataUrl = canvas.toDataURL('image/webp', 0.85); // Compresión
   const storageRef = ref(storage, `imagenes/media_${Date.now()}.webp`);
   await uploadString(storageRef, webpDataUrl, 'data_url');
   const url = await getDownloadURL(storageRef);
@@ -96,7 +94,7 @@ setIsUploading(false);
 
 };
 
-/* STREAMING_CHUNK: Funciones CRUD para Banners, Galería y Selección Visual... */
+// Metadatos y Asignación
 const editMediaMetadata = (id: number, currentTitle: string) => {
 const newTitle = prompt("Edita el nombre o metadato de la imagen (SEO):", currentTitle);
 if (newTitle !== null) {
@@ -128,7 +126,19 @@ const updateHeroMedia = (id: number, field: string, value: string) => setSiteDat
 const removeGalleryItem = (id: number) => setSiteData((prev: any) => ({ ...prev, gallery: prev.gallery.filter((g: any) => g.id !== id) }));
 const updateGalleryItem = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, gallery: prev.gallery.map((g: any) => g.id === id ? { ...g, [field]: value } : g) }));
 
-/* STREAMING_CHUNK: Renderizando pantalla de Login... */
+// CRUDs Adicionales
+const addHorse = () => setSiteData((prev: any) => ({ ...prev, horses: [...prev.horses, { id: Date.now(), name: 'Nuevo', type: 'Manso', photo: '', status: 'Activo' }] }));
+const updateHorse = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.map((h: any) => h.id === id ? { ...h, [field]: value } : h) }));
+const removeHorse = (id: number) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.filter((h: any) => h.id !== id) }));
+
+const addFaq = () => setSiteData((prev: any) => ({ ...prev, faqs: [...prev.faqs, { id: Date.now(), q: 'Nueva Pregunta', a: 'Respuesta', qEn: '', aEn: '' }] }));
+const updateFaq = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.map((f: any) => f.id === id ? { ...f, [field]: value } : f) }));
+const removeFaq = (id: number) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.filter((f: any) => f.id !== id) }));
+
+const addReview = () => setSiteData((prev: any) => ({ ...prev, reviews: [...(prev.reviews || []), { id: Date.now(), author: 'Nombre Cliente', text: 'Excelente...', textEn: 'Excellent...', rating: 5, videoUrl: '' }] }));
+const updateReview = (id: number, field: string, value: any) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.map((r: any) => r.id === id ? { ...r, [field]: value } : r) }));
+const removeReview = (id: number) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.filter((r: any) => r.id !== id) }));
+
 if (!isAuthenticated) {
 return (
 
@@ -142,7 +152,6 @@ Ingresar
 );
 }
 
-/* STREAMING_CHUNK: Renderizando estructura del Dashboard... */
 return (
 
 
@@ -203,7 +212,6 @@ return (
         </div>
       </div>
 
-      /* STREAMING_CHUNK: Renderizando Módulos de Precios y Multimedia... */
       {activeTab === 'comercial' && (
         <div className="bg-white rounded-xl shadow-sm p-6 border space-y-6">
           <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
@@ -233,7 +241,7 @@ return (
                 <div className="flex gap-2">
                   <button onClick={() => {navigator.clipboard.writeText(media.url); alert("URL Copiada")}} className="flex-1 bg-white text-xs p-1.5 rounded border shadow-sm flex items-center justify-center hover:bg-stone-100" title="Copiar URL"><Copy size={14}/></button>
                   <button onClick={() => editMediaMetadata(media.id, media.title)} className="flex-1 bg-blue-100 text-blue-700 text-xs p-1.5 rounded flex items-center justify-center hover:bg-blue-200" title="Editar Metadatos"><Edit3 size={14}/></button>
-                  <button onClick={() => { setSiteData(prev => ({...prev, mediaLibrary: prev.mediaLibrary.filter((m:any) => m.id !== media.id) })) }} className="bg-red-100 text-red-600 text-xs p-1.5 rounded flex items-center justify-center hover:bg-red-200"><Trash2 size={14}/></button>
+                  <button onClick={() => { setSiteData((prev: any) => ({...prev, mediaLibrary: prev.mediaLibrary.filter((m:any) => m.id !== media.id) })) }} className="bg-red-100 text-red-600 text-xs p-1.5 rounded flex items-center justify-center hover:bg-red-200"><Trash2 size={14}/></button>
                 </div>
               </div>
             ))}
@@ -241,7 +249,6 @@ return (
         </div>
       )}
 
-      /* STREAMING_CHUNK: Renderizando Módulos Visuales (Hero y Galería)... */
       {activeTab === 'hero' && (
         <div className="space-y-4">
           <button onClick={() => setShowPicker('hero')} className="bg-stone-900 text-white px-4 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:scale-105 transition-transform"><Plus className="w-5 h-5"/> Seleccionar foto desde la Librería</button>
@@ -250,7 +257,7 @@ return (
               <button onClick={() => removeHeroMedia(h.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg"><Trash2 size={16}/></button>
               <div className="w-full md:w-1/3">
                 <p className="font-bold text-stone-500 mb-2">Banner {idx + 1}</p>
-                <img src={h.url} className="w-full h-32 object-cover rounded-lg border" />
+                <img src={h.url || 'https://via.placeholder.com/300x150'} className="w-full h-32 object-cover rounded-lg border" />
                 <input type="text" value={h.url} onChange={(e) => updateHeroMedia(h.id, 'url', e.target.value)} className="w-full p-2 border mt-2 text-xs rounded" placeholder="O pega una URL externa..." />
               </div>
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 md:mt-0">
@@ -282,7 +289,7 @@ return (
               <button onClick={() => removeGalleryItem(g.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100"><Trash2 size={16}/></button>
               <div className="w-full md:w-1/3">
                 <p className="font-bold text-amber-600 mb-2">Posición #{idx + 1}</p>
-                <img src={g.url} className="w-full h-32 object-cover rounded-lg border" />
+                <img src={g.url || 'https://via.placeholder.com/300x200'} className="w-full h-32 object-cover rounded-lg border" />
               </div>
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 md:mt-0">
                 <div className="space-y-2">
@@ -301,7 +308,6 @@ return (
         </div>
       )}
 
-      /* STREAMING_CHUNK: Renderizando Módulos Restantes... */
       {activeTab === 'seo' && (
         <div className="bg-white p-6 rounded-xl border space-y-6">
            <h3 className="font-bold border-b pb-2">Ventana Intención de Salida (Exit Intent)</h3>
@@ -314,33 +320,94 @@ return (
              <div><label className="text-xs font-bold text-stone-500">🇨🇴 Español</label><input value={siteData.urgencyText} onChange={(e) => handleInputChange('urgencyText', e.target.value)} className="w-full p-2 border rounded mt-1" placeholder="Ej: 🔥 Alta demanda" /></div>
              <div><label className="text-xs font-bold text-blue-600">🇺🇸 Inglés</label><input value={siteData.urgencyTextEn} onChange={(e) => handleInputChange('urgencyTextEn', e.target.value)} className="w-full p-2 border rounded mt-1 bg-blue-50/30" placeholder="Ej: 🔥 High demand" /></div>
            </div>
+           <h3 className="font-bold border-b pb-2 pt-4">Meta Tags de Google</h3>
+           <div className="grid grid-cols-2 gap-4">
+             <div><label className="text-xs font-bold text-stone-500">Título SEO (ES)</label><input value={siteData.metaTitle} onChange={(e) => handleInputChange('metaTitle', e.target.value)} className="w-full p-2 border rounded mt-1" /></div>
+             <div><label className="text-xs font-bold text-blue-600">Título SEO (EN)</label><input value={siteData.metaTitleEn} onChange={(e) => handleInputChange('metaTitleEn', e.target.value)} className="w-full p-2 border rounded mt-1 bg-blue-50/30" /></div>
+           </div>
         </div>
       )}
 
       {activeTab === 'caballos' && (
-        <div className="bg-white p-6 rounded-xl border flex flex-col items-center justify-center text-stone-400 py-12">
-           <Users size={48} className="mb-4 opacity-50"/>
-           <p className="font-bold">Módulo de Directorio Equino en desarrollo o configuración...</p>
-           <p className="text-sm">Tus caballos se renderizarán aquí en la versión completa.</p>
+        <div className="space-y-4">
+          <button onClick={addHorse} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Nuevo Caballo</button>
+          {siteData.horses?.map((horse: any) => (
+            <div key={horse.id} className="bg-white p-4 rounded-xl shadow-sm border flex flex-col md:flex-row gap-4 items-center">
+              <img src={horse.photo || 'https://via.placeholder.com/150'} alt="Caballo" className="w-24 h-24 object-cover rounded-xl bg-stone-100" />
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                <input type="text" value={horse.name} onChange={(e) => updateHorse(horse.id, 'name', e.target.value)} className="p-2 border rounded font-bold" placeholder="Nombre" />
+                <input type="text" value={horse.photo} onChange={(e) => updateHorse(horse.id, 'photo', e.target.value)} className="p-2 border rounded" placeholder="URL Foto..." />
+                <select value={horse.type} onChange={(e) => updateHorse(horse.id, 'type', e.target.value)} className="p-2 border rounded font-bold text-stone-600">
+                  <option value="Manso">Manso (Principiantes)</option>
+                  <option value="Brioso">Brioso (Expertos)</option>
+                </select>
+                <select value={horse.status} onChange={(e) => updateHorse(horse.id, 'status', e.target.value)} className="p-2 border rounded font-bold text-stone-600">
+                  <option value="Activo">Estado: Activo</option>
+                  <option value="Reposo">Estado: En Reposo</option>
+                </select>
+              </div>
+              <button onClick={() => removeHorse(horse.id)} className="text-red-500 p-3 bg-red-50 rounded-xl hover:bg-red-100"><Trash2 className="w-5 h-5"/></button>
+            </div>
+          ))}
         </div>
       )}
+
       {activeTab === 'reviews' && (
-        <div className="bg-white p-6 rounded-xl border flex flex-col items-center justify-center text-stone-400 py-12">
-           <Star size={48} className="mb-4 opacity-50"/>
-           <p className="font-bold">Módulo de Reseñas en desarrollo o configuración...</p>
-           <p className="text-sm">Las reseñas bilingües se renderizarán aquí.</p>
+        <div className="space-y-4">
+          <button onClick={addReview} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Reseña</button>
+          {siteData.reviews?.map((review: any) => (
+            <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-4 relative">
+              <button onClick={() => removeReview(review.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100"><Trash2 className="w-4 h-4"/></button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-12">
+                <div><label className="text-xs font-bold text-stone-500">Nombre del Cliente</label><input type="text" value={review.author} onChange={(e) => updateReview(review.id, 'author', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold text-stone-800 outline-none focus:border-amber-500" /></div>
+                <div><label className="text-xs font-bold text-stone-500">Estrellas</label><select value={review.rating} onChange={(e) => updateReview(review.id, 'rating', Number(e.target.value))} className="w-full p-2 border-b-2 border-stone-200 font-bold text-amber-500 outline-none"><option value={5}>⭐⭐⭐⭐⭐ (5)</option><option value={4}>⭐⭐⭐⭐ (4)</option></select></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+                <div><label className="text-xs font-bold text-stone-500 flex items-center gap-1">🇨🇴 Reseña (Español)</label><textarea value={review.text} onChange={(e) => updateReview(review.id, 'text', e.target.value)} className="w-full p-3 border rounded-xl text-stone-600 mt-1" rows={3} /></div>
+                <div><label className="text-xs font-bold text-blue-600 flex items-center gap-1">🇺🇸 Reseña (Inglés)</label><textarea value={review.textEn || ''} onChange={(e) => updateReview(review.id, 'textEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl bg-blue-50/30 mt-1" rows={3} /></div>
+              </div>
+              <div><label className="text-xs font-bold text-stone-500">URL Video/Post (Opcional)</label><input type="text" value={review.videoUrl} onChange={(e) => updateReview(review.id, 'videoUrl', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 text-blue-600 text-sm" placeholder="https://instagram.com/reel/..." /></div>
+            </div>
+          ))}
         </div>
       )}
+
       {activeTab === 'faq' && (
-        <div className="bg-white p-6 rounded-xl border flex flex-col items-center justify-center text-stone-400 py-12">
-           <MessageSquare size={48} className="mb-4 opacity-50"/>
-           <p className="font-bold">Módulo de FAQ en desarrollo o configuración...</p>
+        <div className="space-y-4">
+          <button onClick={addFaq} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus className="w-4 h-4"/> Añadir Pregunta Bilingüe</button>
+          {siteData.faqs?.map((faq: any) => (
+            <div key={faq.id} className="bg-white p-5 rounded-xl shadow-sm border space-y-4 relative">
+              <button onClick={() => removeFaq(faq.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg hover:bg-red-100 z-10"><Trash2 className="w-4 h-4"/></button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-10">
+                <div className="space-y-2"><label className="text-xs font-bold text-stone-500">🇨🇴 Español</label><input type="text" value={faq.q} onChange={(e) => updateFaq(faq.id, 'q', e.target.value)} className="w-full p-2 border-b-2 border-stone-200 font-bold" placeholder="Pregunta..." /><textarea value={faq.a} onChange={(e) => updateFaq(faq.id, 'a', e.target.value)} className="w-full p-3 border rounded-xl" rows={3} /></div>
+                <div className="space-y-2"><label className="text-xs font-bold text-blue-600">🇺🇸 Inglés</label><input type="text" value={faq.qEn || ''} onChange={(e) => updateFaq(faq.id, 'qEn', e.target.value)} className="w-full p-2 border-b-2 border-blue-200 font-bold bg-blue-50/30" placeholder="Question..." /><textarea value={faq.aEn || ''} onChange={(e) => updateFaq(faq.id, 'aEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl bg-blue-50/30" rows={3} /></div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
+
       {activeTab === 'general' && (
-        <div className="bg-white p-6 rounded-xl border flex flex-col items-center justify-center text-stone-400 py-12">
-           <Settings size={48} className="mb-4 opacity-50"/>
-           <p className="font-bold">Módulo de Configuración General en desarrollo o configuración...</p>
+        <div className="bg-white rounded-xl shadow-sm p-6 border space-y-8">
+          <div><label className="font-bold block mb-1 text-stone-700">Número de WhatsApp (Universal)</label><input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full md:w-1/2 p-3 border-2 rounded-xl font-mono text-lg" placeholder="573000000000" /></div>
+          
+          <div className="space-y-4 bg-stone-50 p-4 rounded-xl border border-stone-200">
+            <h3 className="font-bold text-lg border-b border-stone-200 pb-2 text-stone-800 flex items-center gap-2"><LayoutDashboard className="w-5 h-5"/> Textos: Botones del Menú Móvil</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label className="font-bold text-stone-500 text-sm">🇨🇴 Español</label>
+                <input type="text" value={siteData.navLabel1 || ''} onChange={(e) => handleInputChange('navLabel1', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 1 (Inicio)" />
+                <input type="text" value={siteData.navLabel2 || ''} onChange={(e) => handleInputChange('navLabel2', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 2 (Cotizar)" />
+                <input type="text" value={siteData.navLabel3 || ''} onChange={(e) => handleInputChange('navLabel3', e.target.value)} className="w-full p-2 border rounded-lg font-bold" placeholder="Botón 3 (FAQ)" />
+              </div>
+              <div className="space-y-3">
+                <label className="font-bold text-blue-600 text-sm">🇺🇸 Inglés</label>
+                <input type="text" value={siteData.navLabel1En || ''} onChange={(e) => handleInputChange('navLabel1En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 1 (Home)" />
+                <input type="text" value={siteData.navLabel2En || ''} onChange={(e) => handleInputChange('navLabel2En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 2 (Quote)" />
+                <input type="text" value={siteData.navLabel3En || ''} onChange={(e) => handleInputChange('navLabel3En', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg font-bold bg-blue-50/30" placeholder="Button 3 (FAQ)" />
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
