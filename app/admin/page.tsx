@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, Star, Camera, ArrowUp, ArrowDown } from 'lucide-react';
+import { Settings, Users, Lock, LogOut, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, Star, Camera, ArrowUp, ArrowDown, TrendingUp } from 'lucide-react';
 import { db, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
@@ -32,7 +32,15 @@ export default function AdminDashboard() {
     depositPercent: 50, cancelHours: 48, promoActive: true,
     horses: [], faqs: [], mediaLibrary: [], reviews: [],
     heroMedia: [], // Fotos/Videos/Textos del banner principal
-    gallery: [] // Galería tipo carrusel
+    gallery: [], // Galería tipo carrusel
+    // NUEVO: SEO y CRO
+    metaTitle: 'Cabalgatas en Medellín | Reserva tu experiencia',
+    metaTitleEn: 'Horseback Riding Medellin | Book Now',
+    metaDescription: 'La mejor cabalgata ecológica en Caldas, Antioquia.',
+    metaDescriptionEn: 'The best ecological horseback riding in Medellin, Colombia.',
+    urgencyText: '🔥 Alta demanda: Quedan pocos cupos para este fin de semana',
+    urgencyTextEn: '🔥 High demand: Few spots left for this weekend',
+    enableExitIntent: true
   });
 
   useEffect(() => {
@@ -183,6 +191,7 @@ export default function AdminDashboard() {
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {[
             { id: 'comercial', icon: DollarSign, label: 'Precios y Reglas' },
+            { id: 'seo', icon: TrendingUp, label: 'SEO & CRO Avanzado' }, // NUEVO TAB
             { id: 'hero', icon: LayoutDashboard, label: 'Banners Principales' },
             { id: 'galeria', icon: Camera, label: 'Galería de Fotos' },
             { id: 'multimedia', icon: ImagePlus, label: 'Librería de Medios' },
@@ -201,15 +210,53 @@ export default function AdminDashboard() {
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-32 md:pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 bg-white p-4 rounded-xl shadow-sm border gap-4 sticky top-0 z-20">
-            <h1 className="text-2xl font-bold text-stone-800 capitalize">Módulo: {activeTab}</h1>
+            <h1 className="text-2xl font-bold text-stone-800 capitalize">Módulo: {activeTab.replace('-', ' ')}</h1>
             <div className="flex items-center gap-4 w-full md:w-auto">
               {mensajeGuardado && <span className="text-green-600 font-bold bg-green-50 px-3 py-1 rounded-full">{mensajeGuardado}</span>}
-              {/* AQUÍ ESTABA EL ERROR: Cambiamos saveToFirebase por saveConfig */}
               <button onClick={saveConfig} disabled={isSaving} className="flex-1 md:flex-none flex justify-center items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 font-bold shadow-lg transition-transform active:scale-95">
                 <Save className="w-5 h-5" /> {isSaving ? 'Subiendo...' : 'Publicar Cambios'}
               </button>
             </div>
           </div>
+
+          {/* NUEVO MÓDULO SEO & CRO */}
+          {activeTab === 'seo' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm p-6 border space-y-6">
+                <h3 className="font-bold text-lg border-b pb-2 text-stone-800 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-amber-500"/> Conversión y Ventas (CRO)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                     <label className="font-bold text-stone-500 text-sm">Gatillo de Urgencia 🇨🇴 (Español)</label>
+                     <input type="text" value={siteData.urgencyText || ''} onChange={(e) => handleInputChange('urgencyText', e.target.value)} className="w-full p-2 border rounded-lg" placeholder="Ej: 🔥 Solo quedan 4 cupos hoy" />
+                  </div>
+                  <div className="space-y-3">
+                     <label className="font-bold text-blue-600 text-sm">Gatillo de Urgencia 🇺🇸 (Inglés)</label>
+                     <input type="text" value={siteData.urgencyTextEn || ''} onChange={(e) => handleInputChange('urgencyTextEn', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg bg-blue-50/30" placeholder="Ej: 🔥 Only 4 spots left today" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 pt-4 border-t">
+                  <input type="checkbox" checked={siteData.enableExitIntent} onChange={(e) => handleInputChange('enableExitIntent', e.target.checked)} className="w-6 h-6 text-green-600" />
+                  <label className="font-bold text-stone-700">Activar Pop-up de Descuento al intentar salir de la página (Exit Intent)</label>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-sm p-6 border space-y-6">
+                <h3 className="font-bold text-lg border-b pb-2 text-stone-800">Optimización de Google (SEO)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <label className="font-bold block text-stone-500 border-b pb-1">🇨🇴 Metadatos Español</label>
+                    <div><label className="text-xs font-bold text-stone-500">Meta Title (Aparece en Google)</label><input type="text" value={siteData.metaTitle || ''} onChange={(e) => handleInputChange('metaTitle', e.target.value)} className="w-full p-2 border rounded-lg" /></div>
+                    <div><label className="text-xs font-bold text-stone-500">Meta Description</label><textarea value={siteData.metaDescription || ''} onChange={(e) => handleInputChange('metaDescription', e.target.value)} className="w-full p-3 border rounded-xl" rows={3} /></div>
+                  </div>
+                  <div className="space-y-4 bg-blue-50/30 p-4 rounded-xl border border-blue-100">
+                    <label className="font-bold block text-blue-600 border-b border-blue-200 pb-1">🇺🇸 Metadatos Inglés</label>
+                    <div><label className="text-xs font-bold text-blue-500">Meta Title</label><input type="text" value={siteData.metaTitleEn || ''} onChange={(e) => handleInputChange('metaTitleEn', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg bg-transparent" /></div>
+                    <div><label className="text-xs font-bold text-blue-500">Meta Description</label><textarea value={siteData.metaDescriptionEn || ''} onChange={(e) => handleInputChange('metaDescriptionEn', e.target.value)} className="w-full p-3 border border-blue-200 rounded-xl bg-white" rows={3} /></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {activeTab === 'multimedia' && (
             <div className="space-y-6">
