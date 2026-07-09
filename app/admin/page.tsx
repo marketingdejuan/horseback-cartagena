@@ -22,7 +22,9 @@ export default function AdminDashboard() {
     heroTitle: 'Cabalgatas en Caldas', heroTitleEn: 'Horseback Riding',
     heroSubtitle: 'Conectando jinetes...', heroSubtitleEn: 'Connecting riders...',
     whatsappNumber: '573000000000',
-    navLabel1: 'Inicio', navLabel1En: 'Home', navLabel2: 'Cotizar', navLabel2En: 'Quote', navLabel3: 'FAQ', navLabel3En: 'FAQ',
+    navLabel1: 'Inicio', navLabel1En: 'Home', navLink1: '#inicio',
+    navLabel2: 'Cotizar', navLabel2En: 'Quote', navLink2: '#cotizador',
+    navLabel3: 'FAQ', navLabel3En: 'FAQ', navLink3: '#faq',
     basePrice: 100000, guidePrice: 80000, depositPercent: 50, promoActive: true,
     horses: [], faqs: [], mediaLibrary: [], reviews: [], heroMedia: [], gallery: [],
     metaTitle: 'Cabalgatas', metaTitleEn: 'Horseback', metaDescription: '', metaDescriptionEn: '',
@@ -215,9 +217,9 @@ export default function AdminDashboard() {
                 <div><label className="font-bold text-sm text-blue-600">Dirección EN</label><input value={siteData.mapAddressEn} onChange={(e) => handleInputChange('mapAddressEn', e.target.value)} className="w-full p-2 border rounded mt-1 bg-blue-50" /></div>
               </div>
               <div>
-                <label className="font-bold text-sm">URL de Inserción (Iframe) de Google Maps</label>
-                <p className="text-xs text-stone-500 mb-2">En Google Maps ve a "Compartir" {'>'} "Insertar un mapa" y copia SOLO el enlace que está dentro de src="AQUI".</p>
-                <input value={siteData.mapEmbedUrl} onChange={(e) => handleInputChange('mapEmbedUrl', e.target.value)} className="w-full p-3 border rounded font-mono text-sm" placeholder="https://www.google.com/maps/embed?pb=..." />
+                <label className="font-bold text-sm">Link de Google Maps (Botón Compartir)</label>
+                <p className="text-xs text-stone-500 mb-2">Abre Google Maps en tu celular, dale a "Compartir" y pega el link normal aquí (Ej: https://maps.app.goo.gl/...).</p>
+                <input value={siteData.mapEmbedUrl} onChange={(e) => handleInputChange('mapEmbedUrl', e.target.value)} className="w-full p-3 border rounded text-sm" placeholder="https://maps.app.goo.gl/..." />
               </div>
             </div>
           )}
@@ -348,8 +350,40 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'general' && (
-            <div className="bg-white rounded-xl p-6 border space-y-6">
-              <div><label className="font-bold block mb-1">WhatsApp Principal</label><input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full md:w-1/2 p-3 border-2 rounded-xl font-mono text-lg" placeholder="573000000000" /></div>
+            <div className="bg-white rounded-xl p-6 border space-y-8">
+              <div><label className="font-bold block mb-1">WhatsApp Principal (Universal)</label><input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full md:w-1/2 p-3 border-2 rounded-xl font-mono text-lg" placeholder="573000000000" /></div>
+              
+              {/* NUEVA SECCIÓN DE CONFIGURACIÓN DEL MENÚ INFERIOR */}
+              <div className="space-y-4 bg-stone-50 p-4 rounded-xl border border-stone-200">
+                <h3 className="font-bold text-lg border-b border-stone-200 pb-2 text-stone-800 flex items-center gap-2"><LayoutDashboard className="w-5 h-5"/> Navegación Móvil (Botones Inferiores)</h3>
+                <p className="text-sm text-stone-500">Cambia el texto y el enlace destino de cada botón inferior. (Ejemplo de enlaces: #inicio, #cotizador, #galeria, #reviews, #faq o enlaces a redes).</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Botón 1 */}
+                  <div className="space-y-3 bg-white p-4 rounded-lg border">
+                    <h4 className="font-bold text-stone-700">Botón 1 (Izquierda)</h4>
+                    <div><label className="text-xs font-bold text-stone-500">Texto ES</label><input type="text" value={siteData.navLabel1} onChange={(e) => handleInputChange('navLabel1', e.target.value)} className="w-full p-2 border rounded" placeholder="Inicio" /></div>
+                    <div><label className="text-xs font-bold text-blue-600">Texto EN</label><input type="text" value={siteData.navLabel1En} onChange={(e) => handleInputChange('navLabel1En', e.target.value)} className="w-full p-2 border rounded bg-blue-50" placeholder="Home" /></div>
+                    <div><label className="text-xs font-bold text-stone-500">Enlace (Link)</label><input type="text" value={siteData.navLink1} onChange={(e) => handleInputChange('navLink1', e.target.value)} className="w-full p-2 border rounded font-mono text-sm text-amber-600" placeholder="#inicio" /></div>
+                  </div>
+
+                  {/* Botón 2 */}
+                  <div className="space-y-3 bg-white p-4 rounded-lg border">
+                    <h4 className="font-bold text-stone-700">Botón 2 (Medio)</h4>
+                    <div><label className="text-xs font-bold text-stone-500">Texto ES</label><input type="text" value={siteData.navLabel2} onChange={(e) => handleInputChange('navLabel2', e.target.value)} className="w-full p-2 border rounded" placeholder="Cotizar" /></div>
+                    <div><label className="text-xs font-bold text-blue-600">Texto EN</label><input type="text" value={siteData.navLabel2En} onChange={(e) => handleInputChange('navLabel2En', e.target.value)} className="w-full p-2 border rounded bg-blue-50" placeholder="Quote" /></div>
+                    <div><label className="text-xs font-bold text-stone-500">Enlace (Link)</label><input type="text" value={siteData.navLink2} onChange={(e) => handleInputChange('navLink2', e.target.value)} className="w-full p-2 border rounded font-mono text-sm text-amber-600" placeholder="#cotizador" /></div>
+                  </div>
+
+                  {/* Botón 3 */}
+                  <div className="space-y-3 bg-white p-4 rounded-lg border">
+                    <h4 className="font-bold text-stone-700">Botón 3 (Derecha)</h4>
+                    <div><label className="text-xs font-bold text-stone-500">Texto ES</label><input type="text" value={siteData.navLabel3} onChange={(e) => handleInputChange('navLabel3', e.target.value)} className="w-full p-2 border rounded" placeholder="FAQ" /></div>
+                    <div><label className="text-xs font-bold text-blue-600">Texto EN</label><input type="text" value={siteData.navLabel3En} onChange={(e) => handleInputChange('navLabel3En', e.target.value)} className="w-full p-2 border rounded bg-blue-50" placeholder="FAQ" /></div>
+                    <div><label className="text-xs font-bold text-stone-500">Enlace (Link)</label><input type="text" value={siteData.navLink3} onChange={(e) => handleInputChange('navLink3', e.target.value)} className="w-full p-2 border rounded font-mono text-sm text-amber-600" placeholder="#faq" /></div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

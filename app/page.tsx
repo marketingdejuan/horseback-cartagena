@@ -56,15 +56,15 @@ export default function ClientePage() {
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24 md:pb-8">
       <div className="absolute top-4 right-4 z-50 flex gap-2">
-        <a href="/" className="shadow-lg rounded-full overflow-hidden border-2 border-white"><img src="https://flagcdn.com/w40/co.png" className="w-8 h-8 object-cover" /></a>
-        <a href="/en" className="opacity-50 hover:opacity-100 transition-all shadow-lg rounded-full overflow-hidden border-2 border-transparent hover:border-white"><img src="https://flagcdn.com/w40/us.png" className="w-8 h-8 object-cover" /></a>
+        <a href="/" className="shadow-lg rounded-full overflow-hidden border-2 border-white"><img src="https://flagcdn.com/w40/co.png" className="w-8 h-8 object-cover" alt="ES" /></a>
+        <a href="/en" className="opacity-50 hover:opacity-100 transition-all shadow-lg rounded-full overflow-hidden border-2 border-transparent hover:border-white"><img src="https://flagcdn.com/w40/us.png" className="w-8 h-8 object-cover" alt="EN" /></a>
       </div>
 
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
         {data.heroMedia?.map((media: any, idx: number) => {
           const isVideo = media.url?.toLowerCase().includes('.mp4');
           const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-50' : 'opacity-0'}`;
-          return isVideo ? <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} /> : <img key={idx} src={media.url} className={classes} />;
+          return isVideo ? <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} /> : <img key={idx} src={media.url} className={classes} alt="Banner" />;
         })}
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
@@ -91,7 +91,11 @@ export default function ClientePage() {
                     <option value="16:00">4:00 PM</option>
                   </select>
                 </div>
-                {!esGrupal && fecha && <p className="text-xs text-amber-600 font-bold mt-2">*Horario/Día aplica como Cabalgata Privada.</p>}
+                <div className="mt-4 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    💡 <b>Nota importante:</b> Las cabalgatas grupales (sin costo extra de guía) son únicamente los <b>sábados y domingos a las 2:00 PM</b>. Si escoges cualquier otro día u horario, tu experiencia será 100% exclusiva y privada, lo que incluye el costo del guía privado.
+                  </p>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-bold text-stone-600 mb-2">2. Número de Jinetes</label>
@@ -116,7 +120,6 @@ export default function ClientePage() {
           </div>
         </section>
 
-        {/* MÓDULO GOOGLE MAPS Y CONFIANZA */}
         <section id="ubicacion" className="pt-4 scroll-mt-20">
           <div className="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-stone-50 to-white">
@@ -134,15 +137,25 @@ export default function ClientePage() {
                       <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
                    </div>
                 </div>
-                <p className="text-sm font-bold text-stone-500 mt-2">Basado en {data.googleReviewCount || '150'}+ opiniones en Google</p>
+                <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Basado en {data.googleReviewCount || '150'}+ opiniones en Google</p>
               </div>
             </div>
-            <div className="w-full h-[400px] bg-stone-200">
-              {data.mapEmbedUrl ? (
-                <iframe src={data.mapEmbedUrl} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-stone-400 font-bold">Mapa no configurado</div>
-              )}
+            <div className="w-full h-[300px] relative bg-stone-200 flex items-center justify-center overflow-hidden border-t">
+              <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 blur-[2px]" alt="Mapa de fondo" />
+              <div className="absolute inset-0 bg-stone-900/30"></div>
+              
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="bg-white p-4 rounded-full shadow-2xl mb-4 animate-bounce">
+                  <MapPin className="w-8 h-8 text-amber-500" />
+                </div>
+                {data.mapEmbedUrl ? (
+                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" className="bg-stone-900 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2">
+                    Abrir en Google Maps
+                  </a>
+                ) : (
+                  <span className="bg-white px-4 py-2 rounded-lg font-bold text-stone-500 shadow">Mapa no configurado</span>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -154,7 +167,7 @@ export default function ClientePage() {
               {data.gallery.map((item: any) => (
                 <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border overflow-hidden group">
                   <div className="h-48 overflow-hidden relative bg-stone-100">
-                    <img src={item.url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
+                    <img src={item.url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" alt="Galeria" />
                     <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent"></div>
                     <h3 className="absolute bottom-4 left-4 text-white font-bold text-lg">{item.title}</h3>
                   </div>
@@ -217,11 +230,12 @@ export default function ClientePage() {
 
       <a href={linkGancho} target="_blank" rel="noreferrer" className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-600 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" /></a>
 
+      {/* MENÚ MÓVIL (Con links editables) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-3 pb-safe z-50 flex justify-between items-center md:hidden">
-        <a href="#inicio" className="flex flex-col items-center text-stone-400"><Home className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel1 || 'Inicio'}</span></a>
-        <a href="#cotizador" className="flex flex-col items-center text-stone-400"><Calendar className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel2 || 'Cotizar'}</span></a>
+        <a href={data.navLink1 || '#inicio'} className="flex flex-col items-center text-stone-400"><Home className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel1 || 'Inicio'}</span></a>
+        <a href={data.navLink2 || '#cotizador'} className="flex flex-col items-center text-stone-400"><Calendar className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel2 || 'Cotizar'}</span></a>
         <a href={linkGancho} target="_blank" rel="noreferrer" className="relative -top-5 flex flex-col items-center"><div className="bg-green-500 text-white p-4 rounded-full shadow-lg"><MessageCircle className="w-7 h-7" /></div></a>
-        <a href="#faq" className="flex flex-col items-center text-stone-400"><Info className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel3 || 'FAQ'}</span></a>
+        <a href={data.navLink3 || '#faq'} className="flex flex-col items-center text-stone-400"><Info className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel3 || 'FAQ'}</span></a>
       </nav>
     </div>
   );
