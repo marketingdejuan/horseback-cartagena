@@ -97,7 +97,7 @@ export default function EnglishPage() {
                 <div className="flex justify-between items-center mb-3"><span className="text-stone-300">{jinetes} Riders x ${precioBase.toLocaleString()}</span><span className="font-bold text-lg">${(jinetes * precioBase).toLocaleString()}</span></div>
                 {!esGrupal && <div className="flex justify-between items-center mb-3 text-red-400 bg-red-400/10 p-2 rounded-lg border border-red-400/20"><span>Exclusive Guide Fee</span><span className="font-bold">+${costoGuia.toLocaleString()}</span></div>}
                 <div className="border-t border-stone-700 my-4"></div>
-                <div className="flex justify-between items-end"><span className="text-lg text-stone-300">Total</span><span className="text-4xl font-extrabold text-amber-500">${totalCalculado.toLocaleString()}</span></div>
+                <div className="flex justify-between items-end"><span className="text-lg text-stone-300">Total (COP)</span><span className="text-4xl font-extrabold text-amber-500">${totalCalculado.toLocaleString()}</span></div>
               </div>
               <a href={linkCotizador} target="_blank" rel="noreferrer" className="mt-8 block w-full bg-green-500 hover:bg-green-600 text-center text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg"><MessageCircle className="w-5 h-5"/> Send via WhatsApp</a>
             </div>
@@ -122,7 +122,7 @@ export default function EnglishPage() {
                       <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
                    </div>
                 </div>
-                <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Based on {data.googleReviewCount || '150'}+ Google reviews</p>
+                <p className="text-sm font-bold text-stone-500 mt-2">Based on {data.googleReviewCount || '150'}+ Google reviews</p>
               </div>
             </div>
             <div className="w-full h-[400px] bg-stone-200">
@@ -135,7 +135,6 @@ export default function EnglishPage() {
           </div>
         </section>
 
-        {/* GALLERY */}
         {data.gallery && data.gallery.length > 0 && (
           <section id="galeria" className="pt-4 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-500" /> Photo Gallery</h2>
@@ -154,7 +153,6 @@ export default function EnglishPage() {
           </section>
         )}
 
-        {/* FAQ */}
         {data.faqs && data.faqs.length > 0 && (
           <section id="faq" className="pb-12 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-8 text-center">Frequently Asked Questions</h2>

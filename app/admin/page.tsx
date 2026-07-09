@@ -1,217 +1,360 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import React, { useState, useEffect, useRef } from 'react';
+import { Settings, Users, Lock, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, Star, Camera, ArrowUp, ArrowDown, TrendingUp, Edit3, X, MapPin, BadgeCheck } from 'lucide-react';
+import { db, storage } from '../../lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 
-export default function ClientePage() {
-  const [data, setData] = useState<any>(null);
-  const [fecha, setFecha] = useState('');
-  const [hora, setHora] = useState('10:00'); 
-  const [jinetes, setJinetes] = useState(2);
-  const [currentHero, setCurrentHero] = useState(0);
-  const [showExitPopup, setShowExitPopup] = useState(false);
-  const [hasShownPopup, setHasShownPopup] = useState(false);
+export default function AdminDashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState(false);
+  const [activeTab, setActiveTab] = useState('comercial');
+  const [isSaving, setIsSaving] = useState(false);
+  const [mensajeGuardado, setMensajeGuardado] = useState('');
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [showPicker, setShowPicker] = useState<'hero' | 'galeria' | null>(null);
+
+  const [siteData, setSiteData] = useState<any>({
+    heroTitle: 'Cabalgatas en Caldas', heroTitleEn: 'Horseback Riding',
+    heroSubtitle: 'Conectando jinetes...', heroSubtitleEn: 'Connecting riders...',
+    whatsappNumber: '573000000000',
+    navLabel1: 'Inicio', navLabel1En: 'Home', navLabel2: 'Cotizar', navLabel2En: 'Quote', navLabel3: 'FAQ', navLabel3En: 'FAQ',
+    basePrice: 100000, guidePrice: 80000, depositPercent: 50, promoActive: true,
+    horses: [], faqs: [], mediaLibrary: [], reviews: [], heroMedia: [], gallery: [],
+    metaTitle: 'Cabalgatas', metaTitleEn: 'Horseback', metaDescription: '', metaDescriptionEn: '',
+    urgencyText: '🔥 Quedan pocos cupos', urgencyTextEn: '🔥 Few spots left', enableExitIntent: true,
+    businessName: 'Cabalgatas Ecológicas Medellín',
+    mapAddress: 'Caldas, Antioquia, Colombia', mapAddressEn: 'Caldas, Antioquia, Colombia',
+    googleRating: 5.0, googleReviewCount: 150, mapEmbedUrl: ''
+  });
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, "configuracion", "general"), (docSnap) => {
-      if (docSnap.exists()) setData(docSnap.data());
-    });
-    return unsub;
-  }, []);
-
-  useEffect(() => {
-    if (data?.heroMedia && data.heroMedia.length > 1) {
-      const interval = setInterval(() => setCurrentHero((prev) => (prev + 1) % data.heroMedia.length), 5000);
-      return () => clearInterval(interval);
-    }
-  }, [data?.heroMedia]);
-
-  useEffect(() => {
-    if (data?.enableExitIntent && !hasShownPopup) {
-      const handleMouseLeave = (e: MouseEvent) => {
-        if (e.clientY <= 0) { setShowExitPopup(true); setHasShownPopup(true); }
+    if (isAuthenticated) {
+      const fetchData = async () => {
+        const docSnap = await getDoc(doc(db, "configuracion", "general"));
+        if (docSnap.exists()) setSiteData((prev: any) => ({ ...prev, ...docSnap.data() }));
       };
-      document.addEventListener('mouseleave', handleMouseLeave);
-      return () => document.removeEventListener('mouseleave', handleMouseLeave);
+      fetchData();
     }
-  }, [data, hasShownPopup]);
+  }, [isAuthenticated]);
 
-  if (!data) return <div className="min-h-screen bg-stone-50 flex items-center justify-center animate-pulse"><div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div></div>;
+  const saveConfig = async () => {
+    setIsSaving(true); setMensajeGuardado('');
+    try {
+      await setDoc(doc(db, "configuracion", "general"), siteData);
+      setMensajeGuardado('✅ ¡Cambios Guardados en Vivo!');
+    } catch (error) { setMensajeGuardado('❌ Error al guardar.'); }
+    setIsSaving(false); setTimeout(() => setMensajeGuardado(''), 4000);
+  };
 
-  const esFinDeSemana = fecha ? [6, 0].includes(new Date(fecha + 'T12:00:00').getDay()) : false;
-  const esDosPm = hora === '14:00';
-  const esGrupal = esFinDeSemana && esDosPm; 
+  const handleInputChange = (field: string, value: any) => setSiteData((prev: any) => ({ ...prev, [field]: value }));
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => setPreviewImage(event.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const processAndUploadImage = async () => {
+    if (!previewImage) return;
+    setIsUploading(true);
+    try {
+      const storageRef = ref(storage, `imagenes/media_${Date.now()}.webp`);
+      await uploadString(storageRef, previewImage, 'data_url');
+      const url = await getDownloadURL(storageRef);
+      setSiteData((prev: any) => ({ ...prev, mediaLibrary: [{ id: Date.now(), url, title: 'Nueva Imagen' }, ...(prev.mediaLibrary || [])] }));
+      setPreviewImage(null); if (fileInputRef.current) fileInputRef.current.value = '';
+      alert("✅ Imagen subida a la Librería Universal.");
+    } catch (error) { alert("❌ Error subiendo la imagen."); }
+    setIsUploading(false);
+  };
+
+  const editMediaMetadata = (id: number, currentTitle: string) => {
+    const newTitle = prompt("Nombre/SEO de la imagen:", currentTitle);
+    if (newTitle !== null) setSiteData((prev: any) => ({ ...prev, mediaLibrary: prev.mediaLibrary.map((m: any) => m.id === id ? { ...m, title: newTitle } : m) }));
+  };
+
+  const selectFromLibrary = (media: any) => {
+    if (showPicker === 'hero') {
+      setSiteData((prev: any) => ({ ...prev, heroMedia: [...(prev.heroMedia || []), { id: Date.now(), url: media.url, title: '', titleEn: '', subtitle: '', subtitleEn: '' }] }));
+    } else if (showPicker === 'galeria') {
+      setSiteData((prev: any) => ({ ...prev, gallery: [...(prev.gallery || []), { id: Date.now(), url: media.url, title: media.title || '', titleEn: '', desc: '', descEn: '' }] }));
+    }
+    setShowPicker(null);
+  };
+
+  const moveGalleryItem = (index: number, direction: number) => {
+    const newGallery = [...(siteData.gallery || [])];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= newGallery.length) return;
+    [newGallery[index], newGallery[targetIndex]] = [newGallery[targetIndex], newGallery[index]];
+    setSiteData((prev: any) => ({ ...prev, gallery: newGallery }));
+  };
+
+  const removeHeroMedia = (id: number) => setSiteData((prev: any) => ({ ...prev, heroMedia: prev.heroMedia.filter((h: any) => h.id !== id) }));
+  const updateHeroMedia = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, heroMedia: prev.heroMedia.map((h: any) => h.id === id ? { ...h, [field]: value } : h) }));
   
-  const precioBase = data.basePrice || 100000;
-  const costoGuia = esGrupal ? 0 : (data.guidePrice || 80000); 
-  const totalCalculado = (jinetes * precioBase) + costoGuia;
+  const removeGalleryItem = (id: number) => setSiteData((prev: any) => ({ ...prev, gallery: prev.gallery.filter((g: any) => g.id !== id) }));
+  const updateGalleryItem = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, gallery: prev.gallery.map((g: any) => g.id === id ? { ...g, [field]: value } : g) }));
 
-  const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro extra de guía)' : 'Privada (Incluye guía exclusivo)';
-  const whatsappNum = data.whatsappNumber || "573000000000";
-  
-  const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Hola, quiero reservar el ${fecha || 'próximo fin de semana'} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${esGrupal ? 'Grupal' : 'Privada'}. Cotización: $${totalCalculado.toLocaleString()}`)}`;
-  const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas. 🐎")}`;
+  const addHorse = () => setSiteData((prev: any) => ({ ...prev, horses: [...prev.horses, { id: Date.now(), name: 'Nuevo', type: 'Manso', photo: '', status: 'Activo' }] }));
+  const updateHorse = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.map((h: any) => h.id === id ? { ...h, [field]: value } : h) }));
+  const removeHorse = (id: number) => setSiteData((prev: any) => ({ ...prev, horses: prev.horses.filter((h: any) => h.id !== id) }));
+
+  const addReview = () => setSiteData((prev: any) => ({ ...prev, reviews: [...(prev.reviews || []), { id: Date.now(), author: 'Cliente', text: '', textEn: '', rating: 5, videoUrl: '' }] }));
+  const updateReview = (id: number, field: string, value: any) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.map((r: any) => r.id === id ? { ...r, [field]: value } : r) }));
+  const removeReview = (id: number) => setSiteData((prev: any) => ({ ...prev, reviews: prev.reviews.filter((r: any) => r.id !== id) }));
+
+  const addFaq = () => setSiteData((prev: any) => ({ ...prev, faqs: [...(prev.faqs || []), { id: Date.now(), q: '', a: '', qEn: '', aEn: '' }] }));
+  const updateFaq = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.map((f: any) => f.id === id ? { ...f, [field]: value } : f) }));
+  const removeFaq = (id: number) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.filter((f: any) => f.id !== id) }));
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-stone-100 flex items-center justify-center p-4">
+        <form onSubmit={(e) => { e.preventDefault(); if (password === 'admin') setIsAuthenticated(true); else setLoginError(true); }} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+          <Lock className="w-10 h-10 mx-auto text-amber-600 mb-4"/>
+          <h1 className="text-2xl font-bold mb-6">Acceso CMS</h1>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 border rounded-lg mb-4" placeholder="Contraseña" />
+          {loginError && <p className="text-red-500 font-bold mb-4">Contraseña incorrecta</p>}
+          <button type="submit" className="w-full bg-stone-900 text-white p-3 rounded-lg font-bold">Ingresar</button>
+        </form>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-stone-50 font-sans pb-24 md:pb-8">
-      <div className="absolute top-4 right-4 z-50 flex gap-2">
-        <a href="/" className="shadow-lg rounded-full overflow-hidden border-2 border-white"><img src="https://flagcdn.com/w40/co.png" className="w-8 h-8 object-cover" /></a>
-        <a href="/en" className="opacity-50 hover:opacity-100 transition-all shadow-lg rounded-full overflow-hidden border-2 border-transparent hover:border-white"><img src="https://flagcdn.com/w40/us.png" className="w-8 h-8 object-cover" /></a>
-      </div>
-
-      <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
-        {data.heroMedia?.map((media: any, idx: number) => {
-          const isVideo = media.url?.toLowerCase().includes('.mp4');
-          const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-50' : 'opacity-0'}`;
-          return isVideo ? <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} /> : <img key={idx} src={media.url} className={classes} />;
-        })}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
-        <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitle || "Cabalgatas Ecológicas"}</h1>
-          <p className="text-stone-200 text-lg md:text-xl font-medium">{data.heroSubtitle || "Experiencias únicas."}</p>
+    <div className="min-h-screen bg-stone-50 flex flex-col md:flex-row">
+      {/* Modal del Picker de Librería */}
+      {showPicker && (
+        <div className="fixed inset-0 bg-stone-900/80 z-[100] flex justify-center items-center p-4">
+          <div className="bg-white w-full max-w-4xl max-h-[80vh] rounded-2xl flex flex-col overflow-hidden">
+            <div className="p-4 border-b flex justify-between items-center bg-stone-50">
+              <h2 className="font-bold text-lg flex items-center gap-2"><ImagePlus /> Selecciona una foto para: {showPicker === 'hero' ? 'Banners' : 'Galería'}</h2>
+              <button onClick={() => setShowPicker(null)} className="p-2 bg-stone-200 rounded-full hover:bg-stone-300"><X size={16}/></button>
+            </div>
+            <div className="p-4 overflow-y-auto grid grid-cols-2 md:grid-cols-4 gap-4">
+              {siteData.mediaLibrary?.map((media: any) => (
+                <div key={media.id} onClick={() => selectFromLibrary(media)} className="cursor-pointer group relative rounded-lg overflow-hidden border-2 border-transparent hover:border-amber-500">
+                  <img src={media.url} className="w-full h-32 object-cover" alt={media.title} />
+                  <div className="absolute inset-0 bg-amber-500/0 group-hover:bg-amber-500/20 transition-all flex items-center justify-center">
+                    <span className="opacity-0 group-hover:opacity-100 bg-white text-amber-600 font-bold px-3 py-1 rounded shadow-lg text-sm">Seleccionar</span>
+                  </div>
+                </div>
+              ))}
+              {(!siteData.mediaLibrary || siteData.mediaLibrary.length === 0) && <p className="col-span-full text-center py-8 text-stone-500">No hay fotos en la librería. Sube algunas primero.</p>}
+            </div>
+          </div>
         </div>
-      </section>
+      )}
 
-      <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-16">
-        <section id="cotizador" className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border border-stone-100 scroll-mt-20">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-            <h2 className="text-2xl font-bold flex items-center gap-2"><Calendar className="text-amber-600" /> Cotiza y Reserva</h2>
-            {data.urgencyText && <div className="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2"><Clock className="w-4 h-4"/>{data.urgencyText}</div>}
-          </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-stone-600 mb-2">1. Selecciona Fecha y Hora</label>
-                <div className="flex gap-2">
-                  <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full p-3 border-2 border-stone-200 rounded-xl bg-stone-50 outline-none focus:border-amber-500" />
-                  <select value={hora} onChange={(e) => setHora(e.target.value)} className="w-full p-3 border-2 border-stone-200 rounded-xl bg-stone-50 outline-none focus:border-amber-500">
-                    <option value="10:00">10:00 AM</option>
-                    <option value="14:00">2:00 PM</option>
-                    <option value="16:00">4:00 PM</option>
-                  </select>
-                </div>
-                {!esGrupal && fecha && <p className="text-xs text-amber-600 font-bold mt-2">*Horario/Día aplica como Cabalgata Privada.</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-stone-600 mb-2">2. Número de Jinetes</label>
-                <div className="flex items-center gap-4 bg-stone-50 p-2 rounded-xl border border-stone-200 w-fit">
-                  <button onClick={() => setJinetes(Math.max(1, jinetes - 1))} className="w-10 h-10 bg-white rounded-lg font-bold shadow">-</button>
-                  <span className="w-8 text-center font-bold text-xl">{jinetes}</span>
-                  <button onClick={() => setJinetes(jinetes + 1)} className="w-10 h-10 bg-white rounded-lg font-bold shadow">+</button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-stone-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-between">
-              <div>
-                <p className="text-sm font-bold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1 rounded-lg">{tipoCabalgataStr}</p>
-                <div className="flex justify-between items-center mb-3"><span className="text-stone-300">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span><span className="font-bold text-lg">${(jinetes * precioBase).toLocaleString()}</span></div>
-                {!esGrupal && <div className="flex justify-between items-center mb-3 text-red-400 bg-red-400/10 p-2 rounded-lg border border-red-400/20"><span>Costo Guía Exclusivo</span><span className="font-bold">+${costoGuia.toLocaleString()}</span></div>}
-                <div className="border-t border-stone-700 my-4"></div>
-                <div className="flex justify-between items-end"><span className="text-lg text-stone-300">Total</span><span className="text-4xl font-extrabold text-amber-500">${totalCalculado.toLocaleString()}</span></div>
-              </div>
-              <a href={linkCotizador} target="_blank" rel="noreferrer" className="mt-8 block w-full bg-green-500 hover:bg-green-600 text-center text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg"><MessageCircle className="w-5 h-5"/> Enviar por WhatsApp</a>
+      {/* Menú Lateral */}
+      <aside className="w-full md:w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-10">
+        <div className="p-6 border-b border-stone-800"><h2 className="text-xl font-bold text-white">Panel Admin</h2></div>
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {[
+            { id: 'comercial', icon: DollarSign, label: 'Precios' },
+            { id: 'multimedia', icon: ImagePlus, label: 'Librería' },
+            { id: 'hero', icon: LayoutDashboard, label: 'Banners' },
+            { id: 'galeria', icon: Camera, label: 'Galería' },
+            { id: 'ubicacion', icon: MapPin, label: 'Maps & Confianza' },
+            { id: 'seo', icon: TrendingUp, label: 'SEO & CRO' },
+            { id: 'caballos', icon: Users, label: 'Caballos' },
+            { id: 'reviews', icon: Star, label: 'Reseñas' },
+            { id: 'faq', icon: MessageSquare, label: 'FAQ' },
+            { id: 'general', icon: Settings, label: 'Textos Web' }
+          ].map((item) => (
+            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 p-3 rounded-lg font-medium transition-colors ${activeTab === item.id ? 'bg-amber-600 text-white shadow-lg' : 'hover:bg-stone-800'}`}>
+              <item.icon className="w-5 h-5" /> {item.label}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Contenido Principal */}
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-32">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border sticky top-0 z-20">
+            <h1 className="text-2xl font-bold capitalize text-stone-800">Módulo: {activeTab}</h1>
+            <div className="flex items-center gap-4">
+              {mensajeGuardado && <span className="text-green-600 font-bold bg-green-50 px-3 py-1 rounded-full">{mensajeGuardado}</span>}
+              <button onClick={saveConfig} className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-green-700 shadow-lg">
+                <Save size={20}/> {isSaving ? 'Guardando...' : 'Publicar Cambios'}
+              </button>
             </div>
           </div>
-        </section>
 
-        {/* MÓDULO GOOGLE MAPS Y CONFIANZA */}
-        <section id="ubicacion" className="pt-4 scroll-mt-20">
-          <div className="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
-            <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-stone-50 to-white">
+          {activeTab === 'comercial' && (
+            <div className="bg-white rounded-xl p-6 border space-y-6">
+              <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 text-sm text-amber-800">
+                <b>Regla Activa:</b> Grupales = Fin de semana a las 2:00 PM (Sin recargo guía). Privadas = Cualquier otro caso (Suma recargo guía).
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div><label className="font-bold">Precio Base x Jinete ($)</label><input type="number" value={siteData.basePrice} onChange={(e) => handleInputChange('basePrice', Number(e.target.value))} className="w-full p-3 border rounded-xl mt-1 font-bold" /></div>
+                <div><label className="font-bold">Costo Guía Exclusivo ($)</label><input type="number" value={siteData.guidePrice} onChange={(e) => handleInputChange('guidePrice', Number(e.target.value))} className="w-full p-3 border rounded-xl mt-1 font-bold text-amber-600" /></div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'ubicacion' && (
+            <div className="bg-white rounded-xl p-6 border space-y-6">
+              <h2 className="text-xl font-bold flex items-center gap-2 border-b pb-2"><BadgeCheck className="text-blue-500"/> Negocio Verificado & Google Maps</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="font-bold text-sm">Nombre del Negocio (Check Azul)</label><input value={siteData.businessName} onChange={(e) => handleInputChange('businessName', e.target.value)} className="w-full p-2 border rounded mt-1" /></div>
+                <div><label className="font-bold text-sm">Estrellas en Google (Ej: 4.9)</label><input type="number" step="0.1" value={siteData.googleRating} onChange={(e) => handleInputChange('googleRating', Number(e.target.value))} className="w-full p-2 border rounded mt-1 text-amber-600 font-bold" /></div>
+                <div><label className="font-bold text-sm">Cantidad de Reseñas (Ej: 150)</label><input type="number" value={siteData.googleReviewCount} onChange={(e) => handleInputChange('googleReviewCount', Number(e.target.value))} className="w-full p-2 border rounded mt-1" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="font-bold text-sm">Dirección ES</label><input value={siteData.mapAddress} onChange={(e) => handleInputChange('mapAddress', e.target.value)} className="w-full p-2 border rounded mt-1" /></div>
+                <div><label className="font-bold text-sm text-blue-600">Dirección EN</label><input value={siteData.mapAddressEn} onChange={(e) => handleInputChange('mapAddressEn', e.target.value)} className="w-full p-2 border rounded mt-1 bg-blue-50" /></div>
+              </div>
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-2xl font-extrabold text-stone-800">{data.businessName || 'Cabalgatas Medellín'}</h2>
-                  <BadgeCheck className="w-6 h-6 text-blue-500 fill-current" />
-                </div>
-                <p className="text-stone-500 font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> {data.mapAddress || 'Caldas, Antioquia'}</p>
-              </div>
-              <div className="flex flex-col items-center md:items-end">
-                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border shadow-sm">
-                   <span className="text-3xl font-black text-stone-800">{data.googleRating || '5.0'}</span>
-                   <div className="flex text-amber-500">
-                      <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
-                   </div>
-                </div>
-                <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Basado en {data.googleReviewCount || '150'}+ opiniones en Google</p>
+                <label className="font-bold text-sm">URL de Inserción (Iframe) de Google Maps</label>
+                <p className="text-xs text-stone-500 mb-2">En Google Maps ve a "Compartir" {'>'} "Insertar un mapa" y copia SOLO el enlace que está dentro de src="AQUI".</p>
+                <input value={siteData.mapEmbedUrl} onChange={(e) => handleInputChange('mapEmbedUrl', e.target.value)} className="w-full p-3 border rounded font-mono text-sm" placeholder="https://www.google.com/maps/embed?pb=..." />
               </div>
             </div>
-            <div className="w-full h-[400px] bg-stone-200">
-              {data.mapEmbedUrl ? (
-                <iframe src={data.mapEmbedUrl} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-stone-400 font-bold">Mapa no configurado</div>
-              )}
-            </div>
-          </div>
-        </section>
+          )}
 
-        {/* GALERÍA */}
-        {data.gallery && data.gallery.length > 0 && (
-          <section id="galeria" className="pt-4 scroll-mt-20">
-            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-500" /> Galería</h2>
-            <div className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory hide-scrollbar">
-              {data.gallery.map((item: any) => (
-                <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border overflow-hidden group">
-                  <div className="h-48 overflow-hidden relative bg-stone-100">
-                    <img src={item.url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent"></div>
-                    <h3 className="absolute bottom-4 left-4 text-white font-bold text-lg">{item.title}</h3>
+          {activeTab === 'multimedia' && (
+            <div className="bg-white rounded-xl p-6 border space-y-6">
+              <div>
+                <label className="font-bold block mb-2 text-lg">Subir nueva imagen a Librería</label>
+                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileSelect} className="w-full p-4 border-2 border-dashed rounded-xl bg-stone-50 cursor-pointer mb-2 font-bold" />
+                {previewImage && <button onClick={processAndUploadImage} className="w-full bg-amber-500 text-stone-900 py-3 rounded-xl font-bold disabled:opacity-50"><ImagePlus className="inline mr-2"/> {isUploading ? 'Subiendo...' : 'Subir a Librería'}</button>}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t pt-4">
+                {siteData.mediaLibrary?.map((media: any) => (
+                  <div key={media.id} className="border rounded-xl p-2 bg-stone-50">
+                    <img src={media.url} className="w-full h-24 object-cover rounded-lg mb-2" alt={media.title} />
+                    <p className="text-xs font-bold truncate mb-2 px-1">{media.title || 'Sin nombre'}</p>
+                    <div className="flex gap-2">
+                      <button onClick={() => editMediaMetadata(media.id, media.title)} className="flex-1 bg-blue-100 text-blue-700 text-xs p-1.5 rounded"><Edit3 size={14} className="mx-auto"/></button>
+                      <button onClick={() => { setSiteData((prev: any) => ({...prev, mediaLibrary: prev.mediaLibrary.filter((m:any) => m.id !== media.id) })) }} className="flex-1 bg-red-100 text-red-600 text-xs p-1.5 rounded"><Trash2 size={14} className="mx-auto"/></button>
+                    </div>
                   </div>
-                  {item.desc && <div className="p-4"><p className="text-stone-600 text-sm">{item.desc}</p></div>}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </section>
-        )}
+          )}
 
-        {/* RESEÑAS */}
-        {data.reviews && data.reviews.length > 0 && (
-          <section id="reviews" className="pt-4 scroll-mt-20">
-            <h2 className="text-3xl font-bold text-stone-800 mb-6">Jinetes Felices</h2>
-            <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
-              {data.reviews.map((review: any) => (
-                <div key={review.id} className="min-w-[300px] bg-white p-6 rounded-3xl shadow-sm border snap-center flex flex-col justify-between">
-                  <div>
-                    <div className="flex text-amber-400 mb-3">{[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}</div>
-                    <p className="text-stone-600 italic mb-4 text-sm leading-relaxed">"{review.text}"</p>
+          {activeTab === 'hero' && (
+            <div className="space-y-4">
+              <button onClick={() => setShowPicker('hero')} className="bg-stone-900 text-white px-4 py-3 rounded-xl font-bold flex items-center gap-2"><Plus size={20}/> Seleccionar foto para Banner</button>
+              {siteData.heroMedia?.map((h: any, idx: number) => (
+                <div key={h.id} className="bg-white p-5 rounded-xl border flex flex-col md:flex-row gap-6 relative">
+                  <button onClick={() => removeHeroMedia(h.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg"><Trash2 size={16}/></button>
+                  <div className="w-full md:w-1/3">
+                    <img src={h.url || 'https://via.placeholder.com/300x150'} className="w-full h-32 object-cover rounded-lg border" alt="Hero Banner" />
                   </div>
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                    <span className="font-bold text-sm">{review.author}</span>
-                    {review.videoUrl && <a href={review.videoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-full"><PlayCircle className="w-4 h-4" /> Ver Video</a>}
+                  <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2"><label className="text-xs font-bold">🇨🇴 Español</label><input value={h.title} onChange={(e) => updateHeroMedia(h.id, 'title', e.target.value)} className="w-full p-2 border rounded font-bold" placeholder="Título H1" /><textarea value={h.subtitle} onChange={(e) => updateHeroMedia(h.id, 'subtitle', e.target.value)} className="w-full p-2 border rounded text-sm" placeholder="Subtítulo" rows={2}/></div>
+                    <div className="space-y-2 bg-blue-50 p-3 rounded-lg"><label className="text-xs font-bold text-blue-700">🇺🇸 Inglés</label><input value={h.titleEn} onChange={(e) => updateHeroMedia(h.id, 'titleEn', e.target.value)} className="w-full p-2 border rounded font-bold" placeholder="Title H1" /><textarea value={h.subtitleEn} onChange={(e) => updateHeroMedia(h.id, 'subtitleEn', e.target.value)} className="w-full p-2 border rounded text-sm" placeholder="Subtitle" rows={2}/></div>
                   </div>
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          )}
 
-        {/* FAQ */}
-        {data.faqs && data.faqs.length > 0 && (
-          <section id="faq" className="pb-12 scroll-mt-20">
-            <h2 className="text-3xl font-bold text-stone-800 mb-8 text-center">Preguntas Frecuentes</h2>
-            <div className="space-y-4 max-w-3xl mx-auto">
-              {data.faqs.map((faq: any) => (
-                <details key={faq.id} className="group bg-white rounded-xl border cursor-pointer overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex justify-between items-center font-bold p-5 text-stone-800 hover:bg-stone-50">{faq.q}</summary>
-                  <div className="text-stone-600 px-5 pb-5 bg-stone-50 pt-2 border-t">{faq.a}</div>
-                </details>
+          {activeTab === 'galeria' && (
+            <div className="space-y-4">
+              <button onClick={() => setShowPicker('galeria')} className="bg-stone-900 text-white px-4 py-3 rounded-xl font-bold flex items-center gap-2"><Plus size={20}/> Seleccionar foto para Galería</button>
+              {siteData.gallery?.map((g: any, idx: number) => (
+                <div key={g.id} className="bg-white p-5 rounded-xl border flex flex-col md:flex-row gap-6 relative">
+                  <div className="absolute top-4 right-14 flex gap-2">
+                    <button onClick={() => moveGalleryItem(idx, -1)} className="bg-stone-100 p-2 rounded"><ArrowUp size={16}/></button>
+                    <button onClick={() => moveGalleryItem(idx, 1)} className="bg-stone-100 p-2 rounded"><ArrowDown size={16}/></button>
+                  </div>
+                  <button onClick={() => removeGalleryItem(g.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg"><Trash2 size={16}/></button>
+                  <div className="w-full md:w-1/3">
+                    <p className="font-bold text-amber-600 mb-2">Posición #{idx + 1}</p>
+                    <img src={g.url || 'https://via.placeholder.com/300x200'} className="w-full h-32 object-cover rounded-lg border" alt="Gallery item" />
+                  </div>
+                  <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2"><label className="text-xs font-bold">🇨🇴 Español</label><input value={g.title} onChange={(e) => updateGalleryItem(g.id, 'title', e.target.value)} className="w-full p-2 border rounded font-bold" placeholder="Título foto" /><textarea value={g.desc} onChange={(e) => updateGalleryItem(g.id, 'desc', e.target.value)} className="w-full p-2 border rounded text-sm" placeholder="Descripción" rows={2}/></div>
+                    <div className="space-y-2 bg-blue-50 p-3 rounded-lg"><label className="text-xs font-bold text-blue-700">🇺🇸 Inglés</label><input value={g.titleEn} onChange={(e) => updateGalleryItem(g.id, 'titleEn', e.target.value)} className="w-full p-2 border rounded font-bold" placeholder="Photo title" /><textarea value={g.descEn} onChange={(e) => updateGalleryItem(g.id, 'descEn', e.target.value)} className="w-full p-2 border rounded text-sm" placeholder="Description" rows={2}/></div>
+                  </div>
+                </div>
               ))}
             </div>
-          </section>
-        )}
+          )}
+
+          {activeTab === 'seo' && (
+            <div className="bg-white p-6 rounded-xl border space-y-6">
+              <h3 className="font-bold border-b pb-2">Exit Intent & Urgencia</h3>
+              <div className="flex gap-4 items-center mb-4"><input type="checkbox" checked={siteData.enableExitIntent} onChange={(e) => handleInputChange('enableExitIntent', e.target.checked)} className="w-6 h-6"/><span>Activar Pop-up de Descuento (Exit Intent)</span></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="text-xs font-bold">Gatillo Urgencia ES</label><input value={siteData.urgencyText} onChange={(e) => handleInputChange('urgencyText', e.target.value)} className="w-full p-2 border rounded mt-1" /></div>
+                <div><label className="text-xs font-bold text-blue-600">Gatillo Urgencia EN</label><input value={siteData.urgencyTextEn} onChange={(e) => handleInputChange('urgencyTextEn', e.target.value)} className="w-full p-2 border rounded mt-1 bg-blue-50" /></div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'caballos' && (
+            <div className="space-y-4">
+              <button onClick={addHorse} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus size={16}/> Nuevo Caballo</button>
+              {siteData.horses?.map((horse: any) => (
+                <div key={horse.id} className="bg-white p-4 rounded-xl border flex gap-4 items-center">
+                  <img src={horse.photo || 'https://via.placeholder.com/150'} className="w-24 h-24 object-cover rounded-xl" alt="Caballo" />
+                  <div className="flex-1 grid grid-cols-2 gap-3">
+                    <input type="text" value={horse.name} onChange={(e) => updateHorse(horse.id, 'name', e.target.value)} className="p-2 border rounded" placeholder="Nombre" />
+                    <input type="text" value={horse.photo} onChange={(e) => updateHorse(horse.id, 'photo', e.target.value)} className="p-2 border rounded" placeholder="URL Foto" />
+                    <select value={horse.type} onChange={(e) => updateHorse(horse.id, 'type', e.target.value)} className="p-2 border rounded"><option>Manso</option><option>Brioso</option></select>
+                  </div>
+                  <button onClick={() => removeHorse(horse.id)} className="text-red-500 p-3 bg-red-50 rounded-xl"><Trash2 size={20}/></button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'reviews' && (
+            <div className="space-y-4">
+              <button onClick={addReview} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus size={16}/> Añadir Reseña</button>
+              {siteData.reviews?.map((review: any) => (
+                <div key={review.id} className="bg-white p-5 rounded-xl border space-y-4 relative">
+                  <button onClick={() => removeReview(review.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg"><Trash2 size={16}/></button>
+                  <div className="grid grid-cols-2 gap-4 pr-12">
+                    <div><label className="text-xs font-bold">Cliente</label><input type="text" value={review.author} onChange={(e) => updateReview(review.id, 'author', e.target.value)} className="w-full p-2 border-b-2 font-bold" /></div>
+                    <div><label className="text-xs font-bold">Estrellas</label><select value={review.rating} onChange={(e) => updateReview(review.id, 'rating', Number(e.target.value))} className="w-full p-2 border-b-2 text-amber-500 font-bold"><option value={5}>5 Estrellas</option><option value={4}>4 Estrellas</option></select></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className="text-xs font-bold">Reseña ES</label><textarea value={review.text} onChange={(e) => updateReview(review.id, 'text', e.target.value)} className="w-full p-2 border rounded mt-1" rows={3} /></div>
+                    <div><label className="text-xs font-bold text-blue-600">Reseña EN</label><textarea value={review.textEn} onChange={(e) => updateReview(review.id, 'textEn', e.target.value)} className="w-full p-2 border rounded mt-1 bg-blue-50" rows={3} /></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'faq' && (
+            <div className="space-y-4">
+              <button onClick={addFaq} className="bg-stone-900 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"><Plus size={16}/> Añadir Pregunta</button>
+              {siteData.faqs?.map((faq: any) => (
+                <div key={faq.id} className="bg-white p-5 rounded-xl border relative">
+                  <button onClick={() => removeFaq(faq.id)} className="absolute top-4 right-4 text-red-500 bg-red-50 p-2 rounded-lg"><Trash2 size={16}/></button>
+                  <div className="grid grid-cols-2 gap-6 pr-10">
+                    <div className="space-y-2"><label className="text-xs font-bold">🇨🇴 ES</label><input type="text" value={faq.q} onChange={(e) => updateFaq(faq.id, 'q', e.target.value)} className="w-full p-2 border-b-2 font-bold" placeholder="Pregunta" /><textarea value={faq.a} onChange={(e) => updateFaq(faq.id, 'a', e.target.value)} className="w-full p-2 border rounded" rows={3} /></div>
+                    <div className="space-y-2"><label className="text-xs font-bold text-blue-600">🇺🇸 EN</label><input type="text" value={faq.qEn} onChange={(e) => updateFaq(faq.id, 'qEn', e.target.value)} className="w-full p-2 border-b-2 font-bold bg-blue-50" placeholder="Question" /><textarea value={faq.aEn} onChange={(e) => updateFaq(faq.id, 'aEn', e.target.value)} className="w-full p-2 border rounded bg-blue-50" rows={3} /></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'general' && (
+            <div className="bg-white rounded-xl p-6 border space-y-6">
+              <div><label className="font-bold block mb-1">WhatsApp Principal</label><input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className="w-full md:w-1/2 p-3 border-2 rounded-xl font-mono text-lg" placeholder="573000000000" /></div>
+            </div>
+          )}
+
+        </div>
       </main>
-
-      {/* BOTONES FLOTANTES MÓVILES Y WHATSAPP */}
-      <a href={linkGancho} target="_blank" rel="noreferrer" className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-600 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" /></a>
-
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-3 pb-safe z-50 flex justify-between items-center md:hidden">
-        <a href="#inicio" className="flex flex-col items-center text-stone-400"><Home className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel1 || 'Inicio'}</span></a>
-        <a href="#cotizador" className="flex flex-col items-center text-stone-400"><Calendar className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel2 || 'Cotizar'}</span></a>
-        <a href={linkGancho} target="_blank" rel="noreferrer" className="relative -top-5 flex flex-col items-center"><div className="bg-green-500 text-white p-4 rounded-full shadow-lg"><MessageCircle className="w-7 h-7" /></div></a>
-        <a href="#faq" className="flex flex-col items-center text-stone-400"><Info className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel3 || 'FAQ'}</span></a>
-      </nav>
     </div>
   );
 }

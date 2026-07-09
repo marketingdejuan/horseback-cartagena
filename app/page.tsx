@@ -134,7 +134,7 @@ export default function ClientePage() {
                       <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
                    </div>
                 </div>
-                <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Basado en {data.googleReviewCount || '150'}+ opiniones en Google</p>
+                <p className="text-sm font-bold text-stone-500 mt-2">Basado en {data.googleReviewCount || '150'}+ opiniones en Google</p>
               </div>
             </div>
             <div className="w-full h-[400px] bg-stone-200">
@@ -147,7 +147,6 @@ export default function ClientePage() {
           </div>
         </section>
 
-        {/* GALERÍA */}
         {data.gallery && data.gallery.length > 0 && (
           <section id="galeria" className="pt-4 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-500" /> Galería</h2>
@@ -166,7 +165,6 @@ export default function ClientePage() {
           </section>
         )}
 
-        {/* RESEÑAS */}
         {data.reviews && data.reviews.length > 0 && (
           <section id="reviews" className="pt-4 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-6">Jinetes Felices</h2>
@@ -187,7 +185,6 @@ export default function ClientePage() {
           </section>
         )}
 
-        {/* FAQ */}
         {data.faqs && data.faqs.length > 0 && (
           <section id="faq" className="pb-12 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-8 text-center">Preguntas Frecuentes</h2>
@@ -203,7 +200,21 @@ export default function ClientePage() {
         )}
       </main>
 
-      {/* BOTONES FLOTANTES MÓVILES Y WHATSAPP */}
+      {showExitPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative animate-in zoom-in duration-300">
+            <button onClick={() => setShowExitPopup(false)} className="absolute top-4 right-4 text-stone-400 hover:text-stone-800 bg-stone-100 rounded-full p-2"><X className="w-5 h-5"/></button>
+            <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6"><Gift className="w-10 h-10" /></div>
+            <h3 className="text-2xl font-extrabold text-stone-800 mb-2">¡Espera! No te vayas 🐎</h3>
+            <p className="text-stone-600 mb-8">Resérvalo ahora mismo por WhatsApp y te damos un <b>descuento sorpresa</b>.</p>
+            <a href={linkCotizador} target="_blank" rel="noreferrer" onClick={() => setShowExitPopup(false)} className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg">
+              ¡Reclamar mi regalo!
+            </a>
+            <button onClick={() => setShowExitPopup(false)} className="mt-4 text-sm text-stone-400 font-medium">No gracias</button>
+          </div>
+        </div>
+      )}
+
       <a href={linkGancho} target="_blank" rel="noreferrer" className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-600 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" /></a>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-3 pb-safe z-50 flex justify-between items-center md:hidden">
