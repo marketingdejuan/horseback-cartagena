@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck } from 'lucide-react';
+import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon } from 'lucide-react';
 import { db } from '../../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
@@ -19,6 +19,26 @@ export default function EnglishPage() {
     });
     return unsub;
   }, []);
+
+  // Inyección de SEO Global (Inglés)
+  useEffect(() => {
+    if (data) {
+      if (data.metaTitleEn) document.title = data.metaTitleEn;
+      
+      const setMeta = (name: string, content: string, isProperty = false) => {
+        if(!content) return;
+        const attr = isProperty ? 'property' : 'name';
+        let el = document.querySelector(`meta[${attr}="${name}"]`);
+        if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
+        el.setAttribute('content', content);
+      };
+
+      setMeta('description', data.metaDescriptionEn);
+      setMeta('keywords', data.seoKeywordsEn);
+      setMeta('og:image', data.seoOgImage, true);
+      setMeta('og:title', data.metaTitleEn, true);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (data?.heroMedia && data.heroMedia.length > 1) {
@@ -69,7 +89,8 @@ export default function EnglishPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitleEn || "Horseback Riding Medellín"}</h1>
-          <p className="text-stone-200 text-lg md:text-xl font-medium">{data.heroSubtitleEn || "Unforgettable experiences."}</p>
+          <p className="text-stone-200 text-lg md:text-xl font-medium mb-8">{data.heroSubtitleEn || "Unforgettable experiences."}</p>
+          <a href={linkGancho} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Chat with an Advisor</a>
         </div>
       </section>
 
@@ -133,9 +154,7 @@ export default function EnglishPage() {
               <div className="flex flex-col items-center md:items-end">
                 <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border shadow-sm">
                    <span className="text-3xl font-black text-stone-800">{data.googleRating || '5.0'}</span>
-                   <div className="flex text-amber-500">
-                      <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
-                   </div>
+                   <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
                 </div>
                 <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Based on {data.googleReviewCount || '150'}+ Google reviews</p>
               </div>
@@ -144,15 +163,10 @@ export default function EnglishPage() {
             <div className="w-full h-[300px] relative bg-stone-200 flex items-center justify-center overflow-hidden border-t">
               <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 blur-[2px]" alt="Map background" />
               <div className="absolute inset-0 bg-stone-900/30"></div>
-              
               <div className="relative z-10 flex flex-col items-center">
-                <div className="bg-white p-4 rounded-full shadow-2xl mb-4 animate-bounce">
-                  <MapPin className="w-8 h-8 text-amber-500" />
-                </div>
+                <div className="bg-white p-4 rounded-full shadow-2xl mb-4 animate-bounce"><MapPin className="w-8 h-8 text-amber-500" /></div>
                 {data.mapEmbedUrl ? (
-                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" className="bg-stone-900 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2">
-                    Open in Google Maps
-                  </a>
+                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" className="bg-stone-900 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2">Open in Google Maps</a>
                 ) : (
                   <span className="bg-white px-4 py-2 rounded-lg font-bold text-stone-500 shadow">Map not configured</span>
                 )}
@@ -176,6 +190,54 @@ export default function EnglishPage() {
                 </div>
               ))}
             </div>
+            <div className="flex justify-center mt-6">
+              <a href={linkGancho} target="_blank" rel="noreferrer" className="bg-green-100 text-green-700 hover:bg-green-200 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-colors"><MessageCircle className="w-5 h-5"/> Want to experience this? Contact us</a>
+            </div>
+          </section>
+        )}
+
+        {/* BLOG SEO PREVIEW */}
+        {data.blogPosts && data.blogPosts.length > 0 && (
+          <section id="blog" className="pt-4 scroll-mt-20">
+            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><BookOpen className="w-8 h-8 text-amber-500" /> Our Blog</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {data.blogPosts.slice(0, 2).map((post: any) => (
+                <a key={post.id} href={`/blog/${post.slug}`} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow group">
+                  <img src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} className="w-full h-40 object-cover group-hover:scale-105 transition-transform" alt={post.title} />
+                  <div className="p-6">
+                    <h3 className="font-bold text-xl mb-2 text-stone-800">{post.title}</h3>
+                    <p className="text-stone-500 text-sm line-clamp-2">{post.metaDesc || post.content}</p>
+                    <span className="text-amber-600 font-bold text-sm mt-4 block">Read article →</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+            <div className="text-center mt-6">
+              <a href="/blog" className="inline-block border-2 border-stone-200 text-stone-600 font-bold py-2 px-6 rounded-full hover:bg-stone-50">View all articles</a>
+            </div>
+          </section>
+        )}
+
+        {data.reviews && data.reviews.length > 0 && (
+          <section id="reviews" className="pt-4 scroll-mt-20">
+            <h2 className="text-3xl font-bold text-stone-800 mb-6">Happy Riders</h2>
+            <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
+              {data.reviews.map((review: any) => (
+                <div key={review.id} className="min-w-[300px] bg-white p-6 rounded-3xl shadow-sm border snap-center flex flex-col justify-between">
+                  <div>
+                    <div className="flex text-amber-400 mb-3">{[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}</div>
+                    <p className="text-stone-600 italic mb-4 text-sm leading-relaxed">"{review.textEn || review.text}"</p>
+                  </div>
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <span className="font-bold text-sm">{review.author}</span>
+                    {review.videoUrl && <a href={review.videoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-full"><PlayCircle className="w-4 h-4" /> Watch Video</a>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-center">
+              <a href={linkCotizador} target="_blank" rel="noreferrer" className="bg-green-500 text-white hover:bg-green-600 font-bold py-3 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Join them, book here</a>
+            </div>
           </section>
         )}
 
@@ -190,6 +252,10 @@ export default function EnglishPage() {
                 </details>
               ))}
             </div>
+            <div className="text-center mt-8">
+              <p className="text-stone-500 mb-4">Can't find what you're looking for?</p>
+              <a href={linkGancho} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Talk to an online advisor</a>
+            </div>
           </section>
         )}
       </main>
@@ -202,7 +268,7 @@ export default function EnglishPage() {
             <h3 className="text-2xl font-extrabold text-stone-800 mb-2">Wait! Don't go 🐎</h3>
             <p className="text-stone-600 mb-8">Book right now via WhatsApp and receive a <b>surprise discount</b>.</p>
             <a href={linkCotizador} target="_blank" rel="noreferrer" onClick={() => setShowExitPopup(false)} className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg">
-              Claim my gift!
+              Claim my discount!
             </a>
             <button onClick={() => setShowExitPopup(false)} className="mt-4 text-sm text-stone-400 font-medium">No thanks</button>
           </div>
@@ -211,12 +277,12 @@ export default function EnglishPage() {
 
       <a href={linkGancho} target="_blank" rel="noreferrer" className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-600 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" /></a>
 
-      {/* MENÚ MÓVIL (Con links editables) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-3 pb-safe z-50 flex justify-between items-center md:hidden">
-        <a href={data.navLink1 || '#inicio'} className="flex flex-col items-center text-stone-400"><Home className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel1En || 'Home'}</span></a>
-        <a href={data.navLink2 || '#cotizador'} className="flex flex-col items-center text-stone-400"><Calendar className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel2En || 'Quote'}</span></a>
-        <a href={linkGancho} target="_blank" rel="noreferrer" className="relative -top-5 flex flex-col items-center"><div className="bg-green-500 text-white p-4 rounded-full shadow-lg"><MessageCircle className="w-7 h-7" /></div></a>
-        <a href={data.navLink3 || '#faq'} className="flex flex-col items-center text-stone-400"><Info className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel3En || 'FAQ'}</span></a>
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 pb-safe z-50 grid grid-cols-5 gap-1 text-center md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08)] items-center">
+        <a href={data.navLink1 || '#inicio'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Home className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel1En || 'Home'}</span></a>
+        <a href={data.navLink2 || '#cotizador'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Calendar className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel2En || 'Quote'}</span></a>
+        <a href={linkGancho} target="_blank" rel="noreferrer" className="relative -mt-8 flex justify-center"><div className="bg-green-500 text-white p-4 rounded-full shadow-xl shadow-green-500/40 animate-pulse border-4 border-white"><MessageCircle className="w-7 h-7" /></div></a>
+        <a href={data.navLink3 || '#galeria'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><ImageIcon className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel3En || 'Gallery'}</span></a>
+        <a href={data.navLink4 || '#faq'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Info className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel4En || 'FAQ'}</span></a>
       </nav>
     </div>
   );

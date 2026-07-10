@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck } from 'lucide-react';
+import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
@@ -19,6 +19,26 @@ export default function ClientePage() {
     });
     return unsub;
   }, []);
+
+  // Inyección de SEO Global
+  useEffect(() => {
+    if (data) {
+      if (data.metaTitle) document.title = data.metaTitle;
+      
+      const setMeta = (name: string, content: string, isProperty = false) => {
+        if(!content) return;
+        const attr = isProperty ? 'property' : 'name';
+        let el = document.querySelector(`meta[${attr}="${name}"]`);
+        if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
+        el.setAttribute('content', content);
+      };
+
+      setMeta('description', data.metaDescription);
+      setMeta('keywords', data.seoKeywords);
+      setMeta('og:image', data.seoOgImage, true);
+      setMeta('og:title', data.metaTitle, true);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (data?.heroMedia && data.heroMedia.length > 1) {
@@ -47,7 +67,7 @@ export default function ClientePage() {
   const costoGuia = esGrupal ? 0 : (data.guidePrice || 80000); 
   const totalCalculado = (jinetes * precioBase) + costoGuia;
 
-  const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro extra de guía)' : 'Privada (Incluye guía exclusivo)';
+  const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro de guía)' : 'Privada (Incluye guía exclusivo)';
   const whatsappNum = data.whatsappNumber || "573000000000";
   
   const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Hola, quiero reservar el ${fecha || 'próximo fin de semana'} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${esGrupal ? 'Grupal' : 'Privada'}. Cotización: $${totalCalculado.toLocaleString()}`)}`;
@@ -60,6 +80,7 @@ export default function ClientePage() {
         <a href="/en" className="opacity-50 hover:opacity-100 transition-all shadow-lg rounded-full overflow-hidden border-2 border-transparent hover:border-white"><img src="https://flagcdn.com/w40/us.png" className="w-8 h-8 object-cover" alt="EN" /></a>
       </div>
 
+      {/* HERO SECTION */}
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
         {data.heroMedia?.map((media: any, idx: number) => {
           const isVideo = media.url?.toLowerCase().includes('.mp4');
@@ -69,11 +90,14 @@ export default function ClientePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitle || "Cabalgatas Ecológicas"}</h1>
-          <p className="text-stone-200 text-lg md:text-xl font-medium">{data.heroSubtitle || "Experiencias únicas."}</p>
+          <p className="text-stone-200 text-lg md:text-xl font-medium mb-8">{data.heroSubtitle || "Experiencias únicas en Antioquia."}</p>
+          <a href={linkGancho} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Chatear con Asesor</a>
         </div>
       </section>
 
       <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-16">
+        
+        {/* COTIZADOR */}
         <section id="cotizador" className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border border-stone-100 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
             <h2 className="text-2xl font-bold flex items-center gap-2"><Calendar className="text-amber-600" /> Cotiza y Reserva</h2>
@@ -93,7 +117,7 @@ export default function ClientePage() {
                 </div>
                 <div className="mt-4 bg-amber-50 p-3 rounded-lg border border-amber-200">
                   <p className="text-xs text-amber-800 leading-relaxed">
-                    💡 <b>Nota importante:</b> Las cabalgatas grupales (sin costo extra de guía) son únicamente los <b>sábados y domingos a las 2:00 PM</b>. Si escoges cualquier otro día u horario, tu experiencia será 100% exclusiva y privada, lo que incluye el costo del guía privado.
+                    💡 <b>Nota importante:</b> Las cabalgatas grupales (sin costo extra de guía) son únicamente los <b>sábados y domingos a las 2:00 PM</b>. Cualquier otro día u horario será una experiencia exclusiva y privada (incluye cobro del guía).
                   </p>
                 </div>
               </div>
@@ -120,6 +144,7 @@ export default function ClientePage() {
           </div>
         </section>
 
+        {/* UBICACIÓN Y CONFIANZA */}
         <section id="ubicacion" className="pt-4 scroll-mt-20">
           <div className="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-stone-50 to-white">
@@ -133,25 +158,19 @@ export default function ClientePage() {
               <div className="flex flex-col items-center md:items-end">
                 <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border shadow-sm">
                    <span className="text-3xl font-black text-stone-800">{data.googleRating || '5.0'}</span>
-                   <div className="flex text-amber-500">
-                      <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
-                   </div>
+                   <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
                 </div>
-                <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Basado en {data.googleReviewCount || '150'}+ opiniones en Google</p>
+                <p className="text-sm font-bold text-stone-500 mt-2">Basado en {data.googleReviewCount || '150'}+ opiniones</p>
               </div>
             </div>
+            
             <div className="w-full h-[300px] relative bg-stone-200 flex items-center justify-center overflow-hidden border-t">
-              <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 blur-[2px]" alt="Mapa de fondo" />
+              <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 blur-[2px]" alt="Mapa" />
               <div className="absolute inset-0 bg-stone-900/30"></div>
-              
               <div className="relative z-10 flex flex-col items-center">
-                <div className="bg-white p-4 rounded-full shadow-2xl mb-4 animate-bounce">
-                  <MapPin className="w-8 h-8 text-amber-500" />
-                </div>
+                <div className="bg-white p-4 rounded-full shadow-2xl mb-4 animate-bounce"><MapPin className="w-8 h-8 text-amber-500" /></div>
                 {data.mapEmbedUrl ? (
-                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" className="bg-stone-900 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2">
-                    Abrir en Google Maps
-                  </a>
+                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" className="bg-stone-900 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2">Abrir en Google Maps</a>
                 ) : (
                   <span className="bg-white px-4 py-2 rounded-lg font-bold text-stone-500 shadow">Mapa no configurado</span>
                 )}
@@ -160,6 +179,7 @@ export default function ClientePage() {
           </div>
         </section>
 
+        {/* GALERÍA */}
         {data.gallery && data.gallery.length > 0 && (
           <section id="galeria" className="pt-4 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-500" /> Galería</h2>
@@ -175,9 +195,35 @@ export default function ClientePage() {
                 </div>
               ))}
             </div>
+            <div className="flex justify-center mt-6">
+              <a href={linkGancho} target="_blank" rel="noreferrer" className="bg-green-100 text-green-700 hover:bg-green-200 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-colors"><MessageCircle className="w-5 h-5"/> Me gusta. Quiero más info.</a>
+            </div>
           </section>
         )}
 
+        {/* BLOG SEO PREVIEW */}
+        {data.blogPosts && data.blogPosts.length > 0 && (
+          <section id="blog" className="pt-4 scroll-mt-20">
+            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><BookOpen className="w-8 h-8 text-amber-500" /> Nuestro Blog</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {data.blogPosts.slice(0, 2).map((post: any) => (
+                <a key={post.id} href={`/blog/${post.slug}`} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow group">
+                  <img src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} className="w-full h-40 object-cover group-hover:scale-105 transition-transform" alt={post.title} />
+                  <div className="p-6">
+                    <h3 className="font-bold text-xl mb-2 text-stone-800">{post.title}</h3>
+                    <p className="text-stone-500 text-sm line-clamp-2">{post.metaDesc || post.content}</p>
+                    <span className="text-amber-600 font-bold text-sm mt-4 block">Leer artículo →</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+            <div className="text-center mt-6">
+              <a href="/blog" className="inline-block border-2 border-stone-200 text-stone-600 font-bold py-2 px-6 rounded-full hover:bg-stone-50">Ver todos los artículos</a>
+            </div>
+          </section>
+        )}
+
+        {/* REVIEWS */}
         {data.reviews && data.reviews.length > 0 && (
           <section id="reviews" className="pt-4 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-6">Jinetes Felices</h2>
@@ -195,9 +241,13 @@ export default function ClientePage() {
                 </div>
               ))}
             </div>
+            <div className="flex justify-center">
+              <a href={linkCotizador} target="_blank" rel="noreferrer" className="bg-green-500 text-white hover:bg-green-600 font-bold py-3 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Únete a ellos, reserva aquí</a>
+            </div>
           </section>
         )}
 
+        {/* FAQ */}
         {data.faqs && data.faqs.length > 0 && (
           <section id="faq" className="pb-12 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-8 text-center">Preguntas Frecuentes</h2>
@@ -209,33 +259,44 @@ export default function ClientePage() {
                 </details>
               ))}
             </div>
+            <div className="text-center mt-8">
+              <p className="text-stone-500 mb-4">¿Aún tienes dudas?</p>
+              <a href={linkGancho} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Habla con un asesor ahora</a>
+            </div>
           </section>
         )}
       </main>
 
+      {/* EXIT INTENT */}
       {showExitPopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative animate-in zoom-in duration-300">
             <button onClick={() => setShowExitPopup(false)} className="absolute top-4 right-4 text-stone-400 hover:text-stone-800 bg-stone-100 rounded-full p-2"><X className="w-5 h-5"/></button>
             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6"><Gift className="w-10 h-10" /></div>
             <h3 className="text-2xl font-extrabold text-stone-800 mb-2">¡Espera! No te vayas 🐎</h3>
-            <p className="text-stone-600 mb-8">Resérvalo ahora mismo por WhatsApp y te damos un <b>descuento sorpresa</b>.</p>
+            <p className="text-stone-600 mb-8">Resérvalo ahora mismo por WhatsApp y recibe un <b>descuento sorpresa</b>.</p>
             <a href={linkCotizador} target="_blank" rel="noreferrer" onClick={() => setShowExitPopup(false)} className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg">
-              ¡Reclamar mi regalo!
+              ¡Reclamar mi descuento!
             </a>
             <button onClick={() => setShowExitPopup(false)} className="mt-4 text-sm text-stone-400 font-medium">No gracias</button>
           </div>
         </div>
       )}
 
+      {/* BOTÓN FLOTANTE (PC) */}
       <a href={linkGancho} target="_blank" rel="noreferrer" className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-600 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" /></a>
 
-      {/* MENÚ MÓVIL (Con links editables) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-3 pb-safe z-50 flex justify-between items-center md:hidden">
-        <a href={data.navLink1 || '#inicio'} className="flex flex-col items-center text-stone-400"><Home className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel1 || 'Inicio'}</span></a>
-        <a href={data.navLink2 || '#cotizador'} className="flex flex-col items-center text-stone-400"><Calendar className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel2 || 'Cotizar'}</span></a>
-        <a href={linkGancho} target="_blank" rel="noreferrer" className="relative -top-5 flex flex-col items-center"><div className="bg-green-500 text-white p-4 rounded-full shadow-lg"><MessageCircle className="w-7 h-7" /></div></a>
-        <a href={data.navLink3 || '#faq'} className="flex flex-col items-center text-stone-400"><Info className="w-6 h-6 mb-1" /><span className="text-[10px] font-bold">{data.navLabel3 || 'FAQ'}</span></a>
+      {/* MENÚ MÓVIL (Admin-configurable) */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 pb-safe z-50 grid grid-cols-5 gap-1 text-center md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08)] items-center">
+        <a href={data.navLink1 || '#inicio'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Home className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel1 || 'Inicio'}</span></a>
+        <a href={data.navLink2 || '#cotizador'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Calendar className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel2 || 'Cotizar'}</span></a>
+        
+        <a href={linkGancho} target="_blank" rel="noreferrer" className="relative -mt-8 flex justify-center">
+          <div className="bg-green-500 text-white p-4 rounded-full shadow-xl shadow-green-500/40 animate-pulse border-4 border-white"><MessageCircle className="w-7 h-7" /></div>
+        </a>
+        
+        <a href={data.navLink3 || '#galeria'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><ImageIcon className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel3 || 'Galería'}</span></a>
+        <a href={data.navLink4 || '#faq'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Info className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel4 || 'FAQ'}</span></a>
       </nav>
     </div>
   );
