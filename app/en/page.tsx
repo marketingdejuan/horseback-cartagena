@@ -7,7 +7,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 
 export default function EnglishPage() {
 /* STREAMING_CHUNK: Inicializando estados de la aplicación (EN)... */
-const [data, setData] = useState(null);
+const [data, setData] = useState<any>(null);
 const [fecha, setFecha] = useState('');
 const [hora, setHora] = useState('10:00');
 const [jinetes, setJinetes] = useState(2);
