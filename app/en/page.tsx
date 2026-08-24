@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon } from 'lucide-react';
 import { db } from '../../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
+import PricingSectionEn from '../../components/PlanesEn';
 
 export default function EnglishPage() {
 /* STREAMING_CHUNK: Inicializando estados de la aplicación (EN)... */
@@ -181,6 +182,9 @@ return (
           </div>
         </div>
       </section>
+
+      {/* STREAMING_CHUNK: Renderizando la sección de Planes de Cabalgata (EN)... */}
+      <PricingSectionEn />
 
       {/* STREAMING_CHUNK: Renderizando la sección de Ubicación en Maps (EN)... */}
       <section id="ubicacion" className="pt-4 scroll-mt-20">
