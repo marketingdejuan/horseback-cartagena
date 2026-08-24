@@ -1,9 +1,9 @@
 "use client";
 /* STREAMING_CHUNK: Importando librerías y componentes base... */
 import React, { useEffect, useState } from 'react';
-import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon } from 'lucide-react';
+import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import { db } from '../lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import PricingSection from '../components/Planes';
 
 export default function ClientePage() {
@@ -12,6 +12,8 @@ const [data, setData] = useState<any>(null);
 const [fecha, setFecha] = useState('');
 const [hora, setHora] = useState('10:00');
 const [jinetes, setJinetes] = useState(2);
+// NUEVO ESTADO: Para capturar el teléfono del cliente
+const [telefono, setTelefono] = useState('');
 const [currentHero, setCurrentHero] = useState(0);
 const [showExitPopup, setShowExitPopup] = useState(false);
 const [hasShownPopup, setHasShownPopup] = useState(false);
@@ -42,7 +44,6 @@ if (data.metaTitle) document.title = data.metaTitle;
   setMeta('og:image', data.seoOgImage, true);
   setMeta('og:title', data.metaTitle, true);
 
-  // Inyección del Script de Google Ads / Analytics
   if (data.googleAnalyticsId && !document.getElementById('google-analytics')) {
     const script = document.createElement('script');
     script.id = 'google-analytics';
@@ -84,14 +85,12 @@ return () => document.removeEventListener('mouseleave', handleMouseLeave);
 /* STREAMING_CHUNK: Definiendo la función de rastreo de conversiones (Google Ads)... */
 const trackWhatsAppClick = (ubicacionBoton: string) => {
   if (typeof window !== 'undefined' && (window as any).gtag) {
-    // 1. Envío del evento a Google Analytics 4 (El que ya tenías)
     (window as any).gtag('event', 'whatsapp_click', {
       event_category: 'Conversión Contacto',
       event_label: ubicacionBoton,
       value: 1
     });
 
-    // 2. Envío DIRECTO a Google Ads de la conversión (¡El nuevo código!)
     (window as any).gtag('event', 'conversion', {
       'send_to': 'AW-10958714047/MQGxCMyQ1-YcEL_pwuko',
       'value': 1.0,
@@ -100,20 +99,51 @@ const trackWhatsAppClick = (ubicacionBoton: string) => {
   }
 };
 
-/* STREAMING_CHUNK: Renderizando estado de carga inicial... */
-if (!data) return null;
-
 /* STREAMING_CHUNK: Procesando la lógica comercial (Precios y Reglas)... */
 const esFinDeSemana = fecha ? [6, 0].includes(new Date(fecha + 'T12:00:00').getDay()) : false;
 const esDosPm = hora === '14:00';
 const esGrupal = esFinDeSemana && esDosPm;
-const precioBase = data.basePrice || 100000;
-const costoGuia = esGrupal ? 0 : (data.guidePrice || 80000);
+const precioBase = data?.basePrice || 100000;
+const costoGuia = esGrupal ? 0 : (data?.guidePrice || 80000);
 const totalCalculado = (jinetes * precioBase) + costoGuia;
 const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro extra de guía)' : 'Privada (Incluye guía exclusivo)';
-const whatsappNum = data.whatsappNumber || "573000000000";
+const whatsappNum = data?.whatsappNumber || "573000000000";
 const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Hola, quiero reservar el ${fecha || 'próximo fin de semana'} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${esGrupal ? 'Grupal' : 'Privada'}. Cotización: $${totalCalculado.toLocaleString()}`)}`;
 const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas. 🐎")}`;
+
+// Validación básica: El número debe tener al menos 7 dígitos para habilitar el botón
+const isValidPhone = telefono.trim().length >= 7;
+
+/* Función para interceptar el clic, guardar en el panel admin y abrir WhatsApp */
+const handleReservaWhatsApp = async (e: React.MouseEvent) => {
+  e.preventDefault(); 
+  
+  if (!isValidPhone) return; // Si no hay teléfono válido, no hace nada
+
+  // 1. Enviamos el evento de conversión a Google Ads
+  trackWhatsAppClick('Boton_Cotizador');
+
+  // 2. Guardamos la reserva y EL TELÉFONO silenciosamente en Firebase
+  try {
+    await addDoc(collection(db, 'reservas'), {
+      plan: esGrupal ? 'Cabalgata Grupal' : 'Cabalgata Privada',
+      fecha: fecha || 'Por definir',
+      hora: hora,
+      jinetes: jinetes,
+      telefono: telefono, // Guardamos el contacto capturado
+      total: totalCalculado,
+      fechaCreacion: serverTimestamp(),
+      origen: 'Web Español'
+    });
+  } catch (error) {
+    console.error("Error guardando reserva silenciosa:", error);
+  }
+
+  // 3. Redirigimos al cliente a WhatsApp
+  window.open(linkCotizador, '_blank');
+};
+
+if (!data) return null;
 
 /* STREAMING_CHUNK: Renderizando la cabecera y el Selector de Idioma... */
 return (
@@ -140,6 +170,8 @@ return (
           {data.urgencyText && <div className="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2"><Clock className="w-4 h-4"/>{data.urgencyText}</div>}
         </div>
         <div className="grid md:grid-cols-2 gap-8">
+          
+          {/* Lado Izquierdo: Formularios */}
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-bold text-stone-600 mb-2">1. Selecciona Fecha y Hora</label>
@@ -157,6 +189,7 @@ return (
                 </p>
               </div>
             </div>
+            
             <div>
               <label className="block text-sm font-bold text-stone-600 mb-2">2. Número de Jinetes</label>
               <div className="flex items-center gap-4 bg-stone-50 p-2 rounded-xl border border-stone-200 w-fit">
@@ -165,8 +198,27 @@ return (
                 <button onClick={() => setJinetes(jinetes + 1)} className="w-10 h-10 bg-white rounded-lg font-bold shadow">+</button>
               </div>
             </div>
+
+            {/* NUEVO CAMPO: Teléfono del Cliente */}
+            <div>
+              <label className="block text-sm font-bold text-stone-600 mb-2">3. Tu número de WhatsApp</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="tel"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  placeholder="Ej: 300 123 4567"
+                  className="w-full pl-10 p-3 border-2 border-stone-200 rounded-xl bg-stone-50 outline-none focus:border-green-500 transition-colors font-medium"
+                />
+              </div>
+              <p className="text-xs text-stone-500 mt-2">Obligatorio para enviarte la cotización detallada.</p>
+            </div>
           </div>
           
+          {/* Lado Derecho: Resumen y Botón */}
           <div className="bg-stone-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-between">
             <div>
               <p className="text-sm font-bold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1 rounded-lg">{tipoCabalgataStr}</p>
@@ -175,7 +227,15 @@ return (
               <div className="border-t border-stone-700 my-4"></div>
               <div className="flex justify-between items-end"><span className="text-lg text-stone-300">Total</span><span className="text-4xl font-extrabold text-amber-500">${totalCalculado.toLocaleString()}</span></div>
             </div>
-            <a href={linkCotizador} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Cotizador')} className="mt-8 block w-full bg-green-500 hover:bg-green-600 text-center text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg"><MessageCircle className="w-5 h-5"/> Enviar por WhatsApp</a>
+            
+            {/* BOTÓN INTELIGENTE: Cambia de estilo si no han puesto el teléfono */}
+            <button 
+              onClick={handleReservaWhatsApp} 
+              disabled={!isValidPhone}
+              className={`mt-8 block w-full text-center font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer' : 'bg-stone-700 text-stone-400 cursor-not-allowed border border-stone-600'}`}
+            >
+              <MessageCircle className="w-5 h-5"/> {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
+            </button>
           </div>
         </div>
       </section>
@@ -331,11 +391,11 @@ return (
     <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Flotante')} className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-600 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" /></a>
 
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 pb-safe z-50 grid grid-cols-5 gap-1 text-center md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08)] items-center">
-      <a href={data.navLink1 || '#inicio'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Home className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel1 || 'Inicio'}</span></a>
-      <a href={data.navLink2 || '#cotizador'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Calendar className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel2 || 'Cotizar'}</span></a>
+      <a href={data?.navLink1 || '#inicio'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Home className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel1 || 'Inicio'}</span></a>
+      <a href={data?.navLink2 || '#cotizador'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Calendar className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel2 || 'Cotizar'}</span></a>
       <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Nav_Movil')} className="relative -mt-8 flex justify-center"><div className="bg-green-500 text-white p-4 rounded-full shadow-xl shadow-green-500/40 animate-pulse border-4 border-white"><MessageCircle className="w-7 h-7" /></div></a>
-      <a href={data.navLink3 || '#galeria'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><ImageIcon className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel3 || 'Galería'}</span></a>
-      <a href={data.navLink4 || '#faq'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Info className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data.navLabel4 || 'FAQ'}</span></a>
+      <a href={data?.navLink3 || '#galeria'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><ImageIcon className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel3 || 'Galería'}</span></a>
+      <a href={data?.navLink4 || '#faq'} className="flex flex-col items-center text-stone-500 hover:text-amber-600"><Info className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel4 || 'FAQ'}</span></a>
     </nav>
   </div>
 );
