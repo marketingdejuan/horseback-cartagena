@@ -94,7 +94,7 @@ export default function PricingSection() {
               </li>
               <li className="flex items-start font-medium text-gray-900">
                 <span className="text-orange-500 mr-2">✓</span>
-                Decoración: $50.000 (GRATIS para > 6 personas)
+                Decoración: $50.000 (GRATIS para más de 6 personas)
               </li>
             </ul>
             <button className="w-full bg-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition">
