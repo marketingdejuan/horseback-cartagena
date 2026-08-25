@@ -32,9 +32,6 @@ export default function AdminDashboard() {
     navLabel4: 'FAQ', navLabel4En: 'FAQ', navLink4: '#faq',
     basePrice: 100000, guidePrice: 80000, depositPercent: 50, promoActive: true,
     horses: [], faqs: [], mediaLibrary: [], reviews: [], heroMedia: [], gallery: [],
-    metaTitle: 'Cabalgatas Ecológicas Medellín', metaTitleEn: 'Horseback Riding Medellin',
-    metaDescription: 'Reserva la mejor cabalgata ecológica en Caldas, Antioquia.', metaDescriptionEn: 'Book the best horseback riding tour in Medellin.',
-    seoKeywords: 'cabalgatas medellin, caballos caldas, turismo antioquia', seoKeywordsEn: 'horseback riding medellin, horses antioquia, tours',
     seoOgImage: '', googleAnalyticsId: '',
     urgencyText: '🔥 Quedan pocos cupos', urgencyTextEn: '🔥 Few spots left', enableExitIntent: true,
     businessName: 'Cabalgatas Ecológicas Medellín',
@@ -193,8 +190,7 @@ export default function AdminDashboard() {
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {[
             { id: 'reservas', icon: Calendar, label: 'Reservas CRM' },
-            { id: 'comercial', icon: DollarSign, label: 'Precios' },
-            { id: 'seo', icon: Search, label: 'SEO Avanzado & CRO' },
+            { id: 'comercial', icon: DollarSign, label: 'Precios y Ventas' },
             { id: 'blog', icon: BookOpen, label: 'Blog & Artículos' },
             { id: 'hero', icon: LayoutDashboard, label: 'Banners' },
             { id: 'galeria', icon: Camera, label: 'Galería' },
@@ -203,7 +199,7 @@ export default function AdminDashboard() {
             { id: 'caballos', icon: Users, label: 'Caballos' },
             { id: 'reviews', icon: Star, label: 'Reseñas' },
             { id: 'faq', icon: MessageSquare, label: 'FAQ' },
-            { id: 'general', icon: Settings, label: 'Menú Móvil' }
+            { id: 'general', icon: Settings, label: 'Ajustes Generales' }
           ].map((item) => (
             <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 p-3 rounded-xl font-bold transition-colors ${activeTab === item.id ? 'bg-amber-500 text-stone-900 shadow-lg' : 'hover:bg-stone-800 text-stone-300 hover:text-white'}`}>
               <item.icon className="w-5 h-5" /> {item.label}
@@ -299,61 +295,35 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'comercial' && (
-            <div className="bg-white rounded-2xl p-8 border-2 border-stone-200 shadow-sm space-y-8">
-              <div className="bg-amber-50 p-5 rounded-xl border-2 border-amber-200 text-amber-900 font-medium">
-                <strong className="font-extrabold">Regla Activa:</strong> Grupales = Fin de semana a las 2:00 PM (Sin recargo guía). Privadas = Cualquier otro caso (Suma recargo guía).
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <label className={labelClass}>Precio Base x Jinete ($)</label>
-                  <input type="number" value={siteData.basePrice} onChange={(e) => handleInputChange('basePrice', Number(e.target.value))} className={inputClass} />
+            <div className="space-y-6">
+              <div className="bg-white rounded-2xl p-8 border-2 border-stone-200 shadow-sm space-y-8">
+                <div className="bg-amber-50 p-5 rounded-xl border-2 border-amber-200 text-amber-900 font-medium">
+                  <strong className="font-extrabold">Regla Activa:</strong> Grupales = Fin de semana a las 2:00 PM (Sin recargo guía). Privadas = Cualquier otro caso (Suma recargo guía).
                 </div>
-                <div>
-                  <label className={labelClass}>Costo Guía Exclusivo ($)</label>
-                  <input type="number" value={siteData.guidePrice} onChange={(e) => handleInputChange('guidePrice', Number(e.target.value))} className={inputClass} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'seo' && (
-            <div className="bg-white p-8 rounded-2xl border-2 border-stone-200 shadow-sm space-y-8">
-              <h3 className="font-extrabold text-xl border-b-2 border-stone-100 pb-4 flex items-center gap-3 text-stone-900"><Search className="text-amber-500 w-6 h-6"/> Configuración Global de SEO</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4 bg-stone-50 p-6 rounded-2xl border-2 border-stone-200 shadow-inner">
-                  <h4 className="font-extrabold text-lg text-stone-900 flex items-center gap-2">🇨🇴 SEO Español (Home)</h4>
-                  <div><label className={labelClass}>Meta Title</label><input value={siteData.metaTitle} onChange={(e) => handleInputChange('metaTitle', e.target.value)} className={inputClass} placeholder="Ej: Cabalgatas en Medellín..." /></div>
-                  <div><label className={labelClass}>Meta Description</label><textarea value={siteData.metaDescription} onChange={(e) => handleInputChange('metaDescription', e.target.value)} className={inputClass} rows={3} placeholder="La mejor cabalgata..."/></div>
-                  <div><label className={labelClass}>Keywords (Separar por coma)</label><textarea value={siteData.seoKeywords} onChange={(e) => handleInputChange('seoKeywords', e.target.value)} className={inputClass} rows={2} placeholder="cabalgatas, caballos, medellin..."/></div>
-                </div>
-                <div className="space-y-4 bg-blue-50/50 p-6 rounded-2xl border-2 border-blue-200 shadow-inner">
-                  <h4 className="font-extrabold text-lg text-blue-900 flex items-center gap-2">🇺🇸 SEO Inglés (Home)</h4>
-                  <div><label className={labelClass}>Meta Title</label><input value={siteData.metaTitleEn} onChange={(e) => handleInputChange('metaTitleEn', e.target.value)} className={inputClass} placeholder="Ex: Horseback Riding Medellin..." /></div>
-                  <div><label className={labelClass}>Meta Description</label><textarea value={siteData.metaDescriptionEn} onChange={(e) => handleInputChange('metaDescriptionEn', e.target.value)} className={inputClass} rows={3} placeholder="The best riding..."/></div>
-                  <div><label className={labelClass}>Keywords</label><textarea value={siteData.seoKeywordsEn} onChange={(e) => handleInputChange('seoKeywordsEn', e.target.value)} className={inputClass} rows={2} placeholder="horseback riding, tours..."/></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <label className={labelClass}>Precio Base x Jinete ($)</label>
+                    <input type="number" value={siteData.basePrice} onChange={(e) => handleInputChange('basePrice', Number(e.target.value))} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Costo Guía Exclusivo ($)</label>
+                    <input type="number" value={siteData.guidePrice} onChange={(e) => handleInputChange('guidePrice', Number(e.target.value))} className={inputClass} />
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-4">
-                <label className={labelClass}>Imagen de Portada (OG Image)</label>
-                <p className="text-sm font-medium text-stone-500 mb-3">Es la miniatura que aparece cuando pegas el link de tu web en WhatsApp o Facebook.</p>
-                <input value={siteData.seoOgImage} onChange={(e) => handleInputChange('seoOgImage', e.target.value)} className={inputClass} placeholder="https://tu-imagen.jpg..." />
-              </div>
-
-              <div className="pt-4">
-                <label className={labelClass}>ID Google Analytics (Tracking)</label>
-                <input value={siteData.googleAnalyticsId} onChange={(e) => handleInputChange('googleAnalyticsId', e.target.value)} className={`${inputClass} md:w-1/2`} placeholder="G-XXXXXXXXXX" />
-              </div>
-
-              <h3 className="font-extrabold text-xl border-b-2 border-stone-100 pb-4 pt-6 flex items-center gap-3 text-stone-900"><TrendingUp className="text-green-500 w-6 h-6"/> Ventas y CRO</h3>
-              <div className="flex gap-4 items-center mb-6 bg-stone-50 p-4 rounded-xl border-2 border-stone-200">
-                <input type="checkbox" checked={siteData.enableExitIntent} onChange={(e) => handleInputChange('enableExitIntent', e.target.checked)} className="w-6 h-6 accent-green-600 rounded cursor-pointer"/>
-                <span className="font-bold text-stone-900 cursor-pointer" onClick={(e) => handleInputChange('enableExitIntent', !siteData.enableExitIntent)}>Activar Pop-up de Intención de Salida (Ofrecer Descuento)</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label className={labelClass}>Gatillo de Urgencia ES (Cotizador)</label><input value={siteData.urgencyText} onChange={(e) => handleInputChange('urgencyText', e.target.value)} className={inputClass} placeholder="Ej: 🔥 Quedan pocos cupos" /></div>
-                <div><label className={`${labelClass} text-blue-800`}>Gatillo de Urgencia EN</label><input value={siteData.urgencyTextEn} onChange={(e) => handleInputChange('urgencyTextEn', e.target.value)} className={inputClass} placeholder="Ex: 🔥 Few spots left" /></div>
+              <div className="bg-white rounded-2xl p-8 border-2 border-stone-200 shadow-sm space-y-8">
+                <h3 className="font-extrabold text-xl border-b-2 border-stone-100 pb-4 flex items-center gap-3 text-stone-900">
+                  <TrendingUp className="text-green-500 w-6 h-6"/> Ventas y Conversión (CRO)
+                </h3>
+                <div className="flex gap-4 items-center mb-6 bg-stone-50 p-4 rounded-xl border-2 border-stone-200">
+                  <input type="checkbox" checked={siteData.enableExitIntent} onChange={(e) => handleInputChange('enableExitIntent', e.target.checked)} className="w-6 h-6 accent-green-600 rounded cursor-pointer"/>
+                  <span className="font-bold text-stone-900 cursor-pointer" onClick={(e) => handleInputChange('enableExitIntent', !siteData.enableExitIntent)}>Activar Pop-up de Intención de Salida (Ofrecer Descuento)</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div><label className={labelClass}>Gatillo de Urgencia ES (Cotizador)</label><input value={siteData.urgencyText} onChange={(e) => handleInputChange('urgencyText', e.target.value)} className={inputClass} placeholder="Ej: 🔥 Quedan pocos cupos" /></div>
+                  <div><label className={`${labelClass} text-blue-800`}>Gatillo de Urgencia EN</label><input value={siteData.urgencyTextEn} onChange={(e) => handleInputChange('urgencyTextEn', e.target.value)} className={inputClass} placeholder="Ex: 🔥 Few spots left" /></div>
+                </div>
               </div>
             </div>
           )}
@@ -522,9 +492,22 @@ export default function AdminDashboard() {
 
           {activeTab === 'general' && (
             <div className="bg-white rounded-2xl p-8 border-2 border-stone-200 shadow-sm space-y-10">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <label className="font-extrabold block mb-2 text-xl text-stone-900">Número de WhatsApp Principal del Negocio</label>
+                  <input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className={`${inputClass} text-2xl font-mono text-green-700`} placeholder="573000000000" />
+                </div>
+                <div>
+                  <label className="font-extrabold block mb-2 text-xl text-stone-900">ID de Google Analytics (Seguimiento)</label>
+                  <input value={siteData.googleAnalyticsId} onChange={(e) => handleInputChange('googleAnalyticsId', e.target.value)} className={`${inputClass} text-2xl font-mono text-blue-700`} placeholder="G-XXXXXXXXXX" />
+                </div>
+              </div>
+
               <div>
-                <label className="font-extrabold block mb-2 text-xl text-stone-900">Número de WhatsApp Principal del Negocio</label>
-                <input type="text" value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className={`${inputClass} md:w-1/2 text-2xl font-mono text-green-700`} placeholder="573000000000" />
+                <label className={labelClass}>Imagen de Portada (OG Image)</label>
+                <p className="text-sm font-medium text-stone-500 mb-3">Es la miniatura de la foto que aparece cuando pegas el link de tu web en WhatsApp, Facebook o Instagram.</p>
+                <input value={siteData.seoOgImage} onChange={(e) => handleInputChange('seoOgImage', e.target.value)} className={inputClass} placeholder="https://tu-imagen.jpg..." />
               </div>
               
               <div className="space-y-6 bg-stone-50 p-6 rounded-2xl border-2 border-stone-200 shadow-inner">
