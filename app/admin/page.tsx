@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Settings, Users, Lock, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Star, Camera, BookOpen, Calendar, AlertCircle, LogOut, Zap, MapPin } from 'lucide-react';
-import { db } from '../../lib/firebase';
+import { Settings, Users, Lock, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Star, Camera, BookOpen, Calendar, AlertCircle, LogOut, Zap, MapPin, UploadCloud } from 'lucide-react';
+import { db, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -12,11 +13,11 @@ export default function AdminDashboard() {
   const [loginError, setLoginError] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
-  // INICIA EN LA PESTAÑA DEL CRM DE RESERVAS
-  const [activeTab, setActiveTab] = useState('reservas');
+  const [activeTab, setActiveTab] = useState('blog'); 
   const [isSaving, setIsSaving] = useState(false);
   const [mensajeGuardado, setMensajeGuardado] = useState('');
   const [reservas, setReservas] = useState<any[]>([]);
+  const [uploadingPostId, setUploadingPostId] = useState<number | null>(null);
 
   const [siteData, setSiteData] = useState<any>({
     heroTitle: 'Cabalgatas en Caldas', heroTitleEn: 'Horseback Riding',
@@ -36,7 +37,6 @@ export default function AdminDashboard() {
 
   const auth = getAuth(db.app);
 
-  // 1. AUTENTICACIÓN
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -51,7 +51,6 @@ export default function AdminDashboard() {
     catch (error) { setLoginError(true); }
   };
 
-  // 2. CARGA DE CONFIGURACIÓN Y RESERVAS
   useEffect(() => {
     if (user) {
       const fetchData = async () => {
@@ -68,7 +67,6 @@ export default function AdminDashboard() {
     }
   }, [user]);
 
-  // 3. GUARDADO GENERAL
   const saveConfig = async () => {
     setIsSaving(true); setMensajeGuardado('');
     try {
@@ -81,13 +79,12 @@ export default function AdminDashboard() {
   const handleInputChange = (field: string, value: any) => setSiteData((prev: any) => ({ ...prev, [field]: value }));
 
   // ==========================================
-  // LÓGICA CRM KANBAN (DRAG & DROP + WHATSAPP INTELIGENTE)
+  // LÓGICA CRM KANBAN
   // ==========================================
   const updateEstadoReserva = async (id: string, nuevoEstado: string) => {
     try { await setDoc(doc(db, 'reservas', id), { estado: nuevoEstado }, { merge: true }); } 
-    catch(e) { console.error("Error actualizando estado:", e) }
+    catch(e) { console.error(e) }
   };
-
   const handleDragStart = (e: React.DragEvent, id: string) => e.dataTransfer.setData('reservaId', id);
   const handleDragOver = (e: React.DragEvent) => e.preventDefault();
   const handleDrop = (e: React.DragEvent, nuevoEstado: string) => {
@@ -96,43 +93,52 @@ export default function AdminDashboard() {
     if (id) updateEstadoReserva(id, nuevoEstado);
   };
 
-  // 🚀 SUPERPODER: GENERADOR DE MENSAJES CONTEXTUALES DE WHATSAPP
   const generarEnlaceWhatsApp = (reserva: any, estado: string) => {
     const { fecha, hora, jinetes, total, telefono } = reserva;
     let mensaje = "";
-
     switch (estado) {
-      case 'Nueva':
-        mensaje = `¡Hola! Recibimos tu cotización desde la página web para una cabalgata el ${fecha} a las ${hora} para ${jinetes} jinetes. El valor estimado es de $${total?.toLocaleString()}. ¿Tienes alguna duda para que procedamos con la reserva? 🐎`;
-        break;
-      case 'Contactado':
-        mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. Quería hacerte un breve seguimiento sobre tu reserva pendiente para el ${fecha}. Cuéntame si te animas para ir separando tus caballos. ✨`;
-        break;
-      case 'Abonado':
-        mensaje = `¡Hola! Confirmamos la recepción de tu abono. 🎉 Tu reserva para el ${fecha} a las ${hora} está 100% confirmada. Recuerda llegar 15 minutos antes, usar pantalón largo (no shorts), zapatos cerrados (no sandalias) y traer protector solar. ¡Nos vemos en Caldas! 🤠`;
-        break;
-      case 'Finalizada':
-        mensaje = `¡Hola! Esperamos que hayas disfrutado muchísimo la experiencia con nosotros. 🐴 ¿Nos harías el gran favor de regalarnos una calificación de 5 estrellas en Google? Nos ayuda muchísimo a crecer: [PEGAR_TU_LINK_DE_GOOGLE_AQUÍ] ⭐⭐⭐⭐⭐`;
-        break;
-      default:
-        mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. 🐎`;
+      case 'Nueva': mensaje = `¡Hola! Recibimos tu cotización para una cabalgata el ${fecha} a las ${hora} para ${jinetes} jinetes. Valor estimado: $${total?.toLocaleString()}. ¿Tienes alguna duda? 🐎`; break;
+      case 'Contactado': mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. Quería hacerte un breve seguimiento sobre tu reserva para el ${fecha}. ✨`; break;
+      case 'Abonado': mensaje = `¡Hola! Confirmamos tu abono. 🎉 Tu reserva para el ${fecha} a las ${hora} está 100% confirmada. Recuerda llegar 15 min antes con pantalón largo. 🤠`; break;
+      case 'Finalizada': mensaje = `¡Hola! Esperamos que hayas disfrutado la experiencia. 🐴 ¿Nos regalarías 5 estrellas en Google? ⭐⭐⭐⭐⭐`; break;
+      default: mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. 🐎`;
     }
-
-    const numeroLimpio = telefono?.replace(/\D/g, '') || "";
-    return `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+    return `https://wa.me/${telefono?.replace(/\D/g, '') || ""}?text=${encodeURIComponent(mensaje)}`;
   };
 
   const columnasCRM = ['Nueva', 'Contactado', 'Abonado', 'Finalizada'];
   const coloresColumnas: any = { 'Nueva': 'border-red-500', 'Contactado': 'border-amber-500', 'Abonado': 'border-blue-500', 'Finalizada': 'border-green-500' };
 
   // ==========================================
-  // LÓGICA BLOG
+  // LÓGICA BLOG Y SUBIDA DE IMÁGENES
   // ==========================================
   const removeBlogPost = (id: number) => setSiteData((prev: any) => ({ ...prev, blogPosts: prev.blogPosts.filter((p: any) => p.id !== id) }));
   const updateBlogPost = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, blogPosts: prev.blogPosts.map((p: any) => p.id === id ? { ...p, [field]: value } : p) }));
   const addBlogPost = () => setSiteData((prev: any) => ({ ...prev, blogPosts: [{ id: Date.now(), title: 'Nuevo Artículo', slug: `nuevo-articulo-${Date.now()}`, image: '', content: '', metaTitle: '', metaDesc: '', keywords: '' }, ...(prev.blogPosts || [])] }));
 
-  // CLASES REUTILIZABLES
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, postId: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPostId(postId);
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        const base64Str = reader.result as string;
+        const storageRef = ref(storage, `blog/${Date.now()}_${file.name}`);
+        await uploadString(storageRef, base64Str, 'data_url');
+        const downloadURL = await getDownloadURL(storageRef);
+        updateBlogPost(postId, 'image', downloadURL);
+        setUploadingPostId(null);
+      };
+    } catch (error) {
+      console.error("Error subiendo imagen:", error);
+      alert("Hubo un error subiendo la imagen. Intenta de nuevo.");
+      setUploadingPostId(null);
+    }
+  };
+
   const inputClass = "w-full p-3 border-2 border-stone-300 rounded-lg mt-1 text-stone-900 bg-white font-medium focus:border-amber-500 focus:outline-none placeholder-stone-400";
   const labelClass = "block text-sm font-extrabold text-stone-900 mb-1";
 
@@ -145,8 +151,8 @@ export default function AdminDashboard() {
         <h1 className="text-2xl font-black mb-2 text-stone-900">Acceso Seguro</h1>
         <p className="text-stone-500 font-medium mb-8">Ingresa tus credenciales para administrar la web.</p>
         <div className="space-y-4 text-left">
-          <div><label className={labelClass}>Correo Electrónico</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} placeholder="admin@tudominio.com" required /></div>
-          <div><label className={labelClass}>Contraseña</label><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} placeholder="••••••••" required /></div>
+          <div><label className={labelClass}>Correo Electrónico</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required /></div>
+          <div><label className={labelClass}>Contraseña</label><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} required /></div>
         </div>
         {loginError && <div className="bg-red-50 text-red-600 font-bold p-3 rounded-lg mt-6 border border-red-200 flex items-center gap-2 justify-center"><AlertCircle size={18}/> Credenciales incorrectas</div>}
         <button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 mt-8 py-4 rounded-xl font-extrabold text-lg shadow-lg">Ingresar al Panel</button>
@@ -192,44 +198,20 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* ======================================= */}
-          {/* MÓDULO 1: CRM TRELLO (RESERVAS)         */}
-          {/* ======================================= */}
           {activeTab === 'reservas' && (
             <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory min-h-[70vh]">
               {columnasCRM.map(col => (
-                 <div 
-                   key={col} 
-                   onDrop={(e) => handleDrop(e, col)} 
-                   onDragOver={handleDragOver}
-                   className="min-w-[320px] snap-center bg-stone-200/60 rounded-3xl p-5 flex flex-col gap-4 border-2 border-stone-200"
-                 >
+                 <div key={col} onDrop={(e) => handleDrop(e, col)} onDragOver={handleDragOver} className="min-w-[320px] snap-center bg-stone-200/60 rounded-3xl p-5 flex flex-col gap-4 border-2 border-stone-200">
                    <div className="flex justify-between items-center mb-2">
                      <h3 className="font-black text-stone-800 text-lg">{col}</h3>
-                     <span className="bg-white text-stone-600 font-bold px-3 py-1 rounded-full text-sm shadow-sm">
-                       {reservas.filter(r => (r.estado || 'Nueva') === col).length}
-                     </span>
+                     <span className="bg-white text-stone-600 font-bold px-3 py-1 rounded-full text-sm shadow-sm">{reservas.filter(r => (r.estado || 'Nueva') === col).length}</span>
                    </div>
-
                    {reservas.filter(r => (r.estado || 'Nueva') === col).map(reserva => (
-                     <div 
-                       key={reserva.id} 
-                       draggable 
-                       onDragStart={(e) => handleDragStart(e, reserva.id)}
-                       className={`bg-white p-5 rounded-2xl shadow-sm cursor-grab active:cursor-grabbing border-l-8 ${coloresColumnas[col]} hover:shadow-xl transition-all`}
-                     >
+                     <div key={reserva.id} draggable onDragStart={(e) => handleDragStart(e, reserva.id)} className={`bg-white p-5 rounded-2xl shadow-sm cursor-grab active:cursor-grabbing border-l-8 ${coloresColumnas[col]} hover:shadow-xl transition-all`}>
                         <div className="flex justify-between items-start mb-3">
                           <span className="bg-stone-100 text-stone-600 text-xs font-bold px-3 py-1 rounded-full border">{reserva.origen || 'Web'}</span>
-                          
-                          {/* BOTÓN MÁGICO DE WHATSAPP */}
-                          <a 
-                            href={generarEnlaceWhatsApp(reserva, col)} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-transform hover:scale-110 flex items-center gap-1 group"
-                          >
+                          <a href={generarEnlaceWhatsApp(reserva, col)} target="_blank" rel="noreferrer" className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-transform hover:scale-110 flex items-center gap-1 group">
                             <MessageSquare size={18}/>
-                            <span className="text-[10px] font-bold hidden group-hover:block px-1">Enviar</span>
                           </a>
                         </div>
                         <p className="font-black text-stone-900 text-xl leading-tight mb-2">{reserva.plan}</p>
@@ -246,14 +228,8 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ======================================= */}
-          {/* MÓDULO 2: BLOG Y SEO                    */}
-          {/* ======================================= */}
           {activeTab === 'blog' && (
             <div className="space-y-6">
-              <div className="bg-amber-50 p-5 rounded-2xl border-2 border-amber-200 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="font-medium text-amber-900 flex-1"><strong className="font-extrabold">Blog SEO:</strong> Crea y edita tus artículos para dominar Google.</p>
-              </div>
               <button onClick={addBlogPost} className="bg-stone-900 text-white px-6 py-3 rounded-xl font-extrabold flex items-center gap-2 hover:bg-stone-800 shadow-lg"><Plus size={20}/> Crear Nuevo Artículo</button>
               
               {siteData.blogPosts?.map((post: any) => (
@@ -261,14 +237,27 @@ export default function AdminDashboard() {
                   <button onClick={() => removeBlogPost(post.id)} className="absolute top-6 right-6 text-red-600 bg-red-100 p-3 rounded-xl hover:bg-red-200 transition-colors"><Trash2 size={20}/></button>
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                      <h4 className="font-extrabold text-lg text-stone-900 border-b-2 border-stone-100 pb-2">Contenido</h4>
+                      <h4 className="font-extrabold text-lg text-stone-900 border-b-2 border-stone-100 pb-2">Contenido Visual</h4>
+                      
+                      {/* PREVISUALIZACIÓN Y SUBIDA DE IMAGEN */}
+                      <div>
+                        <label className={labelClass}>Foto del Artículo</label>
+                        {post.image && <img src={post.image} alt="Preview" className="w-full h-40 object-cover rounded-xl border border-stone-200 mb-2 shadow-sm" />}
+                        <div className="flex gap-2">
+                          <input value={post.image} onChange={(e) => updateBlogPost(post.id, 'image', e.target.value)} className={inputClass} placeholder="Pega una URL o sube una foto" />
+                          <label className="bg-amber-100 hover:bg-amber-200 text-amber-700 px-4 py-3 rounded-lg mt-1 cursor-pointer flex items-center justify-center font-bold transition-colors border border-amber-300">
+                            {uploadingPostId === post.id ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-amber-700"></div> : <UploadCloud size={20} />}
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, post.id)} />
+                          </label>
+                        </div>
+                      </div>
+
                       <div><label className={labelClass}>Título (H1)</label><input value={post.title} onChange={(e) => updateBlogPost(post.id, 'title', e.target.value)} className={inputClass} /></div>
-                      <div><label className={labelClass}>Enlace (Slug)</label><input value={post.slug} onChange={(e) => updateBlogPost(post.id, 'slug', e.target.value)} className={`${inputClass} text-amber-700 font-mono`} /></div>
-                      <div><label className={labelClass}>URL Imagen</label><input value={post.image} onChange={(e) => updateBlogPost(post.id, 'image', e.target.value)} className={inputClass} /></div>
                       <div><label className={labelClass}>Cuerpo</label><textarea value={post.content} onChange={(e) => updateBlogPost(post.id, 'content', e.target.value)} className={inputClass} rows={8} /></div>
                     </div>
                     <div className="space-y-4 bg-stone-50 p-6 rounded-2xl border-2 border-stone-200 shadow-inner">
-                      <h4 className="font-extrabold text-lg text-stone-900 border-b-2 border-stone-200 pb-2">SEO</h4>
+                      <h4 className="font-extrabold text-lg text-stone-900 border-b-2 border-stone-200 pb-2">SEO Avanzado</h4>
+                      <div><label className={labelClass}>Enlace (Slug)</label><input value={post.slug} onChange={(e) => updateBlogPost(post.id, 'slug', e.target.value)} className={`${inputClass} text-amber-700 font-mono text-sm`} /></div>
                       <div><label className={labelClass}>Meta Title</label><input value={post.metaTitle} onChange={(e) => updateBlogPost(post.id, 'metaTitle', e.target.value)} className={inputClass} /></div>
                       <div><label className={labelClass}>Meta Description</label><textarea value={post.metaDesc} onChange={(e) => updateBlogPost(post.id, 'metaDesc', e.target.value)} className={inputClass} rows={4} /></div>
                       <div><label className={labelClass}>Keywords</label><textarea value={post.keywords} onChange={(e) => updateBlogPost(post.id, 'keywords', e.target.value)} className={inputClass} rows={3} /></div>
@@ -279,32 +268,20 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ======================================= */}
-          {/* MÓDULO 3: COMERCIAL Y PRECIOS           */}
-          {/* ======================================= */}
           {activeTab === 'comercial' && (
             <div className="bg-white p-8 rounded-2xl border-2 border-stone-200 shadow-sm space-y-6">
-              <h2 className="text-xl font-extrabold text-stone-900 border-b pb-4 mb-6">Configuración de Precios del Cotizador</h2>
               <div className="grid md:grid-cols-2 gap-6">
-                <div><label className={labelClass}>Precio Base por Persona (COP)</label><input type="number" value={siteData.basePrice} onChange={(e) => handleInputChange('basePrice', Number(e.target.value))} className={inputClass} /></div>
-                <div><label className={labelClass}>Costo Extra de Guía Privado (COP)</label><input type="number" value={siteData.guidePrice} onChange={(e) => handleInputChange('guidePrice', Number(e.target.value))} className={inputClass} /></div>
-                <div><label className={labelClass}>Texto de Urgencia (Español)</label><input value={siteData.urgencyText} onChange={(e) => handleInputChange('urgencyText', e.target.value)} className={inputClass} /></div>
-                <div><label className={labelClass}>Texto de Urgencia (Inglés)</label><input value={siteData.urgencyTextEn} onChange={(e) => handleInputChange('urgencyTextEn', e.target.value)} className={inputClass} /></div>
+                <div><label className={labelClass}>Precio Base (COP)</label><input type="number" value={siteData.basePrice} onChange={(e) => handleInputChange('basePrice', Number(e.target.value))} className={inputClass} /></div>
+                <div><label className={labelClass}>Costo Guía Privado (COP)</label><input type="number" value={siteData.guidePrice} onChange={(e) => handleInputChange('guidePrice', Number(e.target.value))} className={inputClass} /></div>
               </div>
             </div>
           )}
 
-          {/* ======================================= */}
-          {/* MÓDULO 4: AJUSTES GENERALES             */}
-          {/* ======================================= */}
           {activeTab === 'general' && (
             <div className="bg-white p-8 rounded-2xl border-2 border-stone-200 shadow-sm space-y-6">
-              <h2 className="text-xl font-extrabold text-stone-900 border-b pb-4 mb-6">Información General del Negocio</h2>
               <div className="grid md:grid-cols-2 gap-6">
-                <div><label className={labelClass}>WhatsApp Principal (Formato: 57300...)</label><input value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className={inputClass} /></div>
-                <div><label className={labelClass}>Nombre del Negocio (Para SEO)</label><input value={siteData.businessName} onChange={(e) => handleInputChange('businessName', e.target.value)} className={inputClass} /></div>
-                <div><label className={labelClass}>Dirección (Google Maps)</label><input value={siteData.mapAddress} onChange={(e) => handleInputChange('mapAddress', e.target.value)} className={inputClass} /></div>
-                <div><label className={labelClass}>Calificación en Google (Ej: 5.0)</label><input value={siteData.googleRating} onChange={(e) => handleInputChange('googleRating', e.target.value)} className={inputClass} /></div>
+                <div><label className={labelClass}>WhatsApp Principal</label><input value={siteData.whatsappNumber} onChange={(e) => handleInputChange('whatsappNumber', e.target.value)} className={inputClass} /></div>
+                <div><label className={labelClass}>Nombre del Negocio</label><input value={siteData.businessName} onChange={(e) => handleInputChange('businessName', e.target.value)} className={inputClass} /></div>
               </div>
             </div>
           )}
