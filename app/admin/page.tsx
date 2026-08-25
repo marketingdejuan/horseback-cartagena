@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Settings, Users, Lock, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Star, Camera, BookOpen, Calendar, AlertCircle, LogOut, Zap, MapPin, UploadCloud } from 'lucide-react';
+import { Settings, Users, Lock, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Star, Camera, BookOpen, Calendar, AlertCircle, LogOut, Zap, MapPin, UploadCloud, Link as LinkIcon } from 'lucide-react';
 import { db, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const [loginError, setLoginError] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState('blog'); 
+  const [activeTab, setActiveTab] = useState('reservas'); 
   const [isSaving, setIsSaving] = useState(false);
   const [mensajeGuardado, setMensajeGuardado] = useState('');
   const [reservas, setReservas] = useState<any[]>([]);
@@ -79,12 +79,13 @@ export default function AdminDashboard() {
   const handleInputChange = (field: string, value: any) => setSiteData((prev: any) => ({ ...prev, [field]: value }));
 
   // ==========================================
-  // LÓGICA CRM KANBAN
+  // LÓGICA CRM KANBAN (CON ENLACE AL WAIVER)
   // ==========================================
   const updateEstadoReserva = async (id: string, nuevoEstado: string) => {
     try { await setDoc(doc(db, 'reservas', id), { estado: nuevoEstado }, { merge: true }); } 
     catch(e) { console.error(e) }
   };
+  
   const handleDragStart = (e: React.DragEvent, id: string) => e.dataTransfer.setData('reservaId', id);
   const handleDragOver = (e: React.DragEvent) => e.preventDefault();
   const handleDrop = (e: React.DragEvent, nuevoEstado: string) => {
@@ -96,12 +97,26 @@ export default function AdminDashboard() {
   const generarEnlaceWhatsApp = (reserva: any, estado: string) => {
     const { fecha, hora, jinetes, total, telefono } = reserva;
     let mensaje = "";
+
+    // Obtenemos el host actual para armar el link dinámicamente
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://cabalgatamedellin.com';
+    const linkRegistro = `${origin}/registro`;
+
     switch (estado) {
-      case 'Nueva': mensaje = `¡Hola! Recibimos tu cotización para una cabalgata el ${fecha} a las ${hora} para ${jinetes} jinetes. Valor estimado: $${total?.toLocaleString()}. ¿Tienes alguna duda? 🐎`; break;
-      case 'Contactado': mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. Quería hacerte un breve seguimiento sobre tu reserva para el ${fecha}. ✨`; break;
-      case 'Abonado': mensaje = `¡Hola! Confirmamos tu abono. 🎉 Tu reserva para el ${fecha} a las ${hora} está 100% confirmada. Recuerda llegar 15 min antes con pantalón largo. 🤠`; break;
-      case 'Finalizada': mensaje = `¡Hola! Esperamos que hayas disfrutado la experiencia. 🐴 ¿Nos regalarías 5 estrellas en Google? ⭐⭐⭐⭐⭐`; break;
-      default: mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. 🐎`;
+      case 'Nueva': 
+        mensaje = `¡Hola! Recibimos tu cotización para una cabalgata el día ${fecha} a las ${hora} para ${jinetes} jinetes. El valor total estimado es de $${total?.toLocaleString()}. ¿Tienes alguna duda para proceder con la reserva? 🐎`; 
+        break;
+      case 'Contactado': 
+        mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. Quería hacerte un breve seguimiento sobre tu reserva para el ${fecha}. Cuéntanos si te animas para asegurar la disponibilidad de los caballos. ✨`; 
+        break;
+      case 'Abonado': 
+        mensaje = `¡Hola! Confirmamos la recepción de tu abono. 🎉 Tu reserva para el ${fecha} a las ${hora} está 100% asegurada.\n\n📝 REQUISITO OBLIGATORIO: Por favor, cada participante debe llenar el registro de seguro y exoneración digital antes de llegar a la finca ingresando aquí:\n👉 ${linkRegistro}\n\nRecomendaciones:\n- Llegar 15 minutos antes.\n- Usar pantalón largo y calzado cerrado (no sandalias ni shorts).\n- Traer protector solar.\n\n¡Nos vemos pronto! 🤠`; 
+        break;
+      case 'Finalizada': 
+        mensaje = `¡Hola! Esperamos que hayas disfrutado al máximo la experiencia a caballo. 🐴 ¿Nos apoyarías regalándonos una calificación de 5 estrellas en Google? Nos ayuda muchísimo: https://g.page/r/cabalgatamedellin/review ⭐⭐⭐⭐⭐`; 
+        break;
+      default: 
+        mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. 🐎`;
     }
     return `https://wa.me/${telefono?.replace(/\D/g, '') || ""}?text=${encodeURIComponent(mensaje)}`;
   };
@@ -198,6 +213,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* CRM TABLERO KANBAN */}
           {activeTab === 'reservas' && (
             <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory min-h-[70vh]">
               {columnasCRM.map(col => (
@@ -210,8 +226,16 @@ export default function AdminDashboard() {
                      <div key={reserva.id} draggable onDragStart={(e) => handleDragStart(e, reserva.id)} className={`bg-white p-5 rounded-2xl shadow-sm cursor-grab active:cursor-grabbing border-l-8 ${coloresColumnas[col]} hover:shadow-xl transition-all`}>
                         <div className="flex justify-between items-start mb-3">
                           <span className="bg-stone-100 text-stone-600 text-xs font-bold px-3 py-1 rounded-full border">{reserva.origen || 'Web'}</span>
-                          <a href={generarEnlaceWhatsApp(reserva, col)} target="_blank" rel="noreferrer" className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-transform hover:scale-110 flex items-center gap-1 group">
+                          
+                          {/* BOTÓN INTELIGENTE DE WHATSAPP */}
+                          <a 
+                            href={generarEnlaceWhatsApp(reserva, col)} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-transform hover:scale-110 flex items-center gap-1 group"
+                          >
                             <MessageSquare size={18}/>
+                            <span className="text-[10px] font-bold hidden group-hover:block px-1">Enviar</span>
                           </a>
                         </div>
                         <p className="font-black text-stone-900 text-xl leading-tight mb-2">{reserva.plan}</p>
@@ -228,6 +252,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* MÓDULO BLOG */}
           {activeTab === 'blog' && (
             <div className="space-y-6">
               <button onClick={addBlogPost} className="bg-stone-900 text-white px-6 py-3 rounded-xl font-extrabold flex items-center gap-2 hover:bg-stone-800 shadow-lg"><Plus size={20}/> Crear Nuevo Artículo</button>
@@ -238,8 +263,6 @@ export default function AdminDashboard() {
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-4">
                       <h4 className="font-extrabold text-lg text-stone-900 border-b-2 border-stone-100 pb-2">Contenido Visual</h4>
-                      
-                      {/* PREVISUALIZACIÓN Y SUBIDA DE IMAGEN */}
                       <div>
                         <label className={labelClass}>Foto del Artículo</label>
                         {post.image && <img src={post.image} alt="Preview" className="w-full h-40 object-cover rounded-xl border border-stone-200 mb-2 shadow-sm" />}
@@ -268,6 +291,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* MÓDULO COMERCIAL */}
           {activeTab === 'comercial' && (
             <div className="bg-white p-8 rounded-2xl border-2 border-stone-200 shadow-sm space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
@@ -277,6 +301,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* MÓDULO GENERAL */}
           {activeTab === 'general' && (
             <div className="bg-white p-8 rounded-2xl border-2 border-stone-200 shadow-sm space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
