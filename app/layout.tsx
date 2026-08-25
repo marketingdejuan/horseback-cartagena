@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 // MOTOR SEO ESTRATÉGICO SUPER OPTIMIZADO PARA MEDELLÍN
 export const metadata: Metadata = {
@@ -29,7 +30,6 @@ export default function RootLayout({
 }>) {
   
   // DATOS ESTRUCTURADOS (SCHEMA.ORG) PARA ENAMORAR A GOOGLE
-  // Esto le dice a Google exactamente qué ofreces y a qué ciudad atiendes.
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "TouristAttraction", "SportsActivityLocation"],
@@ -80,6 +80,10 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-sans">
+        
+        {/* Selector Flotante Inteligente de Idiomas */}
+        <LanguageSwitcher />
+
         {children}
       </body>
     </html>
