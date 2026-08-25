@@ -12,7 +12,6 @@ const [data, setData] = useState<any>(null);
 const [fecha, setFecha] = useState('');
 const [hora, setHora] = useState('10:00');
 const [jinetes, setJinetes] = useState(2);
-// NUEVO ESTADO: Para capturar el teléfono del cliente
 const [telefono, setTelefono] = useState('');
 const [currentHero, setCurrentHero] = useState(0);
 const [showExitPopup, setShowExitPopup] = useState(false);
@@ -111,26 +110,23 @@ const whatsappNum = data?.whatsappNumber || "573000000000";
 const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Hola, quiero reservar el ${fecha || 'próximo fin de semana'} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${esGrupal ? 'Grupal' : 'Privada'}. Cotización: $${totalCalculado.toLocaleString()}`)}`;
 const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas. 🐎")}`;
 
-// Validación básica: El número debe tener al menos 7 dígitos para habilitar el botón
 const isValidPhone = telefono.trim().length >= 7;
 
 /* Función para interceptar el clic, guardar en el panel admin y abrir WhatsApp */
 const handleReservaWhatsApp = async (e: React.MouseEvent) => {
   e.preventDefault(); 
   
-  if (!isValidPhone) return; // Si no hay teléfono válido, no hace nada
+  if (!isValidPhone) return;
 
-  // 1. Enviamos el evento de conversión a Google Ads
   trackWhatsAppClick('Boton_Cotizador');
 
-  // 2. Guardamos la reserva y EL TELÉFONO silenciosamente en Firebase
   try {
     await addDoc(collection(db, 'reservas'), {
       plan: esGrupal ? 'Cabalgata Grupal' : 'Cabalgata Privada',
       fecha: fecha || 'Por definir',
       hora: hora,
       jinetes: jinetes,
-      telefono: telefono, // Guardamos el contacto capturado
+      telefono: telefono,
       total: totalCalculado,
       fechaCreacion: serverTimestamp(),
       origen: 'Web Español'
@@ -139,7 +135,6 @@ const handleReservaWhatsApp = async (e: React.MouseEvent) => {
     console.error("Error guardando reserva silenciosa:", error);
   }
 
-  // 3. Redirigimos al cliente a WhatsApp
   window.open(linkCotizador, '_blank');
 };
 
@@ -164,77 +159,78 @@ return (
 
     {/* STREAMING_CHUNK: Renderizando la sección del Cotizador Interactivo... */}
     <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-16">
-      <section id="cotizador" className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border border-stone-100 scroll-mt-20">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-          <h2 className="text-2xl font-bold flex items-center gap-2"><Calendar className="text-amber-600" /> Cotiza y Reserva</h2>
-          {data.urgencyText && <div className="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2"><Clock className="w-4 h-4"/>{data.urgencyText}</div>}
+      <section id="cotizador" className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border border-stone-200 scroll-mt-20">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-stone-100 pb-4">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-stone-900 flex items-center gap-3">
+            <Calendar className="text-amber-600 w-8 h-8" /> Cotiza y Reserva
+          </h2>
+          {data.urgencyText && <div className="bg-red-50 text-red-700 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2 border border-red-200"><Clock className="w-4 h-4"/>{data.urgencyText}</div>}
         </div>
+        
         <div className="grid md:grid-cols-2 gap-8">
           
-          {/* Lado Izquierdo: Formularios */}
+          {/* Lado Izquierdo: Formularios Alto Contraste */}
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-bold text-stone-600 mb-2">1. Selecciona Fecha y Hora</label>
+              <label className="block text-sm font-extrabold text-stone-900 mb-2">1. Selecciona Fecha y Hora</label>
               <div className="flex gap-2">
-                <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full p-3 border-2 border-stone-200 rounded-xl bg-stone-50 outline-none focus:border-amber-500" />
-                <select value={hora} onChange={(e) => setHora(e.target.value)} className="w-full p-3 border-2 border-stone-200 rounded-xl bg-stone-50 outline-none focus:border-amber-500">
+                <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-500 transition-colors" />
+                <select value={hora} onChange={(e) => setHora(e.target.value)} className="w-full p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-500 transition-colors">
                   <option value="10:00">10:00 AM</option>
                   <option value="14:00">2:00 PM</option>
                   <option value="16:00">4:00 PM</option>
                 </select>
               </div>
-              <div className="mt-4 bg-amber-50 p-3 rounded-lg border border-amber-200">
-                <p className="text-xs text-amber-800 leading-relaxed">
-                  💡 <b>Nota importante:</b> Las cabalgatas grupales (sin costo extra de guía) son únicamente los <b>sábados y domingos a las 2:00 PM</b>. Cualquier otro día u horario será una experiencia exclusiva y privada (incluye cobro del guía).
+              <div className="mt-4 bg-amber-50 p-4 rounded-xl border-2 border-amber-300 shadow-sm">
+                <p className="text-sm text-amber-900 font-medium leading-relaxed">
+                  💡 <strong className="font-extrabold">Nota importante:</strong> Las cabalgatas grupales (sin costo extra de guía) son únicamente los <strong className="font-extrabold">sábados y domingos a las 2:00 PM</strong>. Cualquier otro día u horario será una experiencia exclusiva y privada (incluye cobro del guía).
                 </p>
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-stone-600 mb-2">2. Número de Jinetes</label>
-              <div className="flex items-center gap-4 bg-stone-50 p-2 rounded-xl border border-stone-200 w-fit">
-                <button onClick={() => setJinetes(Math.max(1, jinetes - 1))} className="w-10 h-10 bg-white rounded-lg font-bold shadow">-</button>
-                <span className="w-8 text-center font-bold text-xl">{jinetes}</span>
-                <button onClick={() => setJinetes(jinetes + 1)} className="w-10 h-10 bg-white rounded-lg font-bold shadow">+</button>
+              <label className="block text-sm font-extrabold text-stone-900 mb-2">2. Número de Jinetes</label>
+              <div className="flex items-center gap-4 bg-white p-2 rounded-xl border-2 border-stone-300 w-fit shadow-sm">
+                <button onClick={() => setJinetes(Math.max(1, jinetes - 1))} className="w-10 h-10 bg-stone-100 hover:bg-stone-200 text-stone-900 rounded-lg font-extrabold shadow-sm transition">-</button>
+                <span className="w-8 text-center font-extrabold text-2xl text-stone-900">{jinetes}</span>
+                <button onClick={() => setJinetes(jinetes + 1)} className="w-10 h-10 bg-stone-100 hover:bg-stone-200 text-stone-900 rounded-lg font-extrabold shadow-sm transition">+</button>
               </div>
             </div>
 
-            {/* NUEVO CAMPO: Teléfono del Cliente */}
             <div>
-              <label className="block text-sm font-bold text-stone-600 mb-2">3. Tu número de WhatsApp</label>
+              <label className="block text-sm font-extrabold text-stone-900 mb-2">3. Tu número de WhatsApp</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
+                  <Phone className="h-5 w-5 text-stone-500" />
                 </div>
                 <input
                   type="tel"
                   value={telefono}
                   onChange={(e) => setTelefono(e.target.value)}
                   placeholder="Ej: 300 123 4567"
-                  className="w-full pl-10 p-3 border-2 border-stone-200 rounded-xl bg-stone-50 outline-none focus:border-green-500 transition-colors font-medium"
+                  className="w-full pl-10 p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-500 transition-colors placeholder-stone-400"
                 />
               </div>
-              <p className="text-xs text-stone-500 mt-2">Obligatorio para enviarte la cotización detallada.</p>
+              <p className="text-xs font-bold text-stone-500 mt-2">Obligatorio para enviarte la cotización detallada.</p>
             </div>
           </div>
           
           {/* Lado Derecho: Resumen y Botón */}
-          <div className="bg-stone-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-between">
+          <div className="bg-stone-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-between border-2 border-stone-800">
             <div>
-              <p className="text-sm font-bold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1 rounded-lg">{tipoCabalgataStr}</p>
-              <div className="flex justify-between items-center mb-3"><span className="text-stone-300">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span><span className="font-bold text-lg">${(jinetes * precioBase).toLocaleString()}</span></div>
-              {!esGrupal && <div className="flex justify-between items-center mb-3 text-red-400 bg-red-400/10 p-2 rounded-lg border border-red-400/20"><span>Costo Guía Exclusivo</span><span className="font-bold">+${costoGuia.toLocaleString()}</span></div>}
+              <p className="text-sm font-extrabold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1 rounded-lg border border-amber-500/20">{tipoCabalgataStr}</p>
+              <div className="flex justify-between items-center mb-3"><span className="text-stone-300 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span><span className="font-extrabold text-lg text-white">${(jinetes * precioBase).toLocaleString()}</span></div>
+              {!esGrupal && <div className="flex justify-between items-center mb-3 text-red-300 bg-red-500/10 p-2 rounded-lg border border-red-500/20"><span className="font-bold">Costo Guía Exclusivo</span><span className="font-extrabold">+${costoGuia.toLocaleString()}</span></div>}
               <div className="border-t border-stone-700 my-4"></div>
-              <div className="flex justify-between items-end"><span className="text-lg text-stone-300">Total</span><span className="text-4xl font-extrabold text-amber-500">${totalCalculado.toLocaleString()}</span></div>
+              <div className="flex justify-between items-end"><span className="text-lg text-stone-400 font-bold">Total</span><span className="text-4xl font-black text-amber-500">${totalCalculado.toLocaleString()}</span></div>
             </div>
             
-            {/* BOTÓN INTELIGENTE: Cambia de estilo si no han puesto el teléfono */}
             <button 
               onClick={handleReservaWhatsApp} 
               disabled={!isValidPhone}
-              className={`mt-8 block w-full text-center font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer' : 'bg-stone-700 text-stone-400 cursor-not-allowed border border-stone-600'}`}
+              className={`mt-8 block w-full text-center font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer' : 'bg-stone-800 text-stone-500 cursor-not-allowed border-2 border-stone-700'}`}
             >
-              <MessageCircle className="w-5 h-5"/> {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
+              <MessageCircle className="w-6 h-6"/> {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
             </button>
           </div>
         </div>
