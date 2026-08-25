@@ -6,7 +6,8 @@ export default function PricingSectionEn() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const addonsScrollRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: 'left' | 'right', ref: React.RefObject<HTMLDivElement>) => {
+  // Solución: Usamos 'ref: any' para que TypeScript no arroje error
+  const scroll = (direction: 'left' | 'right', ref: any) => {
     if (ref.current) {
       const { scrollLeft, clientWidth } = ref.current;
       const scrollTo = direction === 'left' ? scrollLeft - 350 : scrollLeft + 350;
@@ -26,7 +27,6 @@ export default function PricingSectionEn() {
           </p>
         </div>
 
-        {/* Contenedor Principal de Planes con Flechas Integradas */}
         <div className="relative group">
           
           <button 
@@ -50,7 +50,6 @@ export default function PricingSectionEn() {
             className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 pt-4 px-4 sm:px-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           >
             
-            {/* 1. Private Ride */}
             <div className="snap-center shrink-0 w-[85vw] md:w-[360px] bg-white rounded-3xl shadow-lg p-8 border-2 border-stone-100 flex flex-col relative hover:border-blue-500 transition-colors">
               <h3 className="text-2xl font-black text-stone-900 mb-2">Private Ride</h3>
               <p className="text-stone-500 text-sm font-medium mb-6 flex-grow">Your own pace. Total exclusivity for you and your companions.</p>
@@ -80,7 +79,6 @@ export default function PricingSectionEn() {
               </button>
             </div>
 
-            {/* 2. Group Ride */}
             <div className="snap-center shrink-0 w-[85vw] md:w-[360px] bg-white rounded-3xl shadow-lg p-8 border-2 border-stone-100 flex flex-col hover:border-green-500 transition-colors">
               <h3 className="text-2xl font-black text-stone-900 mb-2">Group Ride</h3>
               <p className="text-stone-500 text-sm font-medium mb-6 flex-grow">The ideal option for the weekend. Join a group and enjoy nature.</p>
@@ -103,7 +101,6 @@ export default function PricingSectionEn() {
               </button>
             </div>
 
-            {/* 3. Celebration Plan */}
             <div className="snap-center shrink-0 w-[85vw] md:w-[360px] bg-white rounded-3xl shadow-2xl p-8 border-4 border-amber-500 flex flex-col relative transform md:-translate-y-4">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white text-xs font-black uppercase tracking-widest py-1.5 px-4 rounded-full shadow-lg">
                 Most Popular
@@ -135,7 +132,6 @@ export default function PricingSectionEn() {
               </button>
             </div>
 
-            {/* 4. VIP Adventure */}
             <div className="snap-center shrink-0 w-[85vw] md:w-[360px] bg-stone-900 rounded-3xl shadow-xl p-8 border-2 border-stone-800 flex flex-col relative text-white hover:border-yellow-400 transition-colors">
               <h3 className="text-2xl font-black mb-2 text-yellow-400">VIP Adventure</h3>
               <p className="text-stone-400 text-sm font-medium mb-6 flex-grow">The complete experience with no worries. We take care of everything.</p>
@@ -167,7 +163,6 @@ export default function PricingSectionEn() {
           </div>
         </div>
 
-        {/* Add-ons Section */}
         <div className="mt-16 bg-white rounded-3xl shadow-sm p-8 md:p-12 border-2 border-stone-100 relative group">
           <h3 className="text-2xl md:text-3xl font-black text-stone-900 mb-8 text-center">Enhance Your Experience (Add-ons)</h3>
           

@@ -1,14 +1,20 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings, Users, Lock, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, Star, Camera, ArrowUp, ArrowDown, TrendingUp, Edit3, X, MapPin, BadgeCheck, Search, BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Phone } from 'lucide-react';
+import { Settings, Users, Lock, Plus, Trash2, Save, LayoutDashboard, MessageSquare, DollarSign, ImagePlus, Copy, Star, Camera, ArrowUp, ArrowDown, TrendingUp, Edit3, X, MapPin, BadgeCheck, Search, BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Phone, LogOut } from 'lucide-react';
 import { db, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+// NUEVO: Importamos las funciones de seguridad reales de Firebase
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // ESTADOS DE SEGURIDAD REAL
+  const [user, setUser] = useState<any>(null);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
   const [activeTab, setActiveTab] = useState('reservas');
   const [isSaving, setIsSaving] = useState(false);
   const [mensajeGuardado, setMensajeGuardado] = useState('');
@@ -40,20 +46,51 @@ export default function AdminDashboard() {
     blogPosts: []
   });
 
-  // Cargar configuración general
+  // INICIALIZAMOS LA AUTENTICACIÓN
+  const auth = getAuth(db.app);
+
+  // Escuchar cambios de sesión en tiempo real
   useEffect(() => {
-    if (isAuthenticated) {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Lógica de Inicio de Sesión Seguro
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError(false);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error("Error de login:", error);
+      setLoginError(true);
+    }
+  };
+
+  // Lógica de Cerrar Sesión
+  const handleLogout = async () => {
+    await signOut(auth);
+    setEmail('');
+    setPassword('');
+  };
+
+  // Cargar configuración general SOLO si hay un usuario logueado
+  useEffect(() => {
+    if (user) {
       const fetchData = async () => {
         const docSnap = await getDoc(doc(db, "configuracion", "general"));
         if (docSnap.exists()) setSiteData((prev: any) => ({ ...prev, ...docSnap.data() }));
       };
       fetchData();
     }
-  }, [isAuthenticated]);
+  }, [user]);
 
-  // Cargar Reservas en tiempo real
+  // Cargar Reservas en tiempo real SOLO si hay un usuario logueado
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       const q = query(collection(db, 'reservas'), orderBy('fechaCreacion', 'desc'));
       const desuscribir = onSnapshot(q, (snapshot) => {
         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -62,7 +99,7 @@ export default function AdminDashboard() {
       });
       return () => desuscribir();
     }
-  }, [isAuthenticated]);
+  }, [user]);
 
   const saveConfig = async () => {
     setIsSaving(true); setMensajeGuardado('');
@@ -141,23 +178,46 @@ export default function AdminDashboard() {
   const updateFaq = (id: number, field: string, value: string) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.map((f: any) => f.id === id ? { ...f, [field]: value } : f) }));
   const removeFaq = (id: number) => setSiteData((prev: any) => ({ ...prev, faqs: prev.faqs.filter((f: any) => f.id !== id) }));
 
-  if (!isAuthenticated) {
+  // CLASE REUTILIZABLE PARA TODOS LOS INPUTS Y TEXTAREAS (ALTO CONTRASTE)
+  const inputClass = "w-full p-3 border-2 border-stone-300 rounded-lg mt-1 text-stone-900 bg-white font-medium focus:border-amber-500 focus:outline-none placeholder-stone-400";
+  const labelClass = "block text-sm font-extrabold text-stone-900 mb-1";
+
+  // PANTALLA DE CARGA INICIAL
+  if (authLoading) {
+    return <div className="min-h-screen bg-stone-100 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-900"></div></div>;
+  }
+
+  // PANTALLA DE LOGIN SEGURO
+  if (!user) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center p-4">
-        <form onSubmit={(e) => { e.preventDefault(); if (password === 'admin') setIsAuthenticated(true); else setLoginError(true); }} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
-          <Lock className="w-10 h-10 mx-auto text-amber-600 mb-4"/>
-          <h1 className="text-2xl font-bold mb-6 text-stone-900">Acceso CMS</h1>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-4 border-2 border-stone-300 rounded-lg mb-4 text-stone-900 font-bold bg-white focus:border-amber-500 focus:outline-none" placeholder="Contraseña" />
-          {loginError && <p className="text-red-500 font-bold mb-4">Contraseña incorrecta</p>}
-          <button type="submit" className="w-full bg-stone-900 text-white p-4 rounded-lg font-bold text-lg">Ingresar</button>
+        <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center border-2 border-stone-200">
+          <div className="w-20 h-20 bg-stone-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Lock className="w-10 h-10 text-amber-500"/>
+          </div>
+          <h1 className="text-2xl font-black mb-2 text-stone-900">Acceso Seguro</h1>
+          <p className="text-stone-500 font-medium mb-8">Ingresa tus credenciales para administrar la web.</p>
+          
+          <div className="space-y-4 text-left">
+            <div>
+              <label className={labelClass}>Correo Electrónico</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} placeholder="admin@tudominio.com" required />
+            </div>
+            <div>
+              <label className={labelClass}>Contraseña</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} placeholder="••••••••" required />
+            </div>
+          </div>
+
+          {loginError && <div className="bg-red-50 text-red-600 font-bold p-3 rounded-lg mt-6 border border-red-200 flex items-center gap-2 justify-center"><AlertCircle size={18}/> Credenciales incorrectas</div>}
+          
+          <button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 mt-8 py-4 rounded-xl font-extrabold text-lg shadow-lg transition-transform hover:scale-[1.02]">
+            Ingresar al Panel
+          </button>
         </form>
       </div>
     );
   }
-
-  // CLASE REUTILIZABLE PARA TODOS LOS INPUTS Y TEXTAREAS (ALTO CONTRASTE)
-  const inputClass = "w-full p-3 border-2 border-stone-300 rounded-lg mt-1 text-stone-900 bg-white font-medium focus:border-amber-500 focus:outline-none placeholder-stone-400";
-  const labelClass = "block text-sm font-extrabold text-stone-900 mb-1";
 
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col md:flex-row">
@@ -185,8 +245,11 @@ export default function AdminDashboard() {
       )}
 
       {/* Menú Lateral */}
-      <aside className="w-full md:w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-10">
-        <div className="p-6 border-b border-stone-800"><h2 className="text-2xl font-extrabold text-white">Panel Admin</h2></div>
+      <aside className="w-full md:w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-10 relative">
+        <div className="p-6 border-b border-stone-800">
+          <h2 className="text-2xl font-extrabold text-white mb-2">Panel Admin</h2>
+          <p className="text-xs text-stone-500 font-mono truncate">{user.email}</p>
+        </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {[
             { id: 'reservas', icon: Calendar, label: 'Reservas CRM' },
@@ -206,6 +269,12 @@ export default function AdminDashboard() {
             </button>
           ))}
         </nav>
+        {/* BOTÓN CERRAR SESIÓN */}
+        <div className="p-4 border-t border-stone-800 bg-stone-900 pb-safe">
+          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-stone-800 hover:bg-red-500 hover:text-white text-stone-400 font-bold py-3 rounded-xl transition-colors">
+            <LogOut size={18}/> Cerrar Sesión
+          </button>
+        </div>
       </aside>
 
       {/* Contenido Principal */}
