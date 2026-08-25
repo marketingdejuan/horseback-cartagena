@@ -81,7 +81,7 @@ export default function AdminDashboard() {
   const handleInputChange = (field: string, value: any) => setSiteData((prev: any) => ({ ...prev, [field]: value }));
 
   // ==========================================
-  // LÓGICA CRM KANBAN (DRAG & DROP)
+  // LÓGICA CRM KANBAN (DRAG & DROP + WHATSAPP INTELIGENTE)
   // ==========================================
   const updateEstadoReserva = async (id: string, nuevoEstado: string) => {
     try { await setDoc(doc(db, 'reservas', id), { estado: nuevoEstado }, { merge: true }); } 
@@ -94,6 +94,32 @@ export default function AdminDashboard() {
     e.preventDefault();
     const id = e.dataTransfer.getData('reservaId');
     if (id) updateEstadoReserva(id, nuevoEstado);
+  };
+
+  // 🚀 SUPERPODER: GENERADOR DE MENSAJES CONTEXTUALES DE WHATSAPP
+  const generarEnlaceWhatsApp = (reserva: any, estado: string) => {
+    const { fecha, hora, jinetes, total, telefono } = reserva;
+    let mensaje = "";
+
+    switch (estado) {
+      case 'Nueva':
+        mensaje = `¡Hola! Recibimos tu cotización desde la página web para una cabalgata el ${fecha} a las ${hora} para ${jinetes} jinetes. El valor estimado es de $${total?.toLocaleString()}. ¿Tienes alguna duda para que procedamos con la reserva? 🐎`;
+        break;
+      case 'Contactado':
+        mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. Quería hacerte un breve seguimiento sobre tu reserva pendiente para el ${fecha}. Cuéntame si te animas para ir separando tus caballos. ✨`;
+        break;
+      case 'Abonado':
+        mensaje = `¡Hola! Confirmamos la recepción de tu abono. 🎉 Tu reserva para el ${fecha} a las ${hora} está 100% confirmada. Recuerda llegar 15 minutos antes, usar pantalón largo (no shorts), zapatos cerrados (no sandalias) y traer protector solar. ¡Nos vemos en Caldas! 🤠`;
+        break;
+      case 'Finalizada':
+        mensaje = `¡Hola! Esperamos que hayas disfrutado muchísimo la experiencia con nosotros. 🐴 ¿Nos harías el gran favor de regalarnos una calificación de 5 estrellas en Google? Nos ayuda muchísimo a crecer: [PEGAR_TU_LINK_DE_GOOGLE_AQUÍ] ⭐⭐⭐⭐⭐`;
+        break;
+      default:
+        mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. 🐎`;
+    }
+
+    const numeroLimpio = telefono?.replace(/\D/g, '') || "";
+    return `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
   };
 
   const columnasCRM = ['Nueva', 'Contactado', 'Abonado', 'Finalizada'];
@@ -194,8 +220,16 @@ export default function AdminDashboard() {
                      >
                         <div className="flex justify-between items-start mb-3">
                           <span className="bg-stone-100 text-stone-600 text-xs font-bold px-3 py-1 rounded-full border">{reserva.origen || 'Web'}</span>
-                          <a href={`https://wa.me/${reserva.telefono?.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-transform hover:scale-110">
+                          
+                          {/* BOTÓN MÁGICO DE WHATSAPP */}
+                          <a 
+                            href={generarEnlaceWhatsApp(reserva, col)} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-transform hover:scale-110 flex items-center gap-1 group"
+                          >
                             <MessageSquare size={18}/>
+                            <span className="text-[10px] font-bold hidden group-hover:block px-1">Enviar</span>
                           </a>
                         </div>
                         <p className="font-black text-stone-900 text-xl leading-tight mb-2">{reserva.plan}</p>
