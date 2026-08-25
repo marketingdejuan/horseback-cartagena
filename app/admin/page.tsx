@@ -97,6 +97,7 @@ export default function AdminDashboard() {
     if (id) updateEstadoReserva(id, nuevoEstado);
   };
 
+  // Enlace inteligente para el Kanban de Reservas
   const generarEnlaceWhatsApp = (reserva: any, estado: string) => {
     const { fecha, hora, jinetes, total, telefono } = reserva;
     let mensaje = "";
@@ -111,6 +112,15 @@ export default function AdminDashboard() {
       default: mensaje = `¡Hola! Te escribo de Cabalgatas Medellín. 🐎`;
     }
     return `https://wa.me/${telefono?.replace(/\D/g, '') || ""}?text=${encodeURIComponent(mensaje)}`;
+  };
+
+  // 🚀 NUEVO: Enlace inteligente para agradecer el formulario (Waiver)
+  const generarEnlaceWhatsAppWaiver = (cliente: any) => {
+    const primerNombre = (cliente.clientName || '').split(' ')[0] || '';
+    const numeroLimpio = `${cliente.countryCode || ''}${cliente.whatsapp || ''}`.replace(/\D/g, '');
+    const mensaje = `¡Hola ${primerNombre}! Te escribimos de Cabalgatas Medellín. 🐎 Muchas gracias por diligenciar tu registro de exoneración y confirmar tu asistencia.\n\nQueremos dejarte algunas recomendaciones clave para tu cabalgata:\n- Llegar 15 minutos antes de la hora reservada.\n- Usar pantalón largo (esencial) y calzado cerrado (no sandalias).\n- Aplicarte protector solar.\n\n¡Nos vemos pronto en la finca para la aventura! 🤠`;
+    
+    return `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
   };
 
   const columnasCRM = ['Nueva', 'Contactado', 'Abonado', 'Finalizada'];
@@ -220,7 +230,6 @@ export default function AdminDashboard() {
 
           {activeTab === 'marketing' && (
             <div className="space-y-6 animate-in fade-in">
-              {/* Tarjetas Superiores */}
               <div className="bg-white p-8 rounded-3xl shadow-xl border border-stone-100">
                 <div className="bg-blue-50 border border-blue-200 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6 mb-6">
                   <div className="bg-blue-600 text-white p-4 rounded-full shadow-lg"><TrendingUp size={36} /></div>
@@ -243,7 +252,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* NUEVO: Tabla Visual de Clientes Registrados */}
               <div className="bg-white p-8 rounded-3xl shadow-xl border border-stone-100">
                 <h3 className="text-xl font-extrabold text-stone-900 mb-6 border-b pb-4">Últimos Clientes Registrados</h3>
                 <div className="overflow-x-auto">
@@ -253,7 +261,7 @@ export default function AdminDashboard() {
                         <th className="pb-3 font-black">Cliente</th>
                         <th className="pb-3 font-black">Fecha del Tour</th>
                         <th className="pb-3 font-black">Plan</th>
-                        <th className="pb-3 font-black">Contacto</th>
+                        <th className="pb-3 font-black">Contacto (Clic p/ Mensaje)</th>
                         <th className="pb-3 font-black text-center">Firma Digital</th>
                       </tr>
                     </thead>
@@ -268,8 +276,16 @@ export default function AdminDashboard() {
                           <td className="py-4 font-bold text-stone-700">{cliente.tourDate}<br/><span className="text-xs font-normal text-stone-400">{cliente.tourTime}</span></td>
                           <td className="py-4 font-bold text-stone-700">{cliente.tourDuration}</td>
                           <td className="py-4">
-                            <a href={`https://wa.me/${cliente.countryCode?.replace('+','')}${cliente.whatsapp}`} target="_blank" rel="noreferrer" className="text-green-600 font-bold hover:underline block">{cliente.countryCode} {cliente.whatsapp}</a>
-                            {cliente.instagram && <a href={`https://instagram.com/${cliente.instagram.replace('@','')}`} target="_blank" rel="noreferrer" className="text-purple-600 text-xs hover:underline mt-1 block">{cliente.instagram}</a>}
+                            {/* 🚀 BOTÓN MODIFICADO PARA ENVIAR RECOMENDACIONES DE WAIVER */}
+                            <a 
+                              href={generarEnlaceWhatsAppWaiver(cliente)} 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="inline-flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg font-bold hover:bg-green-100 hover:scale-105 transition-all w-max"
+                            >
+                              <MessageSquare size={16}/> {cliente.countryCode} {cliente.whatsapp}
+                            </a>
+                            {cliente.instagram && <a href={`https://instagram.com/${cliente.instagram.replace('@','')}`} target="_blank" rel="noreferrer" className="text-purple-600 text-xs hover:underline mt-2 block">{cliente.instagram}</a>}
                           </td>
                           <td className="py-4 text-center">
                             {cliente.signatureUrl ? (
@@ -292,7 +308,6 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ... (resto de las pestañas intactas: reservas, blog, etc.) ... */}
           {activeTab === 'reservas' && (
              <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory min-h-[70vh]">
               {columnasCRM.map(col => (
