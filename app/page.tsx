@@ -1,6 +1,7 @@
 "use client";
 /* STREAMING_CHUNK: Importando librerías y componentes base... */
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image'; // NUEVO: Importación del optimizador de imágenes
 import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -81,7 +82,7 @@ return () => document.removeEventListener('mouseleave', handleMouseLeave);
 }
 }, [data, hasShownPopup]);
 
-/* STREAMING_CHUNK: Definiendo la función de rastreo de conversiones (Google Ads)... */
+/* STREAMING_CHUNK: Definiendo la función de rastreo de conversiones... */
 const trackWhatsAppClick = (ubicacionBoton: string) => {
   if (typeof window !== 'undefined' && (window as any).gtag) {
     (window as any).gtag('event', 'whatsapp_click', {
@@ -98,7 +99,6 @@ const trackWhatsAppClick = (ubicacionBoton: string) => {
   }
 };
 
-/* STREAMING_CHUNK: Procesando la lógica comercial (Precios y Reglas)... */
 const esFinDeSemana = fecha ? [6, 0].includes(new Date(fecha + 'T12:00:00').getDay()) : false;
 const esDosPm = hora === '14:00';
 const esGrupal = esFinDeSemana && esDosPm;
@@ -109,15 +109,11 @@ const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro extra de guía)' : 'Priva
 const whatsappNum = data?.whatsappNumber || "573000000000";
 const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Hola, quiero reservar el ${fecha || 'próximo fin de semana'} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${esGrupal ? 'Grupal' : 'Privada'}. Cotización: $${totalCalculado.toLocaleString()}`)}`;
 const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas. 🐎")}`;
-
 const isValidPhone = telefono.trim().length >= 7;
 
-/* Función para interceptar el clic, guardar en el panel admin y abrir WhatsApp */
 const handleReservaWhatsApp = async (e: React.MouseEvent) => {
   e.preventDefault(); 
-  
   if (!isValidPhone) return;
-
   trackWhatsAppClick('Boton_Cotizador');
 
   try {
@@ -134,20 +130,46 @@ const handleReservaWhatsApp = async (e: React.MouseEvent) => {
   } catch (error) {
     console.error("Error guardando reserva silenciosa:", error);
   }
-
   window.open(linkCotizador, '_blank');
 };
 
 if (!data) return null;
 
-/* STREAMING_CHUNK: Renderizando la cabecera y el Selector de Idioma... */
+// NUEVO: Generador de FAQ Schema (Rich Snippets para Google)
+const faqSchema = data?.faqs?.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": data.faqs.map((faq: any) => ({
+    "@type": "Question",
+    "name": faq.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.a
+    }
+  }))
+} : null;
+
 return (
   <div className="min-h-screen bg-stone-50 font-sans selection:bg-amber-200">
+    
+    {/* Inyectando las FAQ directo al buscador de Google */}
+    {faqSchema && (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+    )}
+
     <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
       {data.heroMedia?.map((media: any, idx: number) => {
         const isVideo = media.url?.toLowerCase().includes('.mp4');
         const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-50' : 'opacity-0'}`;
-        return isVideo ? <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} /> : <img key={idx} src={media.url} className={classes} alt="Banner" />;
+        // NUEVO: Implementación de Next Image para carga instantánea del Banner
+        return isVideo ? (
+          <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} />
+        ) : (
+          <Image key={idx} src={media.url} alt="Cabalgatas Medellín Banner" fill priority={idx === 0} className={classes} sizes="100vw" />
+        );
       })}
       <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
       <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
@@ -157,8 +179,9 @@ return (
       </div>
     </section>
 
-    {/* STREAMING_CHUNK: Renderizando la sección del Cotizador Interactivo... */}
     <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-16">
+      
+      {/* COTIZADOR */}
       <section id="cotizador" className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border border-stone-200 scroll-mt-20">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-stone-100 pb-4">
           <h2 className="text-2xl md:text-3xl font-extrabold text-stone-900 flex items-center gap-3">
@@ -168,8 +191,6 @@ return (
         </div>
         
         <div className="grid md:grid-cols-2 gap-8">
-          
-          {/* Lado Izquierdo: Formularios Alto Contraste */}
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-extrabold text-stone-900 mb-2">1. Selecciona Fecha y Hora</label>
@@ -200,22 +221,13 @@ return (
             <div>
               <label className="block text-sm font-extrabold text-stone-900 mb-2">3. Tu número de WhatsApp</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-stone-500" />
-                </div>
-                <input
-                  type="tel"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                  placeholder="Ej: 300 123 4567"
-                  className="w-full pl-10 p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-500 transition-colors placeholder-stone-400"
-                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Phone className="h-5 w-5 text-stone-500" /></div>
+                <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej: 300 123 4567" className="w-full pl-10 p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-500 transition-colors placeholder-stone-400"/>
               </div>
               <p className="text-xs font-bold text-stone-500 mt-2">Obligatorio para enviarte la cotización detallada.</p>
             </div>
           </div>
           
-          {/* Lado Derecho: Resumen y Botón */}
           <div className="bg-stone-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-between border-2 border-stone-800">
             <div>
               <p className="text-sm font-extrabold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1 rounded-lg border border-amber-500/20">{tipoCabalgataStr}</p>
@@ -236,10 +248,9 @@ return (
         </div>
       </section>
 
-      {/* STREAMING_CHUNK: Renderizando la sección de Planes de Cabalgata... */}
       <PricingSection />
 
-      {/* STREAMING_CHUNK: Renderizando la sección de Ubicación en Maps... */}
+      {/* SECCIÓN MAPAS CON NEXT IMAGE */}
       <section id="ubicacion" className="pt-4 scroll-mt-20">
         <div className="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
           <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-stone-50 to-white">
@@ -260,7 +271,8 @@ return (
           </div>
           
           <div className="w-full h-[300px] relative bg-stone-200 flex items-center justify-center overflow-hidden border-t">
-            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 blur-[2px]" alt="Mapa de fondo" />
+            {/* NUEVO: Imagen ultra rápida */}
+            <Image src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" alt="Ubicación Mapa" fill className="object-cover opacity-60 blur-[2px]" sizes="(max-width: 768px) 100vw, 800px" />
             <div className="absolute inset-0 bg-stone-900/30"></div>
             
             <div className="relative z-10 flex flex-col items-center">
@@ -279,7 +291,7 @@ return (
         </div>
       </section>
 
-      {/* STREAMING_CHUNK: Renderizando la Galería de Experiencias... */}
+      {/* GALERÍA CON NEXT IMAGE Y LAZY LOADING */}
       {data.gallery && data.gallery.length > 0 && (
         <section id="galeria" className="pt-4 scroll-mt-20">
           <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-500" /> Galería</h2>
@@ -287,7 +299,7 @@ return (
             {data.gallery.map((item: any) => (
               <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border overflow-hidden group">
                 <div className="h-48 overflow-hidden relative bg-stone-100">
-                  <img src={item.url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" alt="Galeria" />
+                  <Image src={item.url} alt={item.title || 'Foto de Cabalgata'} fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 320px" />
                   <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent"></div>
                   <h3 className="absolute bottom-4 left-4 text-white font-bold text-lg">{item.title}</h3>
                 </div>
@@ -301,14 +313,16 @@ return (
         </section>
       )}
 
-      {/* STREAMING_CHUNK: Renderizando Preview de los Artículos del Blog... */}
+      {/* BLOG PREVIEWS CON NEXT IMAGE */}
       {data.blogPosts && data.blogPosts.length > 0 && (
         <section id="blog" className="pt-4 scroll-mt-20">
           <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><BookOpen className="w-8 h-8 text-amber-500" /> Nuestro Blog</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {data.blogPosts.slice(0, 2).map((post: any) => (
               <a key={post.id} href={`/blog/${post.slug}`} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow group">
-                <img src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} className="w-full h-40 object-cover group-hover:scale-105 transition-transform" alt={post.title} />
+                <div className="relative w-full h-40 bg-stone-100">
+                  <Image src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform" sizes="(max-width: 768px) 100vw, 50vw" />
+                </div>
                 <div className="p-6">
                   <h3 className="font-bold text-xl mb-2 text-stone-800">{post.title}</h3>
                   <p className="text-stone-500 text-sm line-clamp-2">{post.metaDesc || post.content}</p>
@@ -323,7 +337,7 @@ return (
         </section>
       )}
 
-      {/* STREAMING_CHUNK: Renderizando la sección de Reseñas de Jinetes... */}
+      {/* RESEÑAS */}
       {data.reviews && data.reviews.length > 0 && (
         <section id="reviews" className="pt-4 scroll-mt-20">
           <h2 className="text-3xl font-bold text-stone-800 mb-6">Jinetes Felices</h2>
@@ -347,7 +361,7 @@ return (
         </section>
       )}
 
-      {/* STREAMING_CHUNK: Renderizando Acordeón de Preguntas Frecuentes... */}
+      {/* PREGUNTAS FRECUENTES */}
       {data.faqs && data.faqs.length > 0 && (
         <section id="faq" className="pb-12 scroll-mt-20">
           <h2 className="text-3xl font-bold text-stone-800 mb-8 text-center">Preguntas Frecuentes</h2>
@@ -367,7 +381,6 @@ return (
       )}
     </main>
 
-    {/* STREAMING_CHUNK: Procesando Pop-up modal de Descuento (Exit Intent)... */}
     {showExitPopup && (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4">
         <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative animate-in zoom-in duration-300">
@@ -383,7 +396,6 @@ return (
       </div>
     )}
 
-    {/* STREAMING_CHUNK: Renderizando barra de navegación y CTAs flotantes... */}
     <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Flotante')} className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-600 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" /></a>
 
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 pb-safe z-50 grid grid-cols-5 gap-1 text-center md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08)] items-center">
