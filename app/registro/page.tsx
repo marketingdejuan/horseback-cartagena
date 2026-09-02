@@ -18,7 +18,6 @@ export default function WaiverPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   
-  // Lógica del Canvas para dibujar la firma
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   
@@ -86,6 +85,7 @@ export default function WaiverPage() {
     const signatureImage = canvas.toDataURL('image/png');
 
     try {
+      // 1. Guardar en Firebase Storage y Firestore
       const storageRef = ref(storage, `firmas_waiver/${Date.now()}_${form.idNumber}.png`);
       await uploadString(storageRef, signatureImage, 'data_url');
       const signatureUrl = await getDownloadURL(storageRef);
@@ -98,17 +98,56 @@ export default function WaiverPage() {
 
       setIsSuccess(true);
       
-      if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Lead', {
-          content_name: form.tourDuration,
-          value: 0.00,
-          currency: 'COP'
-        });
+      // =========================================================================
+      // 🚀 ESTRATEGIA PRO: EXTRACCIÓN Y ENVÍO DE DATA A LOS ALGORITMOS (ADS)
+      // =========================================================================
+      try {
+        // Formateamos la data para que Facebook y Google la entiendan perfectamente
+        const nameParts = form.clientName.trim().split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+        
+        // Teléfono limpio (solo números) y teléfono con símbolo +
+        const cleanPhone = `${form.countryCode.replace('+', '')}${form.whatsapp.replace(/\D/g, '')}`;
+        const phoneForGoogle = `+${cleanPhone}`;
+
+        // 🎯 1. GOOGLE ADS (Conversiones Mejoradas / Enhanced Conversions)
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          // Primero: Inyectamos los datos del usuario de forma segura
+          (window as any).gtag('set', 'user_data', {
+            "phone_number": phoneForGoogle,
+            "address": {
+              "first_name": firstName,
+              "last_name": lastName,
+            }
+          });
+          // Segundo: Disparamos el evento de conversión de Lead
+          (window as any).gtag('event', 'conversion', { 
+            // TODO: Cambiar esto por tu etiqueta de conversión real de Google Ads
+            'send_to': 'AW-XXXXXXXXXX/TU_ETIQUETA_DE_CONVERSION',
+            'value': 0.00,
+            'currency': 'COP'
+          });
+        }
+
+        // 🎯 2. META ADS (Coincidencia Avanzada de Facebook/Instagram)
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+          (window as any).fbq('track', 'Lead', {
+            content_name: form.tourDuration,
+            value: 0.00,
+            currency: 'COP',
+            // Coincidencia Avanzada: Le pasamos los datos para que Meta encuentre su perfil
+            fn: firstName.toLowerCase(),      // First Name
+            ln: lastName.toLowerCase(),       // Last Name
+            ph: cleanPhone,                   // Phone
+            external_id: form.idNumber        // Usamos la cédula como ID único para no duplicar data
+          });
+        }
+      } catch (trackingError) {
+        console.error("Error enviando data a los Píxeles:", trackingError);
       }
-      
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'conversion', { 'send_to': 'TU_CODIGO_DE_GOOGLE/LEAD' });
-      }
+      // =========================================================================
+
     } catch (error) {
       console.error(error);
       alert("Error de conexión. Verifica tu internet e intenta de nuevo.");
@@ -207,7 +246,6 @@ export default function WaiverPage() {
           <div>
             <div className="relative">
               <input required type="text" value={form.instagram} onChange={e=>setForm({...form, instagram: e.target.value})} className="w-full bg-stone-50 border-2 border-stone-200 rounded-2xl p-4 pl-12 outline-none focus:border-amber-500 text-stone-900 font-bold transition-colors" placeholder="Tu usuario de Instagram (@)" />
-              {/* CAMBIO APLICADO: Usamos AtSign en lugar de Instagram */}
               <AtSign className="absolute left-4 top-4 text-stone-400" size={20} />
             </div>
           </div>
