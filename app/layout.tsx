@@ -49,8 +49,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* 🚀 CÓDIGOS DE MARKETING DIGITAL (PÍXELES) */}
         {/* ========================================== */}
         
-        {/* 1. Píxel de Meta (Facebook/Instagram Ads) */}
-        <Script id="meta-pixel" strategy="afterInteractive">
+        {/* 1. Píxel de Meta (Facebook/Instagram Ads) optimizado */}
+        <Script id="meta-pixel" strategy="lazyOnload">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -67,9 +67,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           `}
         </Script>
 
-        {/* 2. Etiqueta de Google (Analytics 4 y Google Ads) */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-12762T7ZP0" strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
+        {/* 2. Etiqueta de Google (Analytics 4 y Google Ads) optimizada */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-12762T7ZP0" strategy="lazyOnload" />
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

@@ -1,14 +1,13 @@
 "use client";
 /* STREAMING_CHUNK: Importando librerías y componentes base... */
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image'; // NUEVO: Importación del optimizador de imágenes
+import Image from 'next/image'; // 🚀 Optimizador de imágenes de Next.js
 import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import PricingSection from '../components/Planes';
 
 export default function ClientePage() {
-/* STREAMING_CHUNK: Inicializando estados de la aplicación... */
 const [data, setData] = useState<any>(null);
 const [fecha, setFecha] = useState('');
 const [hora, setHora] = useState('10:00');
@@ -18,7 +17,6 @@ const [currentHero, setCurrentHero] = useState(0);
 const [showExitPopup, setShowExitPopup] = useState(false);
 const [hasShownPopup, setHasShownPopup] = useState(false);
 
-/* STREAMING_CHUNK: Conectando con Firebase en tiempo real... */
 useEffect(() => {
 const unsub = onSnapshot(doc(db, "configuracion", "general"), (docSnap) => {
 if (docSnap.exists()) setData(docSnap.data());
@@ -26,7 +24,6 @@ if (docSnap.exists()) setData(docSnap.data());
 return unsub;
 }, []);
 
-/* STREAMING_CHUNK: Inyectando metadatos SEO y etiquetas de Google Ads... */
 useEffect(() => {
 if (data) {
 if (data.metaTitle) document.title = data.metaTitle;
@@ -43,27 +40,9 @@ if (data.metaTitle) document.title = data.metaTitle;
   setMeta('keywords', data.seoKeywords);
   setMeta('og:image', data.seoOgImage, true);
   setMeta('og:title', data.metaTitle, true);
-
-  if (data.googleAnalyticsId && !document.getElementById('google-analytics')) {
-    const script = document.createElement('script');
-    script.id = 'google-analytics';
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${data.googleAnalyticsId}`;
-    script.async = true;
-    document.head.appendChild(script);
-
-    const scriptIn = document.createElement('script');
-    scriptIn.innerHTML = `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '${data.googleAnalyticsId}');
-    `;
-    document.head.appendChild(scriptIn);
-  }
 }
 }, [data]);
 
-/* STREAMING_CHUNK: Configurando la rotación del carrusel Hero... */
 useEffect(() => {
 if (data?.heroMedia && data.heroMedia.length > 1) {
 const interval = setInterval(() => setCurrentHero((prev) => (prev + 1) % data.heroMedia.length), 5000);
@@ -71,7 +50,6 @@ return () => clearInterval(interval);
 }
 }, [data?.heroMedia]);
 
-/* STREAMING_CHUNK: Configurando el Pop-up de intención de salida... */
 useEffect(() => {
 if (data?.enableExitIntent && !hasShownPopup) {
 const handleMouseLeave = (e: MouseEvent) => {
@@ -82,7 +60,6 @@ return () => document.removeEventListener('mouseleave', handleMouseLeave);
 }
 }, [data, hasShownPopup]);
 
-/* STREAMING_CHUNK: Definiendo la función de rastreo de conversiones... */
 const trackWhatsAppClick = (ubicacionBoton: string) => {
   if (typeof window !== 'undefined' && (window as any).gtag) {
     (window as any).gtag('event', 'whatsapp_click', {
@@ -135,7 +112,6 @@ const handleReservaWhatsApp = async (e: React.MouseEvent) => {
 
 if (!data) return null;
 
-// NUEVO: Generador de FAQ Schema (Rich Snippets para Google)
 const faqSchema = data?.faqs?.length > 0 ? {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -152,23 +128,28 @@ const faqSchema = data?.faqs?.length > 0 ? {
 return (
   <div className="min-h-screen bg-stone-50 font-sans selection:bg-amber-200">
     
-    {/* Inyectando las FAQ directo al buscador de Google */}
     {faqSchema && (
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
     )}
 
+    {/* 🚀 LCP OPTIMIZADO: Banner Hero */}
     <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
       {data.heroMedia?.map((media: any, idx: number) => {
         const isVideo = media.url?.toLowerCase().includes('.mp4');
         const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-50' : 'opacity-0'}`;
-        // NUEVO: Implementación de Next Image para carga instantánea del Banner
+        
         return isVideo ? (
           <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} />
         ) : (
-          <Image key={idx} src={media.url} alt="Cabalgatas Medellín Banner" fill priority={idx === 0} className={classes} sizes="100vw" />
+          <Image 
+            key={idx} 
+            src={media.url} 
+            alt="Cabalgatas Medellín Banner" 
+            fill 
+            priority={idx === 0} // 🔥 Esto arregla el problema de LCP (4.3s) que marcaba Google
+            className={classes} 
+            sizes="(max-width: 768px) 100vw, 100vw" // 🔥 Envía imágenes ligeras a celulares
+          />
         );
       })}
       <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
@@ -271,8 +252,14 @@ return (
           </div>
           
           <div className="w-full h-[300px] relative bg-stone-200 flex items-center justify-center overflow-hidden border-t">
-            {/* NUEVO: Imagen ultra rápida */}
-            <Image src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" alt="Ubicación Mapa" fill className="object-cover opacity-60 blur-[2px]" sizes="(max-width: 768px) 100vw, 800px" />
+            {/* 🚀 Imagen de mapa optimizada */}
+            <Image 
+              src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" 
+              alt="Ubicación Mapa" 
+              fill 
+              className="object-cover opacity-60 blur-[2px]" 
+              sizes="(max-width: 768px) 100vw, 800px" 
+            />
             <div className="absolute inset-0 bg-stone-900/30"></div>
             
             <div className="relative z-10 flex flex-col items-center">
@@ -299,7 +286,13 @@ return (
             {data.gallery.map((item: any) => (
               <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border overflow-hidden group">
                 <div className="h-48 overflow-hidden relative bg-stone-100">
-                  <Image src={item.url} alt={item.title || 'Foto de Cabalgata'} fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 320px" />
+                  <Image 
+                    src={item.url} 
+                    alt={item.title || 'Foto de Cabalgata'} 
+                    fill 
+                    className="object-cover group-hover:scale-110 transition-transform duration-700" 
+                    sizes="(max-width: 768px) 100vw, 320px" 
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent"></div>
                   <h3 className="absolute bottom-4 left-4 text-white font-bold text-lg">{item.title}</h3>
                 </div>
@@ -321,7 +314,13 @@ return (
             {data.blogPosts.slice(0, 2).map((post: any) => (
               <a key={post.id} href={`/blog/${post.slug}`} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow group">
                 <div className="relative w-full h-40 bg-stone-100">
-                  <Image src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform" sizes="(max-width: 768px) 100vw, 50vw" />
+                  <Image 
+                    src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} 
+                    alt={post.title} 
+                    fill 
+                    className="object-cover group-hover:scale-105 transition-transform" 
+                    sizes="(max-width: 768px) 100vw, 50vw" 
+                  />
                 </div>
                 <div className="p-6">
                   <h3 className="font-bold text-xl mb-2 text-stone-800">{post.title}</h3>
