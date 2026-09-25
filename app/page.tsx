@@ -1,7 +1,6 @@
 "use client";
-/* STREAMING_CHUNK: Importando librerías y componentes base... */
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image'; // 🚀 Optimizador de imágenes de Next.js
+import Image from 'next/image';
 import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -67,7 +66,6 @@ const trackWhatsAppClick = (ubicacionBoton: string) => {
       event_label: ubicacionBoton,
       value: 1
     });
-
     (window as any).gtag('event', 'conversion', {
       'send_to': 'AW-10958714047/MQGxCMyQ1-YcEL_pwuko',
       'value': 1.0,
@@ -112,26 +110,9 @@ const handleReservaWhatsApp = async (e: React.MouseEvent) => {
 
 if (!data) return null;
 
-const faqSchema = data?.faqs?.length > 0 ? {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": data.faqs.map((faq: any) => ({
-    "@type": "Question",
-    "name": faq.q,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.a
-    }
-  }))
-} : null;
-
 return (
   <div className="min-h-screen bg-stone-50 font-sans selection:bg-amber-200">
     
-    {faqSchema && (
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-    )}
-
     {/* 🚀 LCP OPTIMIZADO: Banner Hero */}
     <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
       {data.heroMedia?.map((media: any, idx: number) => {
@@ -146,9 +127,11 @@ return (
             src={media.url} 
             alt="Cabalgatas Medellín Banner" 
             fill 
-            priority={idx === 0} // 🔥 Esto arregla el problema de LCP (4.3s) que marcaba Google
+            priority={idx === 0} 
+            fetchPriority={idx === 0 ? "high" : "auto"} // 🔥 Soluciona la alerta de LCP
+            quality={75} // 🔥 Baja el peso de la imagen sin perder calidad visual
             className={classes} 
-            sizes="(max-width: 768px) 100vw, 100vw" // 🔥 Envía imágenes ligeras a celulares
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // 🔥 Entrega la imagen perfecta según el celular
           />
         );
       })}
@@ -231,7 +214,7 @@ return (
 
       <PricingSection />
 
-      {/* SECCIÓN MAPAS CON NEXT IMAGE */}
+      {/* SECCIÓN MAPAS */}
       <section id="ubicacion" className="pt-4 scroll-mt-20">
         <div className="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
           <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-stone-50 to-white">
@@ -252,11 +235,11 @@ return (
           </div>
           
           <div className="w-full h-[300px] relative bg-stone-200 flex items-center justify-center overflow-hidden border-t">
-            {/* 🚀 Imagen de mapa optimizada */}
             <Image 
               src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" 
               alt="Ubicación Mapa" 
               fill 
+              quality={75}
               className="object-cover opacity-60 blur-[2px]" 
               sizes="(max-width: 768px) 100vw, 800px" 
             />
@@ -278,7 +261,7 @@ return (
         </div>
       </section>
 
-      {/* GALERÍA CON NEXT IMAGE Y LAZY LOADING */}
+      {/* GALERÍA */}
       {data.gallery && data.gallery.length > 0 && (
         <section id="galeria" className="pt-4 scroll-mt-20">
           <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-500" /> Galería</h2>
@@ -290,6 +273,7 @@ return (
                     src={item.url} 
                     alt={item.title || 'Foto de Cabalgata'} 
                     fill 
+                    quality={75}
                     className="object-cover group-hover:scale-110 transition-transform duration-700" 
                     sizes="(max-width: 768px) 100vw, 320px" 
                   />
@@ -306,7 +290,7 @@ return (
         </section>
       )}
 
-      {/* BLOG PREVIEWS CON NEXT IMAGE */}
+      {/* BLOG */}
       {data.blogPosts && data.blogPosts.length > 0 && (
         <section id="blog" className="pt-4 scroll-mt-20">
           <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><BookOpen className="w-8 h-8 text-amber-500" /> Nuestro Blog</h2>
@@ -318,6 +302,7 @@ return (
                     src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} 
                     alt={post.title} 
                     fill 
+                    quality={75}
                     className="object-cover group-hover:scale-105 transition-transform" 
                     sizes="(max-width: 768px) 100vw, 50vw" 
                   />

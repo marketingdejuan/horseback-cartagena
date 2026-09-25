@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 1. Autorización para que Next.js comprima imágenes de Firebase
+  // Configuración de Next/Image para optimizar imágenes de Firebase
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -9,15 +10,17 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com', // Por si acaso usamos fotos de prueba
+        hostname: 'images.unsplash.com',
       }
     ],
   },
-  // 2. Solución Ninja: Ignorar errores viejos de ESLint al compilar en Coolify
+  
+  // Ignorar errores de linter viejos al subir a Coolify
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // 3. Forzar el caché de las imágenes para que Google no se queje de "tiempos de vida de caché"
+  
+  // 🚀 Forzar Caché agresivo (Arregla Captura 22 de PageSpeed)
   async headers() {
     return [
       {
@@ -26,6 +29,15 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
           },
         ],
       },

@@ -42,14 +42,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="es">
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        
+        {/* 🚀 PRECONEXIÓN EXTREMA (Arregla Captura 20 de PageSpeed) */}
+        <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://firestore.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cabalgata-medellin.firebaseapp.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
       </head>
       <body className="antialiased font-sans">
         
-        {/* ========================================== */}
-        {/* 🚀 CÓDIGOS DE MARKETING DIGITAL (PÍXELES) */}
-        {/* ========================================== */}
-        
-        {/* 1. Píxel de Meta (Facebook/Instagram Ads) optimizado */}
+        {/* 🚀 CÓDIGOS DE MARKETING (Carga diferida para no bloquear renderizado) */}
         <Script id="meta-pixel" strategy="lazyOnload">
           {`
             !function(f,b,e,v,n,t,s)
@@ -61,13 +63,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             
-            // TODO: Cambiar este texto por tu ID real de Meta
             fbq('init', 'TU_ID_DEL_PIXEL_DE_FACEBOOK_AQUI'); 
             fbq('track', 'PageView');
           `}
         </Script>
 
-        {/* 2. Etiqueta de Google (Analytics 4 y Google Ads) optimizada */}
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-12762T7ZP0" strategy="lazyOnload" />
         <Script id="google-analytics" strategy="lazyOnload">
           {`
@@ -75,15 +75,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             
-            // Tu código real de Google Analytics 4 ya está configurado:
             gtag('config', 'G-12762T7ZP0'); 
-            
-            // TODO: Cambiar este texto por tu ID real de Google Ads (cuando lo tengas)
             gtag('config', 'AW-XXXXXXXXXX');
           `}
         </Script>
-        
-        {/* ========================================== */}
 
         <LanguageSwitcher />
         {children}
