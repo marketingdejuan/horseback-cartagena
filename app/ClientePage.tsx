@@ -106,7 +106,22 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     window.open(linkCotizador, '_blank');
   };
 
-  if (!data) return null;
+  // 🚀 NUEVO ESQUELETO DE CARGA INSTANTÁNEA (Resuelve el FCP en blanco)
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-stone-900 font-sans selection:bg-amber-200">
+        <section className="relative h-[80vh] bg-stone-800 overflow-hidden flex flex-col justify-end">
+          <div className="absolute inset-0 w-full h-full bg-stone-700 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
+          <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
+            <div className="h-12 md:h-16 bg-stone-600/50 rounded-xl w-3/4 mb-4 mx-auto md:mx-0 animate-pulse"></div>
+            <div className="h-6 md:h-8 bg-stone-600/50 rounded-lg w-1/2 mb-8 mx-auto md:mx-0 animate-pulse"></div>
+            <div className="h-14 w-64 bg-green-500/20 rounded-full mx-auto md:mx-0 animate-pulse"></div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans selection:bg-amber-200">
@@ -126,10 +141,10 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               src={media.url} 
               alt="Cabalgatas Medellín Banner" 
               fill 
-              priority={isFirstItem} // Esto elimina el loading="lazy" que arruinaba tu LCP
-              quality={60} // Reduce el peso drásticamente
+              priority={isFirstItem}
+              quality={60} 
               className={classes} 
-              sizes="(max-width: 768px) 768px, 1200px" // Ayuda a Next.js a comprimir mejor
+              sizes="(max-width: 768px) 768px, 1200px"
             />
           );
         })}
@@ -226,7 +241,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <div className="flex flex-col items-center md:items-end">
                 <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border shadow-sm">
                    <span className="text-3xl font-black text-stone-800">{data.googleRating || '5.0'}</span>
-                   <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
+                   <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
                 </div>
                 <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Basado en {data.googleReviewCount || '150'}+ opiniones</p>
               </div>
