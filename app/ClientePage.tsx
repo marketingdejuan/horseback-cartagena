@@ -6,10 +6,8 @@ import { db } from '../lib/firebase';
 import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import PricingSection from '../components/Planes';
 
-// AHORA RECIBIMOS LOS DATOS INICIALES DEL SERVIDOR
 export default function ClientePage({ initialData }: { initialData: any }) {
   
-  // Inicializamos el estado CON los datos que ya trajo el servidor
   const [data, setData] = useState<any>(initialData);
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('10:00');
@@ -108,17 +106,17 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     window.open(linkCotizador, '_blank');
   };
 
-  // Si data sigue nulo (muy raro ahora por el SSR), no mostramos nada
   if (!data) return null;
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans selection:bg-amber-200">
       
-      {/* 🚀 LCP OPTIMIZADO: Banner Hero */}
+      {/* 🚀 LCP OPTIMIZADO: Banner Hero con Priority Absoluto */}
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
         {data.heroMedia?.map((media: any, idx: number) => {
           const isVideo = media.url?.toLowerCase().includes('.mp4');
-          const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-50' : 'opacity-0'}`;
+          const isFirstItem = idx === 0;
+          const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-100' : 'opacity-0'}`;
           
           return isVideo ? (
             <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} />
@@ -128,11 +126,10 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               src={media.url} 
               alt="Cabalgatas Medellín Banner" 
               fill 
-              priority={idx === 0} 
-              fetchPriority={idx === 0 ? "high" : "auto"} 
-              quality={75} 
+              priority={isFirstItem} // Esto elimina el loading="lazy" que arruinaba tu LCP
+              quality={60} // Reduce el peso drásticamente
               className={classes} 
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+              sizes="(max-width: 768px) 768px, 1200px" // Ayuda a Next.js a comprimir mejor
             />
           );
         })}
@@ -229,7 +226,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <div className="flex flex-col items-center md:items-end">
                 <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border shadow-sm">
                    <span className="text-3xl font-black text-stone-800">{data.googleRating || '5.0'}</span>
-                   <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
+                   <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
                 </div>
                 <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Basado en {data.googleReviewCount || '150'}+ opiniones</p>
               </div>
