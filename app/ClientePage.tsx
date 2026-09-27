@@ -3,12 +3,11 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Eliminamos doc y onSnapshot para no sobrecargar el cliente
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import PricingSection from '../components/Planes';
 
 export default function ClientePage({ initialData }: { initialData: any }) {
   
-  // 1. Usamos solo la data inicial que viene ultra-rápida del servidor
   const [data] = useState<any>(initialData); 
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('10:00');
@@ -17,7 +16,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
 
-  // 2. Eliminamos los useEffect del SEO, del Carrusel y de Firebase. Solo dejamos el del Popup de salida.
   useEffect(() => {
     if (data?.enableExitIntent && !hasShownPopup) {
       const handleMouseLeave = (e: MouseEvent) => {
@@ -76,7 +74,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     window.open(linkCotizador, '_blank');
   };
 
-  // 3. Esqueleto de carga instantánea por si acaso
   if (!data) {
     return (
       <div className="min-h-screen bg-stone-900 font-sans selection:bg-amber-200">
@@ -96,10 +93,10 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   return (
     <div className="min-h-screen bg-stone-50 font-sans selection:bg-amber-200">
       
-      {/* 🚀 4. HERO ULTRA-RÁPIDO: Imagen Local Fija. Adiós al carrusel lento. */}
+      {/* 🚀 HERO ULTRA-RÁPIDO: Imagen Local Fija WebP */}
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
         <Image 
-          src="/cabalgatas-en-medellin-y-caldas.JPG" 
+          src="/cabalgatas-en-medellin-y-caldas.webp" 
           alt="Cabalgatas Medellín Banner" 
           fill 
           priority={true}
@@ -115,7 +112,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         </div>
       </section>
 
-      {/* Todo tu contenido de aquí para abajo quedó EXACTAMENTE IGUAL */}
       <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-16">
         
         {/* COTIZADOR */}
