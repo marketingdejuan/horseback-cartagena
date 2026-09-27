@@ -96,7 +96,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
         <Image 
           src="/cabalgatas-en-medellin-y-caldas.webp" 
-          alt="Jinetes cabalgando por los paisajes de Caldas, Antioquia" // SEO Accesibilidad
+          alt="Jinetes cabalgando por los paisajes de Caldas, Antioquia" 
           fill 
           priority={true}
           quality={60} 
@@ -118,7 +118,8 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <h2 className="text-2xl md:text-3xl font-extrabold text-stone-900 flex items-center gap-3">
               <Calendar className="text-amber-700 w-8 h-8" aria-hidden="true" /> Cotiza y Reserva
             </h2>
-            {data.urgencyText && <div className="bg-red-100 text-red-800 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2 border border-red-300"><Clock className="w-4 h-4" aria-hidden="true"/>{data.urgencyText}</div>}
+            {/* 🔥 Corrección Accesibilidad: Contraste mejorado en el cuadro de urgencia */}
+            {data.urgencyText && <div className="bg-red-50 text-red-900 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2 border border-red-400"><Clock className="w-4 h-4" aria-hidden="true"/>{data.urgencyText}</div>}
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
@@ -293,7 +294,8 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               {data.reviews.map((review: any) => (
                 <div key={review.id} className="min-w-[300px] bg-white p-6 rounded-3xl shadow-sm border snap-center flex flex-col justify-between">
                   <div>
-                    <div className="flex text-amber-500 mb-3" aria-label={`Calificación de ${review.rating} estrellas`}>
+                    {/* 🔥 Corrección Accesibilidad: role="img" en las estrellas */}
+                    <div className="flex text-amber-500 mb-3" role="img" aria-label={`Calificación de ${review.rating} estrellas`}>
                       {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" aria-hidden="true" />)}
                     </div>
                     <p className="text-stone-700 italic mb-4 text-sm leading-relaxed">"{review.text}"</p>

@@ -6,7 +6,6 @@ export default function PricingSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const addonsScrollRef = useRef<HTMLDivElement>(null);
 
-  // Solución: Usamos 'ref: any' para que TypeScript no arroje error
   const scroll = (direction: 'left' | 'right', ref: any) => {
     if (ref.current) {
       const { scrollLeft, clientWidth } = ref.current;
@@ -28,20 +27,22 @@ export default function PricingSection() {
         </div>
 
         <div className="relative group">
+          {/* 🔥 ACCESIBILIDAD: aria-label en botón de planes (izq) */}
           <button 
             onClick={() => scroll('left', scrollRef)} 
             className="absolute -left-2 md:-left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white text-stone-900 p-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-stone-200 hover:bg-stone-100 hover:scale-110 transition-all focus:outline-none"
             aria-label="Ver plan anterior"
           >
-            <ChevronLeft size={28} className="md:w-8 md:h-8" />
+            <ChevronLeft size={28} className="md:w-8 md:h-8" aria-hidden="true" />
           </button>
 
+          {/* 🔥 ACCESIBILIDAD: aria-label en botón de planes (der) */}
           <button 
             onClick={() => scroll('right', scrollRef)} 
             className="absolute -right-2 md:-right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white text-stone-900 p-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-stone-200 hover:bg-stone-100 hover:scale-110 transition-all focus:outline-none"
             aria-label="Ver siguiente plan"
           >
-            <ChevronRight size={28} className="md:w-8 md:h-8" />
+            <ChevronRight size={28} className="md:w-8 md:h-8" aria-hidden="true" />
           </button>
 
           <div 
@@ -61,15 +62,15 @@ export default function PricingSection() {
               </div>
               <ul className="space-y-4 mb-8 text-sm text-stone-700 font-medium flex-grow">
                 <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-blue-500 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Horario 100% flexible
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-blue-500 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Guía exclusivo solo para tu grupo
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-blue-500 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Atención personalizada
                 </li>
               </ul>
@@ -87,11 +88,11 @@ export default function PricingSection() {
               </div>
               <ul className="space-y-4 mb-8 text-sm text-stone-700 font-medium flex-grow">
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-green-500 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Solo Sábados y Domingos a las 2:00 PM
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-green-500 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Sin cobro adicional de guía
                 </li>
               </ul>
@@ -114,15 +115,15 @@ export default function PricingSection() {
               </div>
               <ul className="space-y-4 mb-8 text-sm text-stone-700 font-medium flex-grow">
                 <li className="flex items-start">
-                  <span className="text-amber-500 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-amber-500 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Incluye todo lo del Plan Privado
                 </li>
                 <li className="flex items-start">
-                  <span className="text-amber-500 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-amber-500 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Almuerzo especial incluido
                 </li>
                 <li className="flex items-start bg-amber-50 p-2 rounded-lg border border-amber-100 text-stone-900 font-bold mt-2">
-                  <span className="text-amber-500 mr-2 text-lg leading-none">✓</span>
+                  <span className="text-amber-500 mr-2 text-lg leading-none" aria-hidden="true">✓</span>
                   Decoración: $50.000 (GRATIS para más de 6 personas)
                 </li>
               </ul>
@@ -142,15 +143,15 @@ export default function PricingSection() {
               </div>
               <ul className="space-y-4 mb-8 text-sm text-stone-300 font-medium flex-grow">
                 <li className="flex items-start">
-                  <span className="text-yellow-400 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-yellow-400 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Cabalgata Privada + Almuerzo
                 </li>
                 <li className="flex items-start">
-                  <span className="text-yellow-400 mr-3 font-bold text-lg leading-none">✓</span>
+                  <span className="text-yellow-400 mr-3 font-bold text-lg leading-none" aria-hidden="true">✓</span>
                   Transporte VIP Ida y Vuelta
                 </li>
                 <li className="flex items-start text-xs text-stone-400 bg-stone-800 p-2 rounded-lg mt-2">
-                  <span className="mr-2 text-lg leading-none">ℹ</span>
+                  <span className="mr-2 text-lg leading-none" aria-hidden="true">ℹ</span>
                   Desde Área Metropolitana (Máximo hasta Laureles)
                 </li>
               </ul>
@@ -165,24 +166,28 @@ export default function PricingSection() {
         <div className="mt-16 bg-white rounded-3xl shadow-sm p-8 md:p-12 border-2 border-stone-100 relative group">
           <h3 className="text-2xl md:text-3xl font-black text-stone-900 mb-8 text-center">Mejora tu Experiencia (Add-ons)</h3>
           
+          {/* 🔥 ACCESIBILIDAD: aria-label en botón de add-ons (izq) */}
           <button 
             onClick={() => scroll('left', addonsScrollRef)} 
             className="absolute -left-2 md:-left-6 top-[60%] transform -translate-y-1/2 z-20 bg-white text-stone-900 p-3 rounded-full shadow-lg border border-stone-200 hover:bg-stone-100 focus:outline-none transition-all"
+            aria-label="Ver opciones adicionales anteriores"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={24} aria-hidden="true" />
           </button>
 
+          {/* 🔥 ACCESIBILIDAD: aria-label en botón de add-ons (der) */}
           <button 
             onClick={() => scroll('right', addonsScrollRef)} 
             className="absolute -right-2 md:-right-6 top-[60%] transform -translate-y-1/2 z-20 bg-white text-stone-900 p-3 rounded-full shadow-lg border border-stone-200 hover:bg-stone-100 focus:outline-none transition-all"
+            aria-label="Ver siguientes opciones adicionales"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={24} aria-hidden="true" />
           </button>
 
           <div ref={addonsScrollRef} className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-4 px-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             
             <div className="snap-center shrink-0 w-[75vw] md:w-[320px] flex flex-col items-center p-8 border-2 border-stone-100 rounded-2xl bg-stone-50 hover:border-amber-400 transition-colors">
-              <span className="text-5xl mb-4 drop-shadow-md">🏍️</span>
+              <span className="text-5xl mb-4 drop-shadow-md" role="img" aria-label="Icono de Cuatrimoto">🏍️</span>
               <h4 className="font-black text-xl text-stone-900 text-center mb-2">Tour Cuatrimoto</h4>
               <p className="text-sm font-medium text-stone-500 text-center mb-6">1.5 horas de adrenalina pura</p>
               <div className="text-center mt-auto">
@@ -193,14 +198,14 @@ export default function PricingSection() {
             </div>
 
             <div className="snap-center shrink-0 w-[75vw] md:w-[320px] flex flex-col items-center p-8 border-2 border-stone-100 rounded-2xl bg-stone-50 hover:border-amber-400 transition-colors">
-              <span className="text-5xl mb-4 drop-shadow-md">🤠</span>
+              <span className="text-5xl mb-4 drop-shadow-md" role="img" aria-label="Icono de Sombrero Paisa">🤠</span>
               <h4 className="font-black text-xl text-stone-900 text-center mb-2">Sombrero Paisa</h4>
               <p className="text-sm font-medium text-stone-500 text-center mb-6">Protégete del sol con estilo tradicional</p>
               <span className="font-black text-2xl text-stone-900 mt-auto">$30.000</span>
             </div>
 
             <div className="snap-center shrink-0 w-[75vw] md:w-[320px] flex flex-col items-center p-8 border-2 border-stone-100 rounded-2xl bg-stone-50 hover:border-amber-400 transition-colors">
-              <span className="text-5xl mb-4 drop-shadow-md">🧣</span>
+              <span className="text-5xl mb-4 drop-shadow-md" role="img" aria-label="Icono de Poncho Antioqueño">🧣</span>
               <h4 className="font-black text-xl text-stone-900 text-center mb-2">Poncho Antioqueño</h4>
               <p className="text-sm font-medium text-stone-500 text-center mb-6">Llévate la mejor foto de recuerdo</p>
               <span className="font-black text-2xl text-stone-900 mt-auto">$30.000</span>
