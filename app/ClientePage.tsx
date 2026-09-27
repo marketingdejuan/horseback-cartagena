@@ -3,51 +3,21 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import { db } from '../lib/firebase';
-import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Eliminamos doc y onSnapshot para no sobrecargar el cliente
 import PricingSection from '../components/Planes';
 
 export default function ClientePage({ initialData }: { initialData: any }) {
   
-  const [data, setData] = useState<any>(initialData);
+  // 1. Usamos solo la data inicial que viene ultra-rápida del servidor
+  const [data] = useState<any>(initialData); 
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('10:00');
   const [jinetes, setJinetes] = useState(2);
   const [telefono, setTelefono] = useState('');
-  const [currentHero, setCurrentHero] = useState(0);
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
 
-  useEffect(() => {
-    const unsub = onSnapshot(doc(db, "configuracion", "general"), (docSnap) => {
-      if (docSnap.exists()) setData(docSnap.data());
-    });
-    return unsub;
-  }, []);
-
-  useEffect(() => {
-    if (data) {
-      if (data.metaTitle) document.title = data.metaTitle;
-      const setMeta = (name: string, content: string, isProperty = false) => {
-        if(!content) return;
-        const attr = isProperty ? 'property' : 'name';
-        let el = document.querySelector(`meta[${attr}="${name}"]`);
-        if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
-        el.setAttribute('content', content);
-      };
-      setMeta('description', data.metaDescription);
-      setMeta('keywords', data.seoKeywords);
-      setMeta('og:image', data.seoOgImage, true);
-      setMeta('og:title', data.metaTitle, true);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (data?.heroMedia && data.heroMedia.length > 1) {
-      const interval = setInterval(() => setCurrentHero((prev) => (prev + 1) % data.heroMedia.length), 5000);
-      return () => clearInterval(interval);
-    }
-  }, [data?.heroMedia]);
-
+  // 2. Eliminamos los useEffect del SEO, del Carrusel y de Firebase. Solo dejamos el del Popup de salida.
   useEffect(() => {
     if (data?.enableExitIntent && !hasShownPopup) {
       const handleMouseLeave = (e: MouseEvent) => {
@@ -106,7 +76,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     window.open(linkCotizador, '_blank');
   };
 
-  // 🚀 NUEVO ESQUELETO DE CARGA INSTANTÁNEA (Resuelve el FCP en blanco)
+  // 3. Esqueleto de carga instantánea por si acaso
   if (!data) {
     return (
       <div className="min-h-screen bg-stone-900 font-sans selection:bg-amber-200">
@@ -126,28 +96,17 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   return (
     <div className="min-h-screen bg-stone-50 font-sans selection:bg-amber-200">
       
-      {/* 🚀 LCP OPTIMIZADO: Banner Hero con Priority Absoluto */}
+      {/* 🚀 4. HERO ULTRA-RÁPIDO: Imagen Local Fija. Adiós al carrusel lento. */}
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
-        {data.heroMedia?.map((media: any, idx: number) => {
-          const isVideo = media.url?.toLowerCase().includes('.mp4');
-          const isFirstItem = idx === 0;
-          const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-100' : 'opacity-0'}`;
-          
-          return isVideo ? (
-            <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} />
-          ) : (
-            <Image 
-              key={idx} 
-              src={media.url} 
-              alt="Cabalgatas Medellín Banner" 
-              fill 
-              priority={isFirstItem}
-              quality={60} 
-              className={classes} 
-              sizes="(max-width: 768px) 768px, 1200px"
-            />
-          );
-        })}
+        <Image 
+          src="/cabalgatas-en-medellin-y-caldas.JPG" 
+          alt="Cabalgatas Medellín Banner" 
+          fill 
+          priority={true}
+          quality={60} 
+          className="absolute inset-0 w-full h-full object-cover opacity-90" 
+          sizes="(max-width: 768px) 768px, 1200px" 
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitle || "Cabalgatas Ecológicas"}</h1>
@@ -156,6 +115,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         </div>
       </section>
 
+      {/* Todo tu contenido de aquí para abajo quedó EXACTAMENTE IGUAL */}
       <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-16">
         
         {/* COTIZADOR */}
