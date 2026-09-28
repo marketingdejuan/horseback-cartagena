@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
+import { Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import PricingSection from '../components/Planes';
@@ -107,7 +107,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitle || "Cabalgatas Ecológicas"}</h1>
           <p className="text-stone-200 text-lg md:text-xl font-medium mb-8">{data.heroSubtitle || "Experiencias únicas en Antioquia."}</p>
-          <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Chatear con un asesor por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Principal_Hero')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5" aria-hidden="true"/> Chatear con Asesor</a>
+          <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Chatear con un asesor por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Principal_Hero')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+            <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Chatear con Asesor
+          </a>
         </div>
       </section>
 
@@ -118,7 +120,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <h2 className="text-2xl md:text-3xl font-extrabold text-stone-900 flex items-center gap-3">
               <Calendar className="text-amber-700 w-8 h-8" aria-hidden="true" /> Cotiza y Reserva
             </h2>
-            {/* 🔥 Corrección Accesibilidad: Contraste mejorado en el cuadro de urgencia */}
             {data.urgencyText && <div className="bg-red-50 text-red-900 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2 border border-red-400"><Clock className="w-4 h-4" aria-hidden="true"/>{data.urgencyText}</div>}
           </div>
           
@@ -175,7 +176,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                 aria-label={isValidPhone ? 'Enviar cotización por WhatsApp' : 'Ingresa tu número primero para enviar'}
                 className={`mt-8 block w-full text-center font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-stone-800 text-stone-500 cursor-not-allowed border-2 border-stone-700'}`}
               >
-                <MessageCircle className="w-6 h-6" aria-hidden="true"/> {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
+                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-6 h-6"/> {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
               </button>
             </div>
           </div>
@@ -252,7 +253,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               ))}
             </div>
             <div className="flex justify-center mt-6">
-              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Pedir más información por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} className="bg-green-100 text-green-800 hover:bg-green-200 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-colors"><MessageCircle className="w-5 h-5" aria-hidden="true"/> Me gusta. Quiero más info.</a>
+              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Pedir más información por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} className="bg-green-100 text-green-800 hover:bg-green-200 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-colors">
+                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Me gusta. Quiero más info.
+              </a>
             </div>
           </section>
         )}
@@ -294,7 +297,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               {data.reviews.map((review: any) => (
                 <div key={review.id} className="min-w-[300px] bg-white p-6 rounded-3xl shadow-sm border snap-center flex flex-col justify-between">
                   <div>
-                    {/* 🔥 Corrección Accesibilidad: role="img" en las estrellas */}
                     <div className="flex text-amber-500 mb-3" role="img" aria-label={`Calificación de ${review.rating} estrellas`}>
                       {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" aria-hidden="true" />)}
                     </div>
@@ -308,7 +310,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               ))}
             </div>
             <div className="flex justify-center">
-              <a href={linkCotizador} target="_blank" rel="noreferrer" aria-label="Hacer una reserva por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Reviews')} className="bg-green-600 text-white hover:bg-green-700 font-bold py-3 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5" aria-hidden="true"/> Únete a ellos, reserva aquí</a>
+              <a href={linkCotizador} target="_blank" rel="noreferrer" aria-label="Hacer una reserva por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Reviews')} className="bg-green-600 text-white hover:bg-green-700 font-bold py-3 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105">
+                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Únete a ellos, reserva aquí
+              </a>
             </div>
           </section>
         )}
@@ -326,7 +330,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             </div>
             <div className="text-center mt-8">
               <p className="text-stone-600 mb-4 font-medium">¿Aún tienes dudas?</p>
-              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Hablar con un asesor por WhatsApp para resolver dudas" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5" aria-hidden="true"/> Habla con un asesor ahora</a>
+              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Hablar con un asesor por WhatsApp para resolver dudas" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Habla con un asesor ahora
+              </a>
             </div>
           </section>
         )}
@@ -347,12 +353,22 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         </div>
       )}
 
-      <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Abrir chat flotante de WhatsApp" onClick={() => trackWhatsAppClick('Boton_Flotante')} className="fixed bottom-8 right-8 bg-green-600 text-white p-4 rounded-full shadow-[0_0_20px_rgba(22,163,74,0.4)] hover:bg-green-700 hover:scale-110 transition-all z-50 hidden md:flex items-center justify-center animate-bounce"><MessageCircle className="w-8 h-8" aria-hidden="true" /></a>
+      {/* 🔥 BOTÓN FLOTANTE PRINCIPAL DE WHATSAPP (Desktop) */}
+      <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Abrir chat flotante de WhatsApp" onClick={() => trackWhatsAppClick('Boton_Flotante')} className="fixed bottom-8 right-8 hover:scale-110 transition-transform z-50 hidden md:flex items-center justify-center animate-bounce drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">
+        <Image src="/logo-whatsapp.webp" alt="WhatsApp Flotante" width={64} height={64} aria-hidden="true" className="rounded-full" />
+      </a>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-2 py-3 pb-safe z-50 grid grid-cols-5 gap-1 text-center md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08)] items-center">
         <a href={data?.navLink1 || '#inicio'} aria-label="Ir a la sección de Inicio" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><Home className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel1 || 'Inicio'}</span></a>
         <a href={data?.navLink2 || '#cotizador'} aria-label="Ir a la sección de Cotizador" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><Calendar className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel2 || 'Cotizar'}</span></a>
-        <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Chatear por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Nav_Movil')} className="relative -mt-8 flex justify-center"><div className="bg-green-600 text-white p-4 rounded-full shadow-xl shadow-green-600/40 animate-pulse border-4 border-white"><MessageCircle className="w-7 h-7" aria-hidden="true" /></div></a>
+        
+        {/* 🔥 BOTÓN FLOTANTE CENTRAL DE WHATSAPP (Móvil) */}
+        <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Chatear por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Nav_Movil')} className="relative -mt-8 flex justify-center">
+          <div className="bg-white rounded-full shadow-xl shadow-green-600/40 animate-pulse border-4 border-white flex items-center justify-center p-1">
+            <Image src="/logo-whatsapp.webp" alt="WhatsApp Móvil" width={48} height={48} aria-hidden="true" />
+          </div>
+        </a>
+        
         <a href={data?.navLink3 || '#galeria'} aria-label="Ir a la sección de Galería" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><ImageIcon className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel3 || 'Galería'}</span></a>
         <a href={data?.navLink4 || '#faq'} aria-label="Ir a la sección de Preguntas Frecuentes" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><Info className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel4 || 'FAQ'}</span></a>
       </nav>
