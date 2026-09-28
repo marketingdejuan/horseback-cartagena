@@ -16,9 +16,7 @@ import {
   BadgeCheck, 
   BookOpen, 
   Image as ImageIcon, 
-  Phone, 
-  Instagram, 
-  Facebook 
+  Phone
 } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -497,7 +495,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         )}
       </main>
 
-      {/* 🔥 FOOTER & REDES SOCIALES CONFIGURADAS */}
+      {/* 🔥 FOOTER & REDES SOCIALES CONFIGURADAS (Bypass de Caché) */}
       <footer className="bg-stone-900 text-stone-400 py-12 text-center relative z-20 mt-12 border-t-4 border-amber-600">
         <div className="max-w-4xl mx-auto px-4">
           <h3 className="text-white text-2xl font-black mb-6">Síguenos en nuestras redes</h3>
@@ -507,9 +505,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               target="_blank" 
               rel="noreferrer" 
               aria-label="Instagram de Cabalgatas Medellín" 
-              className="bg-stone-800 p-4 rounded-full hover:bg-pink-600 hover:text-white transition-all hover:scale-110 shadow-lg"
+              className="bg-stone-800 p-4 rounded-full hover:bg-pink-600 hover:text-white transition-all hover:scale-110 shadow-lg flex items-center justify-center"
             >
-              <Instagram className="w-8 h-8" aria-hidden="true" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
             
             <a 
@@ -517,9 +515,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               target="_blank" 
               rel="noreferrer" 
               aria-label="Facebook de Cabalgatas Medellín" 
-              className="bg-stone-800 p-4 rounded-full hover:bg-blue-600 hover:text-white transition-all hover:scale-110 shadow-lg"
+              className="bg-stone-800 p-4 rounded-full hover:bg-blue-600 hover:text-white transition-all hover:scale-110 shadow-lg flex items-center justify-center"
             >
-              <Facebook className="w-8 h-8" aria-hidden="true" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
           </div>
           <p className="text-sm font-medium">© {new Date().getFullYear()} Cabalgatas Medellín. Todos los derechos reservados.</p>
