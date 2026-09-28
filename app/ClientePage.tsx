@@ -1,7 +1,25 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
+import { 
+  Calendar, 
+  ShieldCheck, 
+  Info, 
+  Star, 
+  PlayCircle, 
+  Camera, 
+  X, 
+  Gift, 
+  Clock, 
+  Home, 
+  MapPin, 
+  BadgeCheck, 
+  BookOpen, 
+  Image as ImageIcon, 
+  Phone, 
+  Instagram, 
+  Facebook 
+} from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import PricingSection from '../components/Planes';
@@ -19,7 +37,10 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   useEffect(() => {
     if (data?.enableExitIntent && !hasShownPopup) {
       const handleMouseLeave = (e: MouseEvent) => {
-        if (e.clientY <= 0) { setShowExitPopup(true); setHasShownPopup(true); }
+        if (e.clientY <= 0) { 
+          setShowExitPopup(true); 
+          setHasShownPopup(true); 
+        }
       };
       document.addEventListener('mouseleave', handleMouseLeave);
       return () => document.removeEventListener('mouseleave', handleMouseLeave);
@@ -49,8 +70,11 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   const totalCalculado = (jinetes * precioBase) + costoGuia;
   const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro extra de guía)' : 'Privada (Incluye guía exclusivo)';
   const whatsappNum = data?.whatsappNumber || "573000000000";
-  const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Hola, quiero reservar el ${fecha || 'próximo fin de semana'} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${esGrupal ? 'Grupal' : 'Privada'}. Cotización: $${totalCalculado.toLocaleString()}`)}`;
+  
+  const mensajeReserva = `Hola, quiero reservar el ${fecha || 'próximo fin de semana'} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${esGrupal ? 'Grupal' : 'Privada'}. Cotización: $${totalCalculado.toLocaleString()}`;
+  const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(mensajeReserva)}`;
   const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas. 🐎")}`;
+  
   const isValidPhone = telefono.trim().length >= 7;
 
   const handleReservaWhatsApp = async (e: React.MouseEvent) => {
@@ -105,11 +129,32 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitle || "Cabalgatas Ecológicas"}</h1>
-          <p className="text-stone-200 text-lg md:text-xl font-medium mb-8">{data.heroSubtitle || "Experiencias únicas en Antioquia."}</p>
-          <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Chatear con un asesor por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Principal_Hero')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
-            <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Chatear con Asesor
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">
+            {data.heroTitle || "Cabalgatas Ecológicas"}
+          </h1>
+          <p className="text-stone-200 text-lg md:text-xl font-medium mb-8">
+            {data.heroSubtitle || "Experiencias únicas en Antioquia."}
+          </p>
+          
+          <a 
+            href={linkGancho} 
+            target="_blank" 
+            rel="noreferrer" 
+            aria-label="Chatear con un asesor por WhatsApp" 
+            onClick={() => trackWhatsAppClick('Boton_Principal_Hero')} 
+            className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
+          >
+            <Image 
+              src="/logo-whatsapp.webp" 
+              alt="WhatsApp" 
+              width={24} 
+              height={24} 
+              aria-hidden="true" 
+              className="w-5 h-5"
+            /> 
+            Chatear con Asesor
           </a>
+
         </div>
       </section>
 
@@ -120,7 +165,11 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <h2 className="text-2xl md:text-3xl font-extrabold text-stone-900 flex items-center gap-3">
               <Calendar className="text-amber-700 w-8 h-8" aria-hidden="true" /> Cotiza y Reserva
             </h2>
-            {data.urgencyText && <div className="bg-red-50 text-red-900 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2 border border-red-400"><Clock className="w-4 h-4" aria-hidden="true"/>{data.urgencyText}</div>}
+            {data.urgencyText && (
+              <div className="bg-red-50 text-red-900 px-4 py-2 rounded-xl text-sm font-bold animate-pulse flex items-center gap-2 border border-red-400">
+                <Clock className="w-4 h-4" aria-hidden="true"/>{data.urgencyText}
+              </div>
+            )}
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
@@ -128,8 +177,21 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <div>
                 <label htmlFor="fecha-reserva" className="block text-sm font-extrabold text-stone-900 mb-2">1. Selecciona Fecha y Hora</label>
                 <div className="flex gap-2">
-                  <input id="fecha-reserva" aria-label="Seleccionar fecha" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-600 transition-colors" />
-                  <select id="hora-reserva" aria-label="Seleccionar hora" value={hora} onChange={(e) => setHora(e.target.value)} className="w-full p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-600 transition-colors">
+                  <input 
+                    id="fecha-reserva" 
+                    aria-label="Seleccionar fecha" 
+                    type="date" 
+                    value={fecha} 
+                    onChange={(e) => setFecha(e.target.value)} 
+                    className="w-full p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-600 transition-colors" 
+                  />
+                  <select 
+                    id="hora-reserva" 
+                    aria-label="Seleccionar hora" 
+                    value={hora} 
+                    onChange={(e) => setHora(e.target.value)} 
+                    className="w-full p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-600 transition-colors"
+                  >
                     <option value="10:00">10:00 AM</option>
                     <option value="14:00">2:00 PM</option>
                     <option value="16:00">4:00 PM</option>
@@ -137,7 +199,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                 </div>
                 <div className="mt-4 bg-amber-50 p-4 rounded-xl border-2 border-amber-300 shadow-sm">
                   <p className="text-sm text-amber-900 font-medium leading-relaxed">
-                    💡 <strong className="font-extrabold">Nota importante:</strong> Las cabalgatas grupales (sin costo extra de guía) son únicamente los <strong className="font-extrabold">sábados y domingos a las 2:00 PM</strong>. Cualquier otro día u horario será una experiencia exclusiva y privada (incluye cobro del guía).
+                    💡 <strong className="font-extrabold">Nota importante:</strong> Las cabalgatas grupales (sin costo extra de guía) son únicamente los <strong className="font-extrabold">sábados y domingos a las 2:00 PM</strong>. Cualquier otro día u horario será una experiencia exclusiva y privada.
                   </p>
                 </div>
               </div>
@@ -145,17 +207,39 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <div>
                 <label className="block text-sm font-extrabold text-stone-900 mb-2">2. Número de Jinetes</label>
                 <div className="flex items-center gap-4 bg-white p-2 rounded-xl border-2 border-stone-300 w-fit shadow-sm">
-                  <button aria-label="Disminuir número de jinetes" onClick={() => setJinetes(Math.max(1, jinetes - 1))} className="w-10 h-10 bg-stone-100 hover:bg-stone-200 text-stone-900 rounded-lg font-extrabold shadow-sm transition">-</button>
+                  <button 
+                    aria-label="Disminuir número de jinetes" 
+                    onClick={() => setJinetes(Math.max(1, jinetes - 1))} 
+                    className="w-10 h-10 bg-stone-100 hover:bg-stone-200 text-stone-900 rounded-lg font-extrabold shadow-sm transition"
+                  >
+                    -
+                  </button>
                   <span aria-live="polite" className="w-8 text-center font-extrabold text-2xl text-stone-900">{jinetes}</span>
-                  <button aria-label="Aumentar número de jinetes" onClick={() => setJinetes(jinetes + 1)} className="w-10 h-10 bg-stone-100 hover:bg-stone-200 text-stone-900 rounded-lg font-extrabold shadow-sm transition">+</button>
+                  <button 
+                    aria-label="Aumentar número de jinetes" 
+                    onClick={() => setJinetes(jinetes + 1)} 
+                    className="w-10 h-10 bg-stone-100 hover:bg-stone-200 text-stone-900 rounded-lg font-extrabold shadow-sm transition"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
 
               <div>
                 <label htmlFor="telefono-reserva" className="block text-sm font-extrabold text-stone-900 mb-2">3. Tu número de WhatsApp</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Phone className="h-5 w-5 text-stone-700" aria-hidden="true" /></div>
-                  <input id="telefono-reserva" aria-label="Ingresar número de WhatsApp" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej: 300 123 4567" className="w-full pl-10 p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-600 transition-colors placeholder-stone-500"/>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-stone-700" aria-hidden="true" />
+                  </div>
+                  <input 
+                    id="telefono-reserva" 
+                    aria-label="Ingresar número de WhatsApp" 
+                    type="tel" 
+                    value={telefono} 
+                    onChange={(e) => setTelefono(e.target.value)} 
+                    placeholder="Ej: 300 123 4567" 
+                    className="w-full pl-10 p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-600 transition-colors placeholder-stone-500"
+                  />
                 </div>
                 <p className="text-xs font-bold text-stone-600 mt-2">Obligatorio para enviarte la cotización detallada.</p>
               </div>
@@ -163,11 +247,24 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             
             <div className="bg-stone-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-between border-2 border-stone-800">
               <div>
-                <p className="text-sm font-extrabold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1 rounded-lg border border-amber-500/20">{tipoCabalgataStr}</p>
-                <div className="flex justify-between items-center mb-3"><span className="text-stone-300 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span><span className="font-extrabold text-lg text-white">${(jinetes * precioBase).toLocaleString()}</span></div>
-                {!esGrupal && <div className="flex justify-between items-center mb-3 text-red-300 bg-red-500/10 p-2 rounded-lg border border-red-500/20"><span className="font-bold">Costo Guía Exclusivo</span><span className="font-extrabold">+${costoGuia.toLocaleString()}</span></div>}
+                <p className="text-sm font-extrabold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1 rounded-lg border border-amber-500/20">
+                  {tipoCabalgataStr}
+                </p>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-stone-300 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span>
+                  <span className="font-extrabold text-lg text-white">${(jinetes * precioBase).toLocaleString()}</span>
+                </div>
+                {!esGrupal && (
+                  <div className="flex justify-between items-center mb-3 text-red-300 bg-red-500/10 p-2 rounded-lg border border-red-500/20">
+                    <span className="font-bold">Costo Guía Exclusivo</span>
+                    <span className="font-extrabold">+${costoGuia.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="border-t border-stone-700 my-4"></div>
-                <div className="flex justify-between items-end"><span className="text-lg text-stone-400 font-bold">Total</span><span className="text-4xl font-black text-amber-500">${totalCalculado.toLocaleString()}</span></div>
+                <div className="flex justify-between items-end">
+                  <span className="text-lg text-stone-400 font-bold">Total</span>
+                  <span className="text-4xl font-black text-amber-500">${totalCalculado.toLocaleString()}</span>
+                </div>
               </div>
               
               <button 
@@ -176,7 +273,15 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                 aria-label={isValidPhone ? 'Enviar cotización por WhatsApp' : 'Ingresa tu número primero para enviar'}
                 className={`mt-8 block w-full text-center font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-stone-800 text-stone-500 cursor-not-allowed border-2 border-stone-700'}`}
               >
-                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-6 h-6"/> {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
+                <Image 
+                  src="/logo-whatsapp.webp" 
+                  alt="WhatsApp" 
+                  width={24} 
+                  height={24} 
+                  aria-hidden="true" 
+                  className="w-6 h-6"
+                /> 
+                {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
               </button>
             </div>
           </div>
@@ -192,12 +297,20 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   <h2 className="text-2xl font-extrabold text-stone-800">{data.businessName || 'Cabalgatas Medellín'}</h2>
                   <BadgeCheck className="w-6 h-6 text-blue-600 fill-current" aria-hidden="true" />
                 </div>
-                <p className="text-stone-700 font-medium flex items-center gap-2"><MapPin className="w-4 h-4" aria-hidden="true"/> {data.mapAddress || 'Caldas, Antioquia'}</p>
+                <p className="text-stone-700 font-medium flex items-center gap-2">
+                  <MapPin className="w-4 h-4" aria-hidden="true"/> {data.mapAddress || 'Caldas, Antioquia'}
+                </p>
               </div>
               <div className="flex flex-col items-center md:items-end">
                 <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border shadow-sm" aria-label={`Calificación de ${data.googleRating || '5.0'} estrellas en Google`}>
                    <span className="text-3xl font-black text-stone-800">{data.googleRating || '5.0'}</span>
-                   <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" aria-hidden="true"/><Star className="w-5 h-5 fill-current" aria-hidden="true"/><Star className="w-5 h-5 fill-current" aria-hidden="true"/><Star className="w-5 h-5 fill-current" aria-hidden="true"/><Star className="w-5 h-5 fill-current" aria-hidden="true"/></div>
+                   <div className="flex text-amber-500">
+                     <Star className="w-5 h-5 fill-current" aria-hidden="true"/>
+                     <Star className="w-5 h-5 fill-current" aria-hidden="true"/>
+                     <Star className="w-5 h-5 fill-current" aria-hidden="true"/>
+                     <Star className="w-5 h-5 fill-current" aria-hidden="true"/>
+                     <Star className="w-5 h-5 fill-current" aria-hidden="true"/>
+                   </div>
                 </div>
                 <p className="text-sm font-bold text-stone-600 mt-2">Basado en {data.googleReviewCount || '150'}+ opiniones</p>
               </div>
@@ -219,7 +332,13 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   <MapPin className="w-8 h-8 text-amber-600" aria-hidden="true" />
                 </div>
                 {data.mapEmbedUrl ? (
-                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" aria-label="Abrir ubicación en Google Maps" className="bg-stone-900 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2">
+                  <a 
+                    href={data.mapEmbedUrl} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    aria-label="Abrir ubicación en Google Maps" 
+                    className="bg-stone-900 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2"
+                  >
                     Abrir en Google Maps
                   </a>
                 ) : (
@@ -232,7 +351,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
         {data.gallery && data.gallery.length > 0 && (
           <section id="galeria" className="pt-4 scroll-mt-20">
-            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-600" aria-hidden="true" /> Galería</h2>
+            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2">
+              <Camera className="w-8 h-8 text-amber-600" aria-hidden="true" /> Galería
+            </h2>
             <div className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory hide-scrollbar">
               {data.gallery.map((item: any) => (
                 <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border overflow-hidden group">
@@ -253,16 +374,28 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               ))}
             </div>
             <div className="flex justify-center mt-6">
-              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Pedir más información por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} className="bg-green-100 text-green-800 hover:bg-green-200 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-colors">
-                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Me gusta. Quiero más info.
+              
+              <a 
+                href={linkGancho} 
+                target="_blank" 
+                rel="noreferrer" 
+                aria-label="Pedir más información por WhatsApp" 
+                onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} 
+                className="bg-green-100 text-green-800 hover:bg-green-200 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-colors"
+              >
+                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
+                Me gusta. Quiero más info.
               </a>
+
             </div>
           </section>
         )}
 
         {data.blogPosts && data.blogPosts.length > 0 && (
           <section id="blog" className="pt-4 scroll-mt-20">
-            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><BookOpen className="w-8 h-8 text-amber-600" aria-hidden="true" /> Nuestro Blog</h2>
+            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2">
+              <BookOpen className="w-8 h-8 text-amber-600" aria-hidden="true" /> Nuestro Blog
+            </h2>
             <div className="grid md:grid-cols-2 gap-6">
               {data.blogPosts.slice(0, 2).map((post: any) => (
                 <a key={post.id} href={`/blog/${post.slug}`} aria-label={`Leer artículo: ${post.title}`} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow group">
@@ -285,7 +418,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               ))}
             </div>
             <div className="text-center mt-6">
-              <a href="/blog" aria-label="Ver todos los artículos del blog" className="inline-block border-2 border-stone-300 text-stone-700 font-bold py-2 px-6 rounded-full hover:bg-stone-50">Ver todos los artículos</a>
+              <a href="/blog" aria-label="Ver todos los artículos del blog" className="inline-block border-2 border-stone-300 text-stone-700 font-bold py-2 px-6 rounded-full hover:bg-stone-50">
+                Ver todos los artículos
+              </a>
             </div>
           </section>
         )}
@@ -304,15 +439,29 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-stone-200">
                     <span className="font-bold text-sm text-stone-900">{review.author}</span>
-                    {review.videoUrl && <a href={review.videoUrl} target="_blank" rel="noreferrer" aria-label={`Ver video de testimonio de ${review.author}`} className="flex items-center gap-1 text-xs font-bold text-red-700 bg-red-100 px-3 py-1.5 rounded-full"><PlayCircle className="w-4 h-4" aria-hidden="true" /> Ver Video</a>}
+                    {review.videoUrl && (
+                      <a href={review.videoUrl} target="_blank" rel="noreferrer" aria-label={`Ver video de testimonio de ${review.author}`} className="flex items-center gap-1 text-xs font-bold text-red-700 bg-red-100 px-3 py-1.5 rounded-full">
+                        <PlayCircle className="w-4 h-4" aria-hidden="true" /> Ver Video
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
             <div className="flex justify-center">
-              <a href={linkCotizador} target="_blank" rel="noreferrer" aria-label="Hacer una reserva por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Reviews')} className="bg-green-600 text-white hover:bg-green-700 font-bold py-3 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105">
-                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Únete a ellos, reserva aquí
+              
+              <a 
+                href={linkCotizador} 
+                target="_blank" 
+                rel="noreferrer" 
+                aria-label="Hacer una reserva por WhatsApp" 
+                onClick={() => trackWhatsAppClick('Boton_Abajo_Reviews')} 
+                className="bg-green-600 text-white hover:bg-green-700 font-bold py-3 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105"
+              >
+                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
+                Únete a ellos, reserva aquí
               </a>
+
             </div>
           </section>
         )}
@@ -330,13 +479,52 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             </div>
             <div className="text-center mt-8">
               <p className="text-stone-600 mb-4 font-medium">¿Aún tienes dudas?</p>
-              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Hablar con un asesor por WhatsApp para resolver dudas" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
-                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Habla con un asesor ahora
+              
+              <a 
+                href={linkGancho} 
+                target="_blank" 
+                rel="noreferrer" 
+                aria-label="Hablar con un asesor por WhatsApp para resolver dudas" 
+                onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} 
+                className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
+              >
+                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
+                Habla con un asesor ahora
               </a>
+
             </div>
           </section>
         )}
       </main>
+
+      {/* 🔥 FOOTER & REDES SOCIALES CONFIGURADAS */}
+      <footer className="bg-stone-900 text-stone-400 py-12 text-center relative z-20 mt-12 border-t-4 border-amber-600">
+        <div className="max-w-4xl mx-auto px-4">
+          <h3 className="text-white text-2xl font-black mb-6">Síguenos en nuestras redes</h3>
+          <div className="flex justify-center gap-6 mb-8">
+            <a 
+              href="https://www.instagram.com/cabalgataseco" 
+              target="_blank" 
+              rel="noreferrer" 
+              aria-label="Instagram de Cabalgatas Medellín" 
+              className="bg-stone-800 p-4 rounded-full hover:bg-pink-600 hover:text-white transition-all hover:scale-110 shadow-lg"
+            >
+              <Instagram className="w-8 h-8" aria-hidden="true" />
+            </a>
+            
+            <a 
+              href="https://web.facebook.com/Cabalgatasmedellin" 
+              target="_blank" 
+              rel="noreferrer" 
+              aria-label="Facebook de Cabalgatas Medellín" 
+              className="bg-stone-800 p-4 rounded-full hover:bg-blue-600 hover:text-white transition-all hover:scale-110 shadow-lg"
+            >
+              <Facebook className="w-8 h-8" aria-hidden="true" />
+            </a>
+          </div>
+          <p className="text-sm font-medium">© {new Date().getFullYear()} Cabalgatas Medellín. Todos los derechos reservados.</p>
+        </div>
+      </footer>
 
       {showExitPopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4">
@@ -345,32 +533,87 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <div className="w-20 h-20 bg-green-100 text-green-700 rounded-full flex items-center justify-center mx-auto mb-6"><Gift className="w-10 h-10" aria-hidden="true" /></div>
             <h3 className="text-2xl font-extrabold text-stone-900 mb-2">¡Espera! No te vayas 🐎</h3>
             <p className="text-stone-700 mb-8">Resérvalo ahora mismo por WhatsApp y recibe un <b>descuento sorpresa</b>.</p>
-            <a href={linkCotizador} target="_blank" rel="noreferrer" aria-label="Reclamar descuento por WhatsApp" onClick={() => { setShowExitPopup(false); trackWhatsAppClick('Boton_Exit_Intent'); }} className="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg">
+            
+            <a 
+              href={linkCotizador} 
+              target="_blank" 
+              rel="noreferrer" 
+              aria-label="Reclamar descuento por WhatsApp" 
+              onClick={() => { setShowExitPopup(false); trackWhatsAppClick('Boton_Exit_Intent'); }} 
+              className="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg"
+            >
               ¡Reclamar mi descuento!
             </a>
+
             <button onClick={() => setShowExitPopup(false)} aria-label="Cerrar descuento" className="mt-4 text-sm text-stone-500 font-bold hover:text-stone-700">No gracias</button>
           </div>
         </div>
       )}
 
       {/* 🔥 BOTÓN FLOTANTE PRINCIPAL DE WHATSAPP (Desktop) */}
-      <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Abrir chat flotante de WhatsApp" onClick={() => trackWhatsAppClick('Boton_Flotante')} className="fixed bottom-8 right-8 hover:scale-110 transition-transform z-50 hidden md:flex items-center justify-center animate-bounce drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">
+      <a 
+        href={linkGancho} 
+        target="_blank" 
+        rel="noreferrer" 
+        aria-label="Abrir chat flotante de WhatsApp" 
+        onClick={() => trackWhatsAppClick('Boton_Flotante')} 
+        className="fixed bottom-8 right-8 hover:scale-110 transition-transform z-50 hidden md:flex items-center justify-center animate-bounce drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]"
+      >
         <Image src="/logo-whatsapp.webp" alt="WhatsApp Flotante" width={64} height={64} aria-hidden="true" className="rounded-full" />
       </a>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-2 py-3 pb-safe z-50 grid grid-cols-5 gap-1 text-center md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08)] items-center">
-        <a href={data?.navLink1 || '#inicio'} aria-label="Ir a la sección de Inicio" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><Home className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel1 || 'Inicio'}</span></a>
-        <a href={data?.navLink2 || '#cotizador'} aria-label="Ir a la sección de Cotizador" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><Calendar className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel2 || 'Cotizar'}</span></a>
+        
+        <a 
+          href={data?.navLink1 || '#inicio'} 
+          aria-label="Ir a la sección de Inicio" 
+          className="flex flex-col items-center text-stone-600 hover:text-amber-700"
+        >
+          <Home className="w-5 h-5 mb-1" aria-hidden="true" />
+          <span className="text-[9px] font-bold truncate w-full">{data?.navLabel1 || 'Inicio'}</span>
+        </a>
+
+        <a 
+          href={data?.navLink2 || '#cotizador'} 
+          aria-label="Ir a la sección de Cotizador" 
+          className="flex flex-col items-center text-stone-600 hover:text-amber-700"
+        >
+          <Calendar className="w-5 h-5 mb-1" aria-hidden="true" />
+          <span className="text-[9px] font-bold truncate w-full">{data?.navLabel2 || 'Cotizar'}</span>
+        </a>
         
         {/* 🔥 BOTÓN FLOTANTE CENTRAL DE WHATSAPP (Móvil) */}
-        <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Chatear por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Nav_Movil')} className="relative -mt-8 flex justify-center">
+        <a 
+          href={linkGancho} 
+          target="_blank" 
+          rel="noreferrer" 
+          aria-label="Chatear por WhatsApp" 
+          onClick={() => trackWhatsAppClick('Boton_Nav_Movil')} 
+          className="relative -mt-8 flex justify-center"
+        >
           <div className="bg-white rounded-full shadow-xl shadow-green-600/40 animate-pulse border-4 border-white flex items-center justify-center p-1">
             <Image src="/logo-whatsapp.webp" alt="WhatsApp Móvil" width={48} height={48} aria-hidden="true" />
           </div>
         </a>
         
-        <a href={data?.navLink3 || '#galeria'} aria-label="Ir a la sección de Galería" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><ImageIcon className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel3 || 'Galería'}</span></a>
-        <a href={data?.navLink4 || '#faq'} aria-label="Ir a la sección de Preguntas Frecuentes" className="flex flex-col items-center text-stone-600 hover:text-amber-700"><Info className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel4 || 'FAQ'}</span></a>
+        <a 
+          href={data?.navLink3 || '#galeria'} 
+          aria-label="Ir a la sección de Galería" 
+          className="flex flex-col items-center text-stone-600 hover:text-amber-700"
+        >
+          <ImageIcon className="w-5 h-5 mb-1" aria-hidden="true" />
+          <span className="text-[9px] font-bold truncate w-full">{data?.navLabel3 || 'Galería'}</span>
+        </a>
+
+        <a 
+          href={data?.navLink4 || '#faq'} 
+          aria-label="Ir a la sección de Preguntas Frecuentes" 
+          className="flex flex-col items-center text-stone-600 hover:text-amber-700"
+        >
+          <Info className="w-5 h-5 mb-1" aria-hidden="true" />
+          <span className="text-[9px] font-bold truncate w-full">{data?.navLabel4 || 'FAQ'}</span>
+        </a>
+
       </nav>
     </div>
   );
