@@ -135,7 +135,8 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           <div className="absolute inset-0 bg-black/40"></div>
         </div>
 
-        <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-12 text-center md:text-left">
+        {/* MODIFICACIÓN AQUÍ: Aumentamos pb-24 en móvil para evitar que la tarjeta tape el botón */}
+        <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-24 md:pb-12 text-center md:text-left">
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tighter drop-shadow-xl">
             {data.heroTitle || "Cabalgatas Ecológicas"}
           </h1>
@@ -158,10 +159,11 @@ export default function ClientePage({ initialData }: { initialData: any }) {
       </section>
 
       {/* CONTENIDO PRINCIPAL CON SUPERPOSICIÓN */}
-      <main className="max-w-4xl mx-auto px-4 mt-[-120px] relative z-20 space-y-16">
+      {/* MODIFICACIÓN AQUÍ: Ajuste dinámico de mt-[-60px] móvil y mt-[-120px] desktop */}
+      <main className="max-w-4xl mx-auto px-4 mt-[-60px] md:mt-[-120px] relative z-20 space-y-16">
         
         {/* COTIZADOR - GLASSMORPHISM AVANZADO */}
-        <section id="cotizador" className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-10 border border-white scroll-mt-20">
+        <section id="cotizador" className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-10 border border-white scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4 border-b border-zinc-200/50 pb-6">
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 flex items-center gap-3 tracking-tight">
               <Calendar className="text-amber-600 w-8 h-8" aria-hidden="true" /> Cotiza y Reserva
@@ -227,7 +229,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
         {/* SECCIÓN: LA EXPERIENCIA Y PREPARACIÓN */}
         <section className="grid md:grid-cols-2 gap-6 scroll-mt-20">
-          <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
             <h3 className="text-2xl font-extrabold text-zinc-900 mb-6 tracking-tight flex items-center gap-2">
               <Compass className="w-7 h-7 text-amber-600"/> La Experiencia
             </h3>
@@ -257,7 +259,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </div>
 
           <div className="flex flex-col gap-6">
-            <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
+            <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
               <h3 className="text-2xl font-extrabold text-zinc-900 mb-6 tracking-tight flex items-center gap-2">
                 <CheckCircle2 className="w-7 h-7 text-green-600"/> ¿Qué traer?
               </h3>
@@ -291,7 +293,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         <PricingSection />
 
         <section id="ubicacion" className="pt-4 scroll-mt-20">
-          <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-white overflow-hidden">
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-white overflow-hidden">
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-zinc-50/50 to-white/50">
               <div>
                 <div className="flex items-center gap-2 mb-2">
