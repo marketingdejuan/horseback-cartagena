@@ -75,7 +75,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     window.open(linkCotizador, '_blank');
   };
 
-  // SEO: Datos Estructurados para Google (LocalBusiness & TouristAttraction)
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "TouristAttraction",
@@ -112,23 +111,58 @@ export default function ClientePage({ initialData }: { initialData: any }) {
       {/* Script SEO Invisible */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
 
-      <section id="inicio" className="relative h-[80vh] bg-zinc-900 overflow-hidden flex flex-col justify-end">
-        <Image src="/cabalgatas-en-medellin-y-caldas.webp" alt="Jinetes cabalgando por los paisajes de Caldas, Antioquia" fill priority={true} quality={60} className="absolute inset-0 w-full h-full object-cover opacity-90" sizes="(max-width: 768px) 768px, 1200px" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent z-10"></div>
-        <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight tracking-tight">{data.heroTitle || "Cabalgatas Ecológicas"}</h1>
-          <p className="text-zinc-200 text-lg md:text-xl font-medium mb-8 tracking-wide">{data.heroSubtitle || "Experiencias únicas en Antioquia."}</p>
-          <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Principal_Hero')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
-            <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Chatear con Asesor
+      {/* HEADER DIFUMINADO TECNOLÓGICO */}
+      <section id="inicio" className="relative h-[85vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center">
+        
+        {/* Máscara de Degradado Estilo Apple */}
+        <div 
+          className="absolute inset-0 w-full h-full"
+          style={{
+            maskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)'
+          }}
+        >
+          <Image 
+            src="/cabalgatas-en-medellin-y-caldas.webp" 
+            alt="Jinetes cabalgando por los paisajes de Caldas, Antioquia" 
+            fill 
+            priority={true}
+            quality={75} 
+            className="absolute inset-0 w-full h-full object-cover" 
+            sizes="(max-width: 768px) 768px, 1200px" 
+          />
+          {/* Overlay oscuro sutil para que el texto resalte */}
+          <div className="absolute inset-0 bg-black/40"></div>
+        </div>
+
+        <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-12 text-center md:text-left">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tighter drop-shadow-xl">
+            {data.heroTitle || "Cabalgatas Ecológicas"}
+          </h1>
+          <p className="text-zinc-100 text-xl md:text-2xl font-medium mb-10 tracking-wide drop-shadow-md max-w-2xl">
+            {data.heroSubtitle || "Experiencias únicas en Antioquia."}
+          </p>
+          
+          <a 
+            href={linkGancho} 
+            target="_blank" 
+            rel="noreferrer" 
+            aria-label="Chatear con un asesor por WhatsApp" 
+            onClick={() => trackWhatsAppClick('Boton_Principal_Hero')} 
+            className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
+          >
+            <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
+            Chatear con Asesor
           </a>
         </div>
       </section>
 
-      <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-16">
+      {/* CONTENIDO PRINCIPAL CON SUPERPOSICIÓN */}
+      <main className="max-w-4xl mx-auto px-4 mt-[-120px] relative z-20 space-y-16">
         
-        {/* COTIZADOR */}
-        <section id="cotizador" className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 md:p-8 border border-white/60 scroll-mt-20">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-zinc-100 pb-4">
+        {/* COTIZADOR - GLASSMORPHISM AVANZADO */}
+        <section id="cotizador" className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-10 border border-white scroll-mt-20">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4 border-b border-zinc-200/50 pb-6">
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 flex items-center gap-3 tracking-tight">
               <Calendar className="text-amber-600 w-8 h-8" aria-hidden="true" /> Cotiza y Reserva
             </h2>
@@ -139,26 +173,26 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             )}
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-10">
+            <div className="space-y-8">
               <div>
-                <label className="block text-sm font-bold text-zinc-800 mb-2">1. Selecciona Fecha y Hora</label>
-                <div className="flex gap-2">
-                  <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full p-4 border border-zinc-200 rounded-2xl bg-zinc-50/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all" />
-                  <select value={hora} onChange={(e) => setHora(e.target.value)} className="w-full p-4 border border-zinc-200 rounded-2xl bg-zinc-50/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all">
+                <label className="block text-sm font-bold text-zinc-800 mb-3">1. Selecciona Fecha y Hora</label>
+                <div className="flex gap-3">
+                  <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full p-4 border border-zinc-200/50 rounded-2xl bg-white/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all shadow-sm" />
+                  <select value={hora} onChange={(e) => setHora(e.target.value)} className="w-full p-4 border border-zinc-200/50 rounded-2xl bg-white/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all shadow-sm">
                     <option value="10:00">10:00 AM</option>
                     <option value="14:00">2:00 PM</option>
                     <option value="16:00">4:00 PM</option>
                   </select>
                 </div>
-                <div className="mt-4 bg-zinc-50 p-4 rounded-2xl border border-zinc-100 shadow-sm">
+                <div className="mt-4 bg-zinc-100/50 p-4 rounded-2xl border border-zinc-200/50">
                   <p className="text-sm text-zinc-600 font-medium leading-relaxed">💡 <strong className="font-extrabold text-zinc-800">Nota importante:</strong> Las cabalgatas grupales (sin costo extra de guía) son los <strong className="font-extrabold text-zinc-800">sábados y domingos a las 2:00 PM</strong>. Otro horario será una experiencia privada.</p>
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-bold text-zinc-800 mb-2">2. Número de Jinetes</label>
-                <div className="flex items-center gap-4 bg-zinc-50/50 p-2 rounded-2xl border border-zinc-200 w-fit">
+                <label className="block text-sm font-bold text-zinc-800 mb-3">2. Número de Jinetes</label>
+                <div className="flex items-center gap-4 bg-white/50 p-2 rounded-2xl border border-zinc-200/50 w-fit shadow-sm">
                   <button onClick={() => setJinetes(Math.max(1, jinetes - 1))} className="w-12 h-12 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-extrabold shadow-sm border border-zinc-100 transition-all">-</button>
                   <span className="w-8 text-center font-extrabold text-2xl text-zinc-900">{jinetes}</span>
                   <button onClick={() => setJinetes(jinetes + 1)} className="w-12 h-12 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-extrabold shadow-sm border border-zinc-100 transition-all">+</button>
@@ -166,63 +200,55 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-zinc-800 mb-2">3. Tu número de WhatsApp</label>
+                <label className="block text-sm font-bold text-zinc-800 mb-3">3. Tu número de WhatsApp</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Phone className="h-5 w-5 text-zinc-400" /></div>
-                  <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej: 300 123 4567" className="w-full pl-12 p-4 border border-zinc-200 rounded-2xl bg-zinc-50/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all placeholder-zinc-400" />
+                  <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej: 300 123 4567" className="w-full pl-12 p-4 border border-zinc-200/50 rounded-2xl bg-white/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all shadow-sm placeholder-zinc-400" />
                 </div>
               </div>
             </div>
             
-            <div className="bg-zinc-900 rounded-[1.5rem] p-8 text-white shadow-2xl flex flex-col justify-between border border-zinc-800">
+            <div className="bg-zinc-900 rounded-[2rem] p-8 text-white shadow-2xl flex flex-col justify-between border border-zinc-800">
               <div>
-                <p className="text-xs font-bold text-amber-500 mb-4 bg-amber-500/10 inline-block px-3 py-1.5 rounded-lg uppercase tracking-wider">{tipoCabalgataStr}</p>
-                <div className="flex justify-between items-center mb-3"><span className="text-zinc-400 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span><span className="font-bold text-lg text-white">${(jinetes * precioBase).toLocaleString()}</span></div>
+                <p className="text-xs font-bold text-amber-500 mb-5 bg-amber-500/10 inline-block px-4 py-2 rounded-xl uppercase tracking-wider">{tipoCabalgataStr}</p>
+                <div className="flex justify-between items-center mb-4"><span className="text-zinc-400 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span><span className="font-bold text-xl text-white">${(jinetes * precioBase).toLocaleString()}</span></div>
                 {!esGrupal && (
-                  <div className="flex justify-between items-center mb-3 text-red-300 bg-red-500/10 p-3 rounded-xl border border-red-500/10"><span className="font-semibold text-sm">Costo Guía Exclusivo</span><span className="font-bold">+${costoGuia.toLocaleString()}</span></div>
+                  <div className="flex justify-between items-center mb-4 text-red-300 bg-red-500/10 p-4 rounded-xl border border-red-500/10"><span className="font-semibold text-sm">Costo Guía Exclusivo</span><span className="font-bold">+${costoGuia.toLocaleString()}</span></div>
                 )}
                 <div className="border-t border-zinc-800 my-6"></div>
-                <div className="flex justify-between items-end"><span className="text-lg text-zinc-400 font-medium tracking-tight">Total estimado</span><span className="text-4xl font-extrabold text-amber-500 tracking-tight">${totalCalculado.toLocaleString()}</span></div>
+                <div className="flex justify-between items-end"><span className="text-lg text-zinc-400 font-medium tracking-tight">Total estimado</span><span className="text-5xl font-extrabold text-amber-500 tracking-tighter">${totalCalculado.toLocaleString()}</span></div>
               </div>
-              <button onClick={handleReservaWhatsApp} disabled={!isValidPhone} className={`mt-8 block w-full text-center font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'}`}>
+              <button onClick={handleReservaWhatsApp} disabled={!isValidPhone} className={`mt-8 block w-full text-center font-extrabold py-5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'}`}>
                 <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} className="w-6 h-6"/> {isValidPhone ? 'Enviar por WhatsApp' : 'Ingresa tu número primero'}
               </button>
             </div>
           </div>
         </section>
 
-        {/* NUEVA SECCIÓN: LA EXPERIENCIA Y PREPARACIÓN */}
+        {/* SECCIÓN: LA EXPERIENCIA Y PREPARACIÓN */}
         <section className="grid md:grid-cols-2 gap-6 scroll-mt-20">
-          
-          {/* El Itinerario */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 border border-white/60">
+          <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
             <h3 className="text-2xl font-extrabold text-zinc-900 mb-6 tracking-tight flex items-center gap-2">
               <Compass className="w-7 h-7 text-amber-600"/> La Experiencia
             </h3>
             <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[1.1rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-zinc-200 before:to-transparent">
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10">
-                  <Coffee className="w-4 h-4" />
-                </div>
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Coffee className="w-4 h-4" /></div>
+                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
                   <h4 className="font-bold text-zinc-900">1. Bienvenida</h4>
                   <p className="text-sm text-zinc-500 mt-1">Llegada a la finca, inducción rápida y tinto campesino.</p>
                 </div>
               </div>
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10">
-                  <Heart className="w-4 h-4" />
-                </div>
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Heart className="w-4 h-4" /></div>
+                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
                   <h4 className="font-bold text-zinc-900">2. Conexión</h4>
                   <p className="text-sm text-zinc-500 mt-1">Te asignamos el caballo ideal según tu nivel de experiencia.</p>
                 </div>
               </div>
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10">
-                  <Camera className="w-4 h-4" />
-                </div>
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Camera className="w-4 h-4" /></div>
+                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
                   <h4 className="font-bold text-zinc-900">3. El Recorrido</h4>
                   <p className="text-sm text-zinc-500 mt-1">Ruta guiada por miradores, senderos ecológicos y naturaleza pura.</p>
                 </div>
@@ -230,33 +256,32 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             </div>
           </div>
 
-          {/* Preparación y Seguridad */}
           <div className="flex flex-col gap-6">
-            <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 border border-white/60">
+            <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
               <h3 className="text-2xl font-extrabold text-zinc-900 mb-6 tracking-tight flex items-center gap-2">
                 <CheckCircle2 className="w-7 h-7 text-green-600"/> ¿Qué traer?
               </h3>
               <ul className="space-y-4">
-                <li className="flex items-center gap-4 bg-zinc-50 p-3 rounded-2xl border border-zinc-100">
-                  <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-100"><Sun className="w-5 h-5 text-amber-500"/></div>
+                <li className="flex items-center gap-4 bg-white/60 p-3 rounded-2xl border border-zinc-100 shadow-sm">
+                  <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-50"><Sun className="w-5 h-5 text-amber-500"/></div>
                   <span className="font-medium text-zinc-700">Bloqueador solar y gorra</span>
                 </li>
-                <li className="flex items-center gap-4 bg-zinc-50 p-3 rounded-2xl border border-zinc-100">
-                  <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-100"><ShieldCheck className="w-5 h-5 text-zinc-500"/></div>
+                <li className="flex items-center gap-4 bg-white/60 p-3 rounded-2xl border border-zinc-100 shadow-sm">
+                  <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-50"><ShieldCheck className="w-5 h-5 text-zinc-500"/></div>
                   <span className="font-medium text-zinc-700">Pantalón largo (jean o sudadera)</span>
                 </li>
-                <li className="flex items-center gap-4 bg-zinc-50 p-3 rounded-2xl border border-zinc-100">
-                  <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-100"><MapPin className="w-5 h-5 text-zinc-500"/></div>
+                <li className="flex items-center gap-4 bg-white/60 p-3 rounded-2xl border border-zinc-100 shadow-sm">
+                  <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-50"><MapPin className="w-5 h-5 text-zinc-500"/></div>
                   <span className="font-medium text-zinc-700">Zapatos cerrados (botas o tenis)</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-[2rem] shadow-xl p-8 border border-zinc-700 text-white relative overflow-hidden">
+            <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-[2.5rem] shadow-xl p-8 border border-zinc-700 text-white relative overflow-hidden">
               <Shield className="absolute -right-4 -top-4 w-32 h-32 text-white/5 rotate-12" />
               <h3 className="text-xl font-extrabold mb-2 tracking-tight">Viaja Asegurado</h3>
-              <p className="text-zinc-300 text-sm leading-relaxed mb-4">Tu bienestar es nuestra prioridad. Todas nuestras rutas incluyen póliza de asistencia médica con <b>Magenta Seguros</b>.</p>
-              <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 font-bold px-4 py-2 rounded-xl text-sm border border-green-500/30">
+              <p className="text-zinc-300 text-sm leading-relaxed mb-5">Tu bienestar es nuestra prioridad. Todas nuestras rutas incluyen póliza de asistencia médica con <b>Magenta Seguros</b>.</p>
+              <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 font-bold px-4 py-2.5 rounded-xl text-sm border border-green-500/30">
                 <ShieldCheck className="w-4 h-4"/> Cobertura Total Incluida
               </div>
             </div>
@@ -266,7 +291,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         <PricingSection />
 
         <section id="ubicacion" className="pt-4 scroll-mt-20">
-          <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 overflow-hidden">
+          <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-white overflow-hidden">
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-zinc-50/50 to-white/50">
               <div>
                 <div className="flex items-center gap-2 mb-2">
@@ -278,7 +303,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                 </p>
               </div>
               <div className="flex flex-col items-center md:items-end">
-                <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-zinc-100" aria-label={`Calificación de ${data.googleRating || '5.0'} estrellas en Google`}>
+                <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-zinc-100">
                    <span className="text-3xl font-extrabold text-zinc-900 tracking-tight">{data.googleRating || '5.0'}</span>
                    <div className="flex text-amber-400">
                      <Star className="w-5 h-5 fill-current" aria-hidden="true"/>
@@ -301,7 +326,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   <MapPin className="w-8 h-8 text-amber-600" aria-hidden="true" />
                 </div>
                 {data.mapEmbedUrl ? (
-                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" aria-label="Abrir ubicación en Google Maps" className="bg-zinc-900/90 backdrop-blur-md text-white font-bold py-3 px-6 rounded-2xl shadow-xl transition-all hover:scale-105 flex items-center gap-2 hover:bg-black">
+                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" className="bg-zinc-900/90 backdrop-blur-md text-white font-bold py-3 px-6 rounded-2xl shadow-xl transition-all hover:scale-105 flex items-center gap-2 hover:bg-black">
                     Abrir en Google Maps
                   </a>
                 ) : (
@@ -330,8 +355,35 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               ))}
             </div>
             <div className="flex justify-center mt-2">
-              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Pedir más información por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} className="bg-green-50 text-green-700 hover:bg-green-100 font-bold py-3.5 px-8 rounded-full flex items-center gap-2 transition-colors border border-green-200/50">
+              <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} className="bg-green-50 text-green-700 hover:bg-green-100 font-bold py-3.5 px-8 rounded-full flex items-center gap-2 transition-colors border border-green-200/50">
                 <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> Me gusta. Quiero más info.
+              </a>
+            </div>
+          </section>
+        )}
+
+        {data.blogPosts && data.blogPosts.length > 0 && (
+          <section id="blog" className="pt-4 scroll-mt-20">
+            <h2 className="text-3xl font-extrabold text-zinc-900 mb-8 flex items-center gap-3 tracking-tight">
+              <BookOpen className="w-8 h-8 text-amber-600" aria-hidden="true" /> Nuestro Blog
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {data.blogPosts.slice(0, 2).map((post: any) => (
+                <a key={post.id} href={`/blog/${post.slug}`} className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 overflow-hidden hover:shadow-lg transition-all duration-300 group">
+                  <div className="relative w-full h-48 bg-zinc-100">
+                    <Image src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} alt={`Imagen de portada para ${post.title}`} fill quality={75} className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out" sizes="(max-width: 768px) 100vw, 50vw" />
+                  </div>
+                  <div className="p-7">
+                    <h3 className="font-extrabold text-xl mb-3 text-zinc-900 tracking-tight">{post.title}</h3>
+                    <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">{post.metaDesc || post.content}</p>
+                    <span className="text-amber-600 font-bold text-sm mt-5 block">Leer artículo →</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <a href="/blog" className="inline-block border border-zinc-200 bg-white text-zinc-700 font-bold py-3 px-8 rounded-full hover:bg-zinc-50 hover:text-zinc-900 transition-colors shadow-sm">
+                Ver todos los artículos
               </a>
             </div>
           </section>
@@ -352,7 +404,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   <div className="flex items-center justify-between mt-4 pt-5 border-t border-zinc-100">
                     <span className="font-bold text-sm text-zinc-900">{review.author}</span>
                     {review.videoUrl && (
-                      <a href={review.videoUrl} target="_blank" rel="noreferrer" aria-label={`Ver video de testimonio de ${review.author}`} className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-3.5 py-2 rounded-xl transition-colors hover:bg-red-100">
+                      <a href={review.videoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-3.5 py-2 rounded-xl transition-colors hover:bg-red-100">
                         <PlayCircle className="w-4 h-4" aria-hidden="true" /> Ver Video
                       </a>
                     )}
@@ -389,10 +441,10 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           <h3 className="text-white text-2xl font-bold mb-8 tracking-tight">Síguenos en nuestras redes</h3>
           <div className="flex justify-center gap-6 mb-10">
             <a href="https://www.instagram.com/cabalgataseco" target="_blank" rel="noreferrer" className="bg-zinc-900 p-4 rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300 hover:scale-110 flex items-center justify-center border border-zinc-800 hover:border-pink-500">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
             <a href="https://web.facebook.com/Cabalgatasmedellin" target="_blank" rel="noreferrer" className="bg-zinc-900 p-4 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 hover:scale-110 flex items-center justify-center border border-zinc-800 hover:border-blue-500">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
           </div>
           <p className="text-sm font-medium tracking-wide text-zinc-500">© {new Date().getFullYear()} Cabalgatas Medellín. Todos los derechos reservados.</p>
