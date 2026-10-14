@@ -5,8 +5,8 @@ import {
   Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, 
   Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone 
 } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
+// 🔥 ¡Adiós Firebase! Eliminamos sus importaciones de aquí
 import PricingSection from '../components/Planes';
 
 export default function ClientePage({ initialData }: { initialData: any }) {
@@ -62,24 +62,33 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   
   const isValidPhone = telefono.trim().length >= 7;
 
+  // 🔥 AQUÍ OCURRE LA MAGIA: CONEXIÓN DIRECTA CON EL SÚPER ERP
   const handleReservaWhatsApp = async (e: React.MouseEvent) => {
     e.preventDefault(); 
     if (!isValidPhone) return;
     trackWhatsAppClick('Boton_Cotizador');
+    
     try {
-      await addDoc(collection(db, 'reservas'), {
-        plan: esGrupal ? 'Cabalgata Grupal' : 'Cabalgata Privada',
-        fecha: fecha || 'Por definir',
-        hora: hora,
-        jinetes: jinetes,
-        telefono: telefono,
-        total: totalCalculado,
-        fechaCreacion: serverTimestamp(),
-        origen: 'Web Español'
+      const payload = {
+        clientName: "Lead Web (Cotizador)", // Como no pedimos nombre, le asignamos este título
+        phone: telefono,
+        date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
+        totalValue: totalCalculado,
+        notes: `Cotización Web | Modalidad: ${esGrupal ? 'Grupal' : 'Privada'} | ${jinetes} Jinetes.`,
+        brand: 'cabalgatamedellin.com',
+        funnelStage: 'Nueva'
+      };
+
+      await fetch('https://admin.cabalgatas.co/api/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
+      console.log("¡Lead enviado al CRM!");
     } catch (error) {
-      console.error("Error guardando reserva silenciosa:", error);
+      console.error("Error guardando reserva en el ERP:", error);
     }
+    
     window.open(linkCotizador, '_blank');
   };
 
@@ -396,7 +405,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               aria-label="Instagram de Cabalgatas Medellín" 
               className="bg-stone-800 p-4 rounded-full hover:bg-pink-600 hover:text-white transition-all hover:scale-110 shadow-lg group"
             >
-              {/* SVG NATIVO DE INSTAGRAM */}
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 group-hover:scale-110 transition-transform" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
             
@@ -407,7 +415,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               aria-label="Facebook de Cabalgatas Medellín" 
               className="bg-stone-800 p-4 rounded-full hover:bg-blue-600 hover:text-white transition-all hover:scale-110 shadow-lg group"
             >
-              {/* SVG NATIVO DE FACEBOOK */}
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 group-hover:scale-110 transition-transform" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
           </div>
