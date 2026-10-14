@@ -1,53 +1,111 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { MessageCircle, Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
-import { db } from '../../lib/firebase';
-import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { MessageCircle, Calendar, Info, Star, PlayCircle, Camera, X, Gift, Clock, Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone } from 'lucide-react';
 import PricingSectionEn from '../../components/PlanesEn';
 
+// 🔥 CONFIGURACIÓN DE MARCA (Si copias este archivo a otro sitio, solo cambia esta línea)
+const MARCA_SITIO = 'cabalgatamedellin.com';
+
+const DATOS_BASE_EN = {
+  businessName: 'Cabalgatas Medellín',
+  whatsappNumber: '573000000000',
+  basePrice: 100000,
+  guidePrice: 80000,
+  enableExitIntent: true,
+  heroTitleEn: 'Ecological Horseback Riding in Medellin',
+  heroSubtitleEn: 'Disconnect from the city and live an unforgettable horseback riding experience in the mountains of Antioquia, Colombia.',
+  urgencyTextEn: 'Last spots available for this weekend!',
+  mapAddressEn: 'Caldas, Antioquia (South of the Aburrá Valley)',
+  googleRating: '5.0',
+  googleReviewCount: '150',
+  mapEmbedUrl: 'https://maps.google.com',
+  reviews: [
+    {
+      id: 'rev-1',
+      author: 'Camila Restrepo',
+      rating: 5,
+      textEn: 'An amazing experience! The horses are very well cared for, super gentle, and the mountain views in Caldas are breathtaking.'
+    },
+    {
+      id: 'rev-2',
+      author: 'Andrés Gómez',
+      rating: 5,
+      textEn: 'Went with my partner on the private tour and everything was spotless. Our guide was super attentive taking photos and showing us the trail.'
+    },
+    {
+      id: 'rev-3',
+      author: 'Family Traveler',
+      rating: 5,
+      textEn: 'It was our first time riding horses and we felt safe from the very first minute. 100% recommended!'
+    }
+  ],
+  faqs: [
+    {
+      id: 'faq-1',
+      qEn: 'Do I need previous horseback riding experience?',
+      aEn: 'No prior experience is needed. Our horses are gentle and trained for ecological tourism, and before heading out you will receive a practical briefing from our guides.'
+    },
+    {
+      id: 'faq-2',
+      qEn: 'What should I wear for the tour?',
+      aEn: 'Long pants (jeans or comfortable pants covering your legs) and closed-toe shoes (sneakers or boots) are mandatory. We also recommend sunscreen and a hat.'
+    },
+    {
+      id: 'faq-3',
+      qEn: 'What is the difference between a group ride and a private ride?',
+      aEn: 'Group rides take place on Saturdays and Sundays at 2:00 PM with no extra guide fee. At any other time or weekday, the tour is 100% private and exclusive for your group.'
+    }
+  ],
+  gallery: [],
+  blogPosts: []
+};
+
 export default function EnglishPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>(DATOS_BASE_EN);
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('10:00');
   const [jinetes, setJinetes] = useState(2);
   const [telefono, setTelefono] = useState('');
-  const [currentHero, setCurrentHero] = useState(0);
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
 
+  // 🔥 SINCRONIZACIÓN AUTOMÁTICA CON EL SÚPER ERP
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, "configuracion", "general"), (docSnap) => {
-      if (docSnap.exists()) setData(docSnap.data());
-    });
-    return unsub;
+    const sincronizarConERP = async () => {
+      try {
+        const [resAjustes, resBlog] = await Promise.all([
+          fetch(`https://admin.cabalgatas.co/api/ajustes?brandName=${MARCA_SITIO}`, { cache: 'no-store' }),
+          fetch(`https://admin.cabalgatas.co/api/blog?brand=${MARCA_SITIO}`, { cache: 'no-store' })
+        ]);
+
+        const nuevosDatos: any = {};
+
+        if (resAjustes.ok) {
+          const ajustesERP = await resAjustes.json();
+          if (ajustesERP.basePrice) nuevosDatos.basePrice = ajustesERP.basePrice;
+          if (ajustesERP.guidePrice !== undefined) nuevosDatos.guidePrice = ajustesERP.guidePrice;
+          if (ajustesERP.whatsappNumber) nuevosDatos.whatsappNumber = ajustesERP.whatsappNumber;
+          if (ajustesERP.businessName && ajustesERP.businessName !== 'Nombre del Negocio') {
+            nuevosDatos.businessName = ajustesERP.businessName;
+          }
+        }
+
+        if (resBlog.ok) {
+          const blogERP = await resBlog.json();
+          if (Array.isArray(blogERP) && blogERP.length > 0) {
+            nuevosDatos.blogPosts = blogERP;
+          }
+        }
+
+        setData((prev: any) => ({ ...prev, ...nuevosDatos }));
+      } catch (error) {
+        console.error("Error syncing English page with ERP:", error);
+      }
+    };
+
+    sincronizarConERP();
   }, []);
-
-  useEffect(() => {
-    if (data) {
-      if (data.metaTitle) document.title = `${data.metaTitle} | English`;
-
-      const setMeta = (name: string, content: string, isProperty = false) => {
-        if(!content) return;
-        const attr = isProperty ? 'property' : 'name';
-        let el = document.querySelector(`meta[${attr}="${name}"]`);
-        if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
-        el.setAttribute('content', content);
-      };
-
-      setMeta('description', data.metaDescription);
-      setMeta('keywords', data.seoKeywords);
-      setMeta('og:image', data.seoOgImage, true);
-      setMeta('og:title', `${data.metaTitle} | English`, true);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (data?.heroMedia && data.heroMedia.length > 1) {
-      const interval = setInterval(() => setCurrentHero((prev) => (prev + 1) % data.heroMedia.length), 5000);
-      return () => clearInterval(interval);
-    }
-  }, [data?.heroMedia]);
 
   useEffect(() => {
     if (data?.enableExitIntent && !hasShownPopup) {
@@ -66,6 +124,11 @@ export default function EnglishPage() {
         event_label: ubicacionBoton,
         value: 1
       });
+      (window as any).gtag('event', 'conversion', {
+        'send_to': 'AW-10958714047/MQGxCMyQ1-YcEL_pwuko',
+        'value': 1.0,
+        'currency': 'COP'
+      });
     }
   };
 
@@ -73,7 +136,7 @@ export default function EnglishPage() {
   const esDosPm = hora === '14:00';
   const esGrupal = esFinDeSemana && esDosPm;
   const precioBase = data?.basePrice || 100000;
-  const costoGuia = esGrupal ? 0 : (data?.guidePrice || 80000);
+  const costoGuia = esGrupal ? 0 : (data?.guidePrice ?? 80000);
   const totalCalculado = (jinetes * precioBase) + costoGuia;
   const tipoCabalgataStr = esGrupal ? 'Group Ride (No extra guide fee)' : 'Private Ride (Exclusive guide included)';
   const whatsappNum = data?.whatsappNumber || "573000000000";
@@ -83,31 +146,34 @@ export default function EnglishPage() {
   
   const isValidPhone = telefono.trim().length >= 7;
 
+  // 🔥 ENVÍO DIRECTO AL CRM KANBAN DEL SÚPER ERP
   const handleReservaWhatsApp = async (e: React.MouseEvent) => {
     e.preventDefault(); 
     if (!isValidPhone) return;
     trackWhatsAppClick('Boton_Cotizador_EN');
 
     try {
-      await addDoc(collection(db, 'reservas'), {
-        plan: esGrupal ? 'Group Ride' : 'Private Ride',
-        fecha: fecha || 'To be defined',
-        hora: hora,
-        jinetes: jinetes,
-        telefono: telefono,
-        total: totalCalculado,
-        fechaCreacion: serverTimestamp(),
-        origen: 'Web English'
+      const payload = {
+        clientName: "Lead Web EN 🇺🇸 (Quote)",
+        phone: telefono,
+        date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
+        totalValue: totalCalculado,
+        notes: `🇬🇧 Habla Inglés (Web EN) | Modalidad: ${esGrupal ? 'Grupal' : 'Privada'} | ${jinetes} Jinetes.`,
+        brand: MARCA_SITIO,
+        funnelStage: 'Nueva'
+      };
+
+      await fetch('https://admin.cabalgatas.co/api/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
     } catch (error) {
-      console.error("Error saving silent reservation:", error);
+      console.error("Error saving reservation in ERP:", error);
     }
     window.open(linkCotizador, '_blank');
   };
 
-  if (!data) return null;
-
-  // FAQ Schema optimizado para las preguntas y respuestas en INGLÉS
   const faqSchema = data?.faqs?.length > 0 ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -132,20 +198,20 @@ export default function EnglishPage() {
       )}
 
       <section id="inicio" className="relative h-[80vh] bg-stone-900 overflow-hidden flex flex-col justify-end">
-        {data.heroMedia?.map((media: any, idx: number) => {
-          const isVideo = media.url?.toLowerCase().includes('.mp4');
-          const classes = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentHero ? 'opacity-50' : 'opacity-0'}`;
-          return isVideo ? (
-            <video key={idx} src={media.url} autoPlay loop muted playsInline className={classes} />
-          ) : (
-            <Image key={idx} src={media.url} alt="Horseback Riding Medellin" fill priority={idx === 0} className={classes} sizes="100vw" />
-          );
-        })}
+        <Image 
+          src="/cabalgatas-en-medellin-y-caldas.webp" 
+          alt="Horseback Riding Medellin and Caldas" 
+          fill 
+          priority={true} 
+          quality={60}
+          className="absolute inset-0 w-full h-full object-cover opacity-90" 
+          sizes="(max-width: 768px) 768px, 1200px" 
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-transparent z-10"></div>
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-16 md:pb-12 text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">{data.heroTitleEn || "Ecological Horseback Riding"}</h1>
           <p className="text-stone-200 text-lg md:text-xl font-medium mb-8">{data.heroSubtitleEn || "Unique experiences in Antioquia, Colombia."}</p>
-          <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Principal_Hero_EN')} className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Chat with an Advisor</a>
+          <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Principal_Hero_EN')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"><MessageCircle className="w-5 h-5"/> Chat with an Advisor</a>
         </div>
       </section>
 
@@ -189,10 +255,10 @@ export default function EnglishPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-extrabold text-stone-900 mb-2">3. Your WhatsApp number</label>
+                <label htmlFor="telefono-reserva" className="block text-sm font-extrabold text-stone-900 mb-2">3. Your WhatsApp number</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Phone className="h-5 w-5 text-stone-500" /></div>
-                  <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ex: +1 234 567 8900" className="w-full pl-10 p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-500 transition-colors placeholder-stone-400"/>
+                  <input id="telefono-reserva" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ex: +1 234 567 8900" className="w-full pl-10 p-3 border-2 border-stone-300 rounded-xl bg-white text-stone-900 font-bold outline-none focus:border-green-500 transition-colors placeholder-stone-400"/>
                 </div>
                 <p className="text-xs font-bold text-stone-500 mt-2">Mandatory to send you the detailed quote.</p>
               </div>
@@ -220,7 +286,7 @@ export default function EnglishPage() {
 
         <PricingSectionEn />
 
-        {/* SECCIÓN MAPAS CON NEXT IMAGE */}
+        {/* SECCIÓN MAPAS */}
         <section id="ubicacion" className="pt-4 scroll-mt-20">
           <div className="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-stone-50 to-white">
@@ -229,14 +295,14 @@ export default function EnglishPage() {
                   <h2 className="text-2xl font-extrabold text-stone-800">{data.businessName || 'Cabalgatas Medellín'}</h2>
                   <BadgeCheck className="w-6 h-6 text-blue-500 fill-current" />
                 </div>
-                <p className="text-stone-500 font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> {data.mapAddressEn || data.mapAddress || 'Caldas, Antioquia'}</p>
+                <p className="text-stone-500 font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> {data.mapAddressEn || 'Caldas, Antioquia'}</p>
               </div>
               <div className="flex flex-col items-center md:items-end">
                 <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border shadow-sm">
                    <span className="text-3xl font-black text-stone-800">{data.googleRating || '5.0'}</span>
                    <div className="flex text-amber-500"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
                 </div>
-                <p className="text-sm font-bold text-stone-500 mt-2 hover:underline cursor-pointer">Based on {data.googleReviewCount || '150'}+ reviews</p>
+                <p className="text-sm font-bold text-stone-500 mt-2">Based on {data.googleReviewCount || '150'}+ reviews</p>
               </div>
             </div>
             
@@ -260,29 +326,7 @@ export default function EnglishPage() {
           </div>
         </section>
 
-        {/* GALERÍA CON NEXT IMAGE Y TRADUCCIONES */}
-        {data.gallery && data.gallery.length > 0 && (
-          <section id="galeria" className="pt-4 scroll-mt-20">
-            <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><Camera className="w-8 h-8 text-amber-500" /> Gallery</h2>
-            <div className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory hide-scrollbar">
-              {data.gallery.map((item: any) => (
-                <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border overflow-hidden group">
-                  <div className="h-48 overflow-hidden relative bg-stone-100">
-                    <Image src={item.url} alt={item.titleEn || item.title || 'Horseback riding photo'} fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 320px" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent"></div>
-                    <h3 className="absolute bottom-4 left-4 text-white font-bold text-lg">{item.titleEn || item.title}</h3>
-                  </div>
-                  {(item.descEn || item.desc) && <div className="p-4"><p className="text-stone-600 text-sm">{item.descEn || item.desc}</p></div>}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center mt-6">
-              <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria_EN')} className="bg-green-100 text-green-700 hover:bg-green-200 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-colors"><MessageCircle className="w-5 h-5"/> I like it. I want more info.</a>
-            </div>
-          </section>
-        )}
-
-        {/* BLOG PREVIEWS CON NEXT IMAGE */}
+        {/* BLOG PREVIEWS */}
         {data.blogPosts && data.blogPosts.length > 0 && (
           <section id="blog" className="pt-4 scroll-mt-20">
             <h2 className="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-2"><BookOpen className="w-8 h-8 text-amber-500" /> Our Blog</h2>
@@ -290,7 +334,7 @@ export default function EnglishPage() {
               {data.blogPosts.slice(0, 2).map((post: any) => (
                 <a key={post.id} href={`/blog/${post.slug}`} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow group">
                   <div className="relative w-full h-40 bg-stone-100">
-                    <Image src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform" sizes="(max-width: 768px) 100vw, 50vw" />
+                    <img src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-xl mb-2 text-stone-800">{post.title}</h3>
