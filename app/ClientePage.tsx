@@ -2,22 +2,59 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { 
-  Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, 
+  Calendar, Info, Star, PlayCircle, Camera, X, Gift, Clock, 
   Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone 
 } from 'lucide-react';
-
-// 🔥 ¡Adiós Firebase! Eliminamos sus importaciones de aquí
 import PricingSection from '../components/Planes';
+
+const MARCA_SITIO = 'cabalgatamedellin.com';
 
 export default function ClientePage({ initialData }: { initialData: any }) {
   
-  const [data] = useState<any>(initialData); 
+  const [data, setData] = useState<any>(initialData || {}); 
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('10:00');
   const [jinetes, setJinetes] = useState(2);
   const [telefono, setTelefono] = useState('');
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
+
+  // 🔥 SINCRONIZACIÓN AUTOMÁTICA DE PRECIOS, WHATSAPP Y BLOG DESDE EL SÚPER ERP
+  useEffect(() => {
+    const sincronizarConERP = async () => {
+      try {
+        const [resAjustes, resBlog] = await Promise.all([
+          fetch(`https://admin.cabalgatas.co/api/ajustes?brandName=${MARCA_SITIO}`, { cache: 'no-store' }),
+          fetch(`https://admin.cabalgatas.co/api/blog?brand=${MARCA_SITIO}`, { cache: 'no-store' })
+        ]);
+
+        const nuevosDatos: any = {};
+
+        if (resAjustes.ok) {
+          const ajustesERP = await resAjustes.json();
+          if (ajustesERP.basePrice) nuevosDatos.basePrice = ajustesERP.basePrice;
+          if (ajustesERP.guidePrice !== undefined) nuevosDatos.guidePrice = ajustesERP.guidePrice;
+          if (ajustesERP.whatsappNumber) nuevosDatos.whatsappNumber = ajustesERP.whatsappNumber;
+          if (ajustesERP.businessName && ajustesERP.businessName !== 'Nombre del Negocio') {
+            nuevosDatos.businessName = ajustesERP.businessName;
+          }
+        }
+
+        if (resBlog.ok) {
+          const blogERP = await resBlog.json();
+          if (Array.isArray(blogERP) && blogERP.length > 0) {
+            nuevosDatos.blogPosts = blogERP;
+          }
+        }
+
+        setData((prev: any) => ({ ...prev, ...nuevosDatos }));
+      } catch (error) {
+        console.error("Error sincronizando datos con el ERP:", error);
+      }
+    };
+
+    sincronizarConERP();
+  }, []);
 
   useEffect(() => {
     if (data?.enableExitIntent && !hasShownPopup) {
@@ -51,7 +88,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   const esDosPm = hora === '14:00';
   const esGrupal = esFinDeSemana && esDosPm;
   const precioBase = data?.basePrice || 100000;
-  const costoGuia = esGrupal ? 0 : (data?.guidePrice || 80000);
+  const costoGuia = esGrupal ? 0 : (data?.guidePrice ?? 80000);
   const totalCalculado = (jinetes * precioBase) + costoGuia;
   const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro extra de guía)' : 'Privada (Incluye guía exclusivo)';
   const whatsappNum = data?.whatsappNumber || "573000000000";
@@ -62,7 +99,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   
   const isValidPhone = telefono.trim().length >= 7;
 
-  // 🔥 AQUÍ OCURRE LA MAGIA: CONEXIÓN DIRECTA CON EL SÚPER ERP
   const handleReservaWhatsApp = async (e: React.MouseEvent) => {
     e.preventDefault(); 
     if (!isValidPhone) return;
@@ -70,12 +106,12 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     
     try {
       const payload = {
-        clientName: "Lead Web (Cotizador)", // Como no pedimos nombre, le asignamos este título
+        clientName: "Lead Web (Cotizador)",
         phone: telefono,
         date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
         totalValue: totalCalculado,
         notes: `Cotización Web | Modalidad: ${esGrupal ? 'Grupal' : 'Privada'} | ${jinetes} Jinetes.`,
-        brand: 'cabalgatamedellin.com',
+        brand: MARCA_SITIO,
         funnelStage: 'Nueva'
       };
 
@@ -84,7 +120,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      console.log("¡Lead enviado al CRM!");
     } catch (error) {
       console.error("Error guardando reserva en el ERP:", error);
     }
@@ -322,7 +357,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               {data.blogPosts.slice(0, 2).map((post: any) => (
                 <a key={post.id} href={`/blog/${post.slug}`} aria-label={`Leer artículo: ${post.title}`} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow group">
                   <div className="relative w-full h-40 bg-stone-100">
-                    <Image src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} alt={`Imagen de portada para ${post.title}`} fill quality={75} className="object-cover group-hover:scale-105 transition-transform" sizes="(max-width: 768px) 100vw, 50vw" />
+                    <img src={post.image || 'https://images.unsplash.com/photo-1598048600115-325d36e2ca0e?q=80&w=800'} alt={`Imagen de portada para ${post.title}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-xl mb-2 text-stone-800">{post.title}</h3>

@@ -2,50 +2,63 @@ import React from 'react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import { ArrowLeft, MessageCircle, Home, ChevronRight } from 'lucide-react';
-import { db } from '../../../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
 
 export const dynamic = 'force-dynamic';
+
+// 🔥 CONFIGURACIÓN DE MARCA (Si copias este archivo a otro sitio, solo cambia estas 3 líneas)
+const MARCA_SITIO = 'cabalgatamedellin.com';
+const NOMBRE_COMERCIAL = 'Cabalgatas Medellín';
+const URL_SITIO = 'https://cabalgatamedellin.com';
 
 const normalizarTexto = (texto: string) => {
   return (texto || '').trim().toLowerCase();
 };
 
+// 🔥 CONEXIÓN SERVIDOR A SERVIDOR CON EL SÚPER ERP (PostgreSQL)
 async function getPost(slug: string) {
-  if (!slug) return { post: null, globalData: null };
+  if (!slug) return { post: null, globalData: null, allPosts: [] };
   try {
-    const docSnap = await getDoc(doc(db, "configuracion", "general"));
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      const slugBuscado = normalizarTexto(decodeURIComponent(slug));
-      
-      const post = data.blogPosts?.find((p: any) => normalizarTexto(p.slug) === slugBuscado);
-      
-      return { post: post || null, globalData: data };
-    }
+    const [resPosts, resAjustes] = await Promise.all([
+      fetch(`https://admin.cabalgatas.co/api/blog?brand=${MARCA_SITIO}`, { cache: 'no-store' }),
+      fetch(`https://admin.cabalgatas.co/api/ajustes?brandName=${MARCA_SITIO}`, { cache: 'no-store' })
+    ]);
+
+    const allPosts = resPosts.ok ? await resPosts.json() : [];
+    const globalData = resAjustes.ok ? await resAjustes.json() : null;
+
+    const slugBuscado = normalizarTexto(decodeURIComponent(slug));
+    const listaPosts = Array.isArray(allPosts) ? allPosts : [];
+    
+    const post = listaPosts.find((p: any) => normalizarTexto(p.slug) === slugBuscado);
+    
+    return { post: post || null, globalData, allPosts: listaPosts };
   } catch (error) {
-    console.error("Error cargando el artículo:", error);
+    console.error("Error cargando el artículo desde el ERP:", error);
   }
-  return { post: null, globalData: null };
+  return { post: null, globalData: null, allPosts: [] };
 }
 
-// 🔴 SOLUCIÓN NEXT.JS 15+: Await params (Esperar a que lea el enlace)
+// 🔴 SOLUCIÓN NEXT.JS 15+: Await params (SEO Dinámico en el Servidor)
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const { post } = await getPost(slug);
 
   if (!post) {
-    return { title: 'Artículo no encontrado | Cabalgatas Medellín' };
+    return { title: `Artículo no encontrado | ${NOMBRE_COMERCIAL}` };
   }
 
+  const ogImage = post.image && !post.image.startsWith('data:') 
+    ? post.image 
+    : `${URL_SITIO}/cabalgatas-en-medellin-y-caldas.webp`;
+
   return {
-    title: `${post.metaTitle || post.title} | Cabalgatas Medellín`,
-    description: post.metaDesc || post.content.substring(0, 150) + '...',
+    title: `${post.metaTitle || post.title} | ${NOMBRE_COMERCIAL}`,
+    description: post.metaDesc || (post.content ? post.content.substring(0, 150) + '...' : ''),
     keywords: post.keywords || 'cabalgatas medellin',
     openGraph: {
       title: post.metaTitle || post.title,
-      description: post.metaDesc || post.content.substring(0, 150),
-      images: [post.image || 'https://cabalgatamedellin.com/default.jpg'],
+      description: post.metaDesc || (post.content ? post.content.substring(0, 150) : ''),
+      images: [ogImage],
       type: 'article',
     }
   };
@@ -53,23 +66,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 // 🔴 SOLUCIÓN NEXT.JS 15+: Await params en el componente visual
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
-  // Desempaquetamos la promesa de los parámetros
   const { slug } = await params;
-  const { post, globalData } = await getPost(slug);
+  const { post, globalData, allPosts } = await getPost(slug);
 
   if (!post) {
     return (
       <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center text-center p-4">
         <h1 className="text-4xl font-bold text-stone-800 mb-2">Artículo no encontrado</h1>
-        <p className="text-stone-500 mb-6">El sistema intentó buscar el enlace exacto: <b className="text-stone-900 bg-stone-200 px-2 py-1 rounded">"{slug}"</b></p>
+        <p className="text-stone-500 mb-6">
+          El sistema intentó buscar el enlace exacto: <b className="text-stone-900 bg-stone-200 px-2 py-1 rounded">"{slug}"</b>
+        </p>
         
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 mb-8 max-w-md w-full text-left text-sm text-stone-600">
-           <p className="font-extrabold text-stone-900 mb-3 border-b pb-2">Enlaces disponibles en tu base de datos:</p>
+           <p className="font-extrabold text-stone-900 mb-3 border-b pb-2">Enlaces disponibles en tu Súper ERP ({MARCA_SITIO}):</p>
            <ul className="list-disc pl-5 space-y-2 font-mono text-amber-700">
-             {globalData?.blogPosts?.map((p:any, idx: number) => (
+             {allPosts.map((p: any, idx: number) => (
                <li key={idx}>"{p.slug}"</li>
              ))}
-             {!globalData?.blogPosts?.length && <li>No hay artículos guardados.</li>}
+             {!allPosts.length && <li>No hay artículos guardados para esta marca.</li>}
            </ul>
         </div>
 
@@ -87,10 +101,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": post.title,
-    "image": [post.image],
-    "author": { "@type": "Organization", "name": "Cabalgatas Medellín" },
-    "publisher": { "@type": "Organization", "name": "Cabalgatas Medellín", "logo": { "@type": "ImageObject", "url": "https://cabalgatamedellin.com/logo.png" } },
-    "description": post.metaDesc || post.content.substring(0, 150),
+    "image": [post.image || `${URL_SITIO}/cabalgatas-en-medellin-y-caldas.webp`],
+    "author": { "@type": "Organization", "name": NOMBRE_COMERCIAL },
+    "publisher": { 
+      "@type": "Organization", 
+      "name": NOMBRE_COMERCIAL, 
+      "logo": { "@type": "ImageObject", "url": `${URL_SITIO}/logo.png` } 
+    },
+    "description": post.metaDesc || (post.content ? post.content.substring(0, 150) : ''),
     "articleBody": post.content
   };
 
@@ -98,9 +116,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://cabalgatamedellin.com" },
-      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://cabalgatamedellin.com/blog" },
-      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://cabalgatamedellin.com/blog/${slug}` }
+      { "@type": "ListItem", "position": 1, "name": "Inicio", "item": URL_SITIO },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${URL_SITIO}/blog` },
+      { "@type": "ListItem", "position": 3, "name": post.title, "item": `${URL_SITIO}/blog/${slug}` }
     ]
   };
 
@@ -121,6 +139,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             alt={post.title}
             fill
             priority
+            unoptimized
             className="object-cover opacity-60 hover:scale-105 transition-transform duration-1000" 
             sizes="100vw"
          />
