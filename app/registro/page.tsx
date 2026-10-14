@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { PenTool, CheckCircle2, AlertTriangle, Calendar, Map, User, Phone, AtSign, FileText, Users } from 'lucide-react';
-import { db, storage } from '../../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+
+// 🔥 CONFIGURACIÓN DE MARCA: Si copias este archivo a otro sitio, solo cambia estas 2 líneas:
+const MARCA_SITIO = 'cabalgatamedellin.com'; // Opciones: 'cabalgatas.co' | 'cabalgatamedellin.com' | 'toursdemedellin.com'
+const NOMBRE_COMERCIAL = 'Cabalgatas Medellín';
 
 export default function WaiverPage() {
   const [form, setForm] = useState({ 
@@ -85,16 +86,33 @@ export default function WaiverPage() {
     const signatureImage = canvas.toDataURL('image/png');
 
     try {
-      // 1. Guardar en Firebase Storage y Firestore
-      const storageRef = ref(storage, `firmas_waiver/${Date.now()}_${form.idNumber}.png`);
-      await uploadString(storageRef, signatureImage, 'data_url');
-      const signatureUrl = await getDownloadURL(storageRef);
+      // 🔥 1. ENVIAR DIRECTAMENTE AL SÚPER ERP CENTRAL (PostgreSQL)
+      const payloadERP = {
+        fullName: form.clientName.trim(),
+        idType: form.idType,
+        documentId: form.idNumber.trim(),
+        phone: `${form.countryCode === 'Otro' ? '' : form.countryCode}${form.whatsapp.replace(/\D/g, '')}`,
+        instagram: form.instagram.trim(),
+        emergencyContact: form.emergencyContact.trim(),
+        tourDate: new Date(`${form.tourDate}T12:00:00Z`).toISOString(),
+        tourTime: form.tourTime,
+        planType: form.tourDuration,
+        hasMinor: form.hasMinor,
+        minorName: form.hasMinor ? form.minorName : null,
+        minorId: form.hasMinor ? form.minorId : null,
+        signatureUrl: signatureImage, // Enviamos la firma digital lista para visualizar
+        brand: MARCA_SITIO
+      };
 
-      await addDoc(collection(db, 'exoneraciones'), {
-        ...form,
-        signatureUrl,
-        fechaRegistro: serverTimestamp(),
+      const response = await fetch('https://admin.cabalgatas.co/api/clientes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadERP)
       });
+
+      if (!response.ok) {
+        throw new Error("Error en la respuesta del servidor ERP");
+      }
 
       setIsSuccess(true);
       
@@ -102,18 +120,15 @@ export default function WaiverPage() {
       // 🚀 ESTRATEGIA PRO: EXTRACCIÓN Y ENVÍO DE DATA A LOS ALGORITMOS (ADS)
       // =========================================================================
       try {
-        // Formateamos la data para que Facebook y Google la entiendan perfectamente
         const nameParts = form.clientName.trim().split(' ');
         const firstName = nameParts[0] || '';
         const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
         
-        // Teléfono limpio (solo números) y teléfono con símbolo +
         const cleanPhone = `${form.countryCode.replace('+', '')}${form.whatsapp.replace(/\D/g, '')}`;
         const phoneForGoogle = `+${cleanPhone}`;
 
         // 🎯 1. GOOGLE ADS (Conversiones Mejoradas / Enhanced Conversions)
         if (typeof window !== 'undefined' && (window as any).gtag) {
-          // Primero: Inyectamos los datos del usuario de forma segura
           (window as any).gtag('set', 'user_data', {
             "phone_number": phoneForGoogle,
             "address": {
@@ -121,9 +136,7 @@ export default function WaiverPage() {
               "last_name": lastName,
             }
           });
-          // Segundo: Disparamos el evento de conversión de Lead
           (window as any).gtag('event', 'conversion', { 
-            // TODO: Cambiar esto por tu etiqueta de conversión real de Google Ads
             'send_to': 'AW-XXXXXXXXXX/TU_ETIQUETA_DE_CONVERSION',
             'value': 0.00,
             'currency': 'COP'
@@ -136,11 +149,10 @@ export default function WaiverPage() {
             content_name: form.tourDuration,
             value: 0.00,
             currency: 'COP',
-            // Coincidencia Avanzada: Le pasamos los datos para que Meta encuentre su perfil
-            fn: firstName.toLowerCase(),      // First Name
-            ln: lastName.toLowerCase(),       // Last Name
-            ph: cleanPhone,                   // Phone
-            external_id: form.idNumber        // Usamos la cédula como ID único para no duplicar data
+            fn: firstName.toLowerCase(),
+            ln: lastName.toLowerCase(),
+            ph: cleanPhone,
+            external_id: form.idNumber
           });
         }
       } catch (trackingError) {
@@ -175,14 +187,16 @@ export default function WaiverPage() {
       
       <div className="bg-stone-900 pt-12 pb-20 px-6 rounded-b-[40px] shadow-2xl text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
-        <h1 className="text-3xl font-black text-white uppercase tracking-tighter relative z-10">Cabalgatas Medellín</h1>
+        <h1 className="text-3xl font-black text-white uppercase tracking-tighter relative z-10">{NOMBRE_COMERCIAL}</h1>
         <p className="text-amber-500 font-bold text-sm mt-2 relative z-10">Registro y Exoneración de Responsabilidades</p>
       </div>
 
       <form onSubmit={handleSubmit} className="px-4 -mt-12 space-y-6 max-w-lg mx-auto w-full relative z-20">
         
         <div className="bg-white p-6 rounded-3xl shadow-xl border border-stone-100 space-y-5">
-          <h2 className="font-black text-stone-900 flex items-center gap-2 text-lg"><Map size={20} className="text-amber-500"/> 1. Datos de la Cabalgata</h2>
+
+<Map size={20} className="text-amber-500"/>
+<h2 className="font-black text-stone-900 flex items-center gap-2 text-lg"> 1. Datos de la Cabalgata</h2>
           
           <div>
             <label className="block text-xs font-black text-stone-500 uppercase mb-2 ml-1">Fecha de la reserva</label>
@@ -265,7 +279,7 @@ export default function WaiverPage() {
           {form.hasMinor && (
             <div className="space-y-5 pt-4 border-t border-stone-100 animate-in fade-in">
               <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200">
-                <p className="text-xs text-blue-900 font-bold leading-relaxed">Declaro bajo juramento que soy padre y/o acudiente del menor. Exonero a Cabalgatas Medellín de todo daño que pueda ocurrirle bajo mi supervisión durante la interacción con los equinos.</p>
+                <p className="text-xs text-blue-900 font-bold leading-relaxed">Declaro bajo juramento que soy padre y/o acudiente del menor. Exonero a {NOMBRE_COMERCIAL} de todo daño que pueda ocurrirle bajo mi supervisión durante la interacción con los equinos.</p>
               </div>
               
               <label className="block text-xs font-black text-stone-500 uppercase ml-1">Acudiente Responsable</label>
@@ -296,9 +310,9 @@ export default function WaiverPage() {
           
           <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 h-48 overflow-y-scroll text-xs text-stone-600 leading-relaxed text-justify shadow-inner">
             <strong className="text-stone-900 uppercase">Exoneración de Responsabilidades y Asunción de Riesgos</strong><br/><br/>
-            <strong>Asunción de Riesgos:</strong> Entendiendo que la práctica de montar a caballo, el ecoturismo y la interacción con animales es una actividad que conlleva riesgos inherentes. Los caballos son animales vivos con instinto de huida que pueden reaccionar de forma impredecible ante sonidos, movimientos u objetos. Declaro a CABALGATAS MEDELLÍN que entiendo los riesgos que suponen este tipo de prácticas.<br/><br/>
+            <strong>Asunción de Riesgos:</strong> Entendiendo que la práctica de montar a caballo, el ecoturismo y la interacción con animales es una actividad que conlleva riesgos inherentes. Los caballos son animales vivos con instinto de huida que pueden reaccionar de forma impredecible ante sonidos, movimientos u objetos. Declaro a {NOMBRE_COMERCIAL.toUpperCase()} que entiendo los riesgos que suponen este tipo de prácticas.<br/><br/>
             He elegido personalmente asistir a este evento/tour y acepto y asumo completa y voluntariamente todos los riesgos de accidentes, lesiones físicas o daños. Asumo y me haré cargo de mis propios gastos médicos y de emergencia en caso de lesión.<br/><br/>
-            <strong>Indemnización:</strong> Acepto indemnizar y eximir de todo tipo de responsabilidad civil o penal a CABALGATAS MEDELLÍN, sus guías, propietarios y dueños de los predios, de todas las reclamaciones por daños personales o contra mi propiedad durante el recorrido.<br/><br/>
+            <strong>Indemnización:</strong> Acepto indemnizar y eximir de todo tipo de responsabilidad civil o penal a {NOMBRE_COMERCIAL.toUpperCase()}, sus guías, propietarios y dueños de los predios, de todas las reclamaciones por daños personales o contra mi propiedad durante el recorrido.<br/><br/>
             <strong>Condiciones de Salud:</strong> Declaro que gozo de buena salud física y mental para realizar la actividad. Confirmo que no me encuentro bajo los efectos de sustancias alucinógenas o estado de embriaguez extrema que comprometa mi seguridad o la del animal. Acepto seguir en todo momento las instrucciones del guía asignado.<br/><br/>
             <strong>Habeas Data:</strong> Acepto que mi nombre, fotografías o filmaciones realizadas durante el recorrido puedan ser usadas con fines promocionales. De conformidad con la Ley 1581 de 2012, autorizo el tratamiento de mis datos personales.
           </div>
@@ -333,7 +347,7 @@ export default function WaiverPage() {
         <button type="submit" disabled={isSubmitting} className="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 font-black text-xl py-5 rounded-2xl shadow-xl active:scale-95 transition-all flex justify-center items-center gap-3">
           {isSubmitting ? <AlertTriangle className="animate-pulse" /> : 'Guardar y Finalizar Registro'}
         </button>
-        <p className="text-center text-xs text-stone-400 font-bold mt-4">Protegido con encriptación de Firebase.</p>
+        <p className="text-center text-xs text-stone-400 font-bold mt-4">Protegido con encriptación SSL en Servidor Central.</p>
       </form>
     </div>
   );
