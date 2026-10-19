@@ -1,35 +1,29 @@
 "use client";
 import React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Globe } from 'lucide-react';
 
 export default function LanguageSwitcher() {
   const pathname = usePathname();
-  const router = useRouter();
   
-  const isEnglish = pathname.startsWith('/en');
+  // Ocultar en paneles administrativos o registro si existen
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/registro')) {
+    return null;
+  }
 
-  const toggleLanguage = () => {
-    if (isEnglish) {
-      router.push('/'); 
-    } else {
-      router.push('/en'); 
-    }
-  };
+  const isEnglish = pathname?.startsWith('/en');
 
   return (
-    <button 
-      onClick={toggleLanguage}
-      // SOLUCIÓN: bottom-24 en móviles para esquivar el menú, y bottom-8 en PC. z-[100] para que siempre esté arriba.
-      className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-[100] bg-stone-900 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-3 hover:bg-stone-800 transition-all hover:scale-110 border-2 border-stone-700 group animate-in slide-in-from-left"
-    >
-      <Globe className="w-6 h-6 text-amber-500 group-hover:animate-spin" />
-      <span className="font-extrabold text-sm hidden md:block">
-        {isEnglish ? '🇪🇸 Ver en Español (COP)' : '🇺🇸 English (USD)'}
-      </span>
-      <span className="font-extrabold text-sm block md:hidden">
-        {isEnglish ? '🇪🇸 ESP' : '🇺🇸 ENG'}
-      </span>
-    </button>
+    <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
+      <Link
+        href={isEnglish ? '/' : '/en'}
+        aria-label={isEnglish ? 'Cambiar idioma a Español' : 'Switch language to English'}
+        className="flex items-center gap-1.5 bg-white/80 hover:bg-white backdrop-blur-md text-zinc-800 px-3.5 py-2 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-white/60 text-xs font-bold tracking-tight transition-all duration-300 hover:scale-105"
+      >
+        <Globe className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" />
+        <span>{isEnglish ? 'ES 🇨🇴' : 'EN 🇺🇸'}</span>
+      </Link>
+    </div>
   );
 }
