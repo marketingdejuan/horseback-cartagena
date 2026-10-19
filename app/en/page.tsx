@@ -130,13 +130,16 @@ export default function EnglishPage() {
   const esFinDeSemana = fecha ? [6, 0].includes(new Date(fecha + 'T12:00:00').getDay()) : false;
   const esDosPm = hora === '14:00';
   const esGrupal = esFinDeSemana && esDosPm;
-  const precioBase = data?.basePrice || 100000;
+  const precioBase = data?.basePrice ? data.basePrice : 100000;
   const costoGuia = esGrupal ? 0 : (data?.guidePrice ?? 80000);
   const totalCalculado = (jinetes * precioBase) + costoGuia;
   const tipoCabalgataStr = esGrupal ? 'Group Ride (No extra guide fee)' : 'Private Ride (Exclusive guide included)';
-  const whatsappNum = data?.whatsappNumber || "573000000000";
+  const whatsappNum = data?.whatsappNumber ? data.whatsappNumber : "573000000000";
+  const fechaTexto = fecha ? fecha : 'next weekend';
+  const modalidadTexto = esGrupal ? 'Group' : 'Private';
   
-  const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(`Hello, I want to book on ${fecha \vert{}\vert{} 'next weekend'} at${hora}. We are ${jinetes} people. Modality: ${esGrupal ? 'Group' : 'Private'}. Quote: $${totalCalculado.toLocaleString()} COP`)}`;
+  const mensajeCotizador = `Hello, I want to book on ${fechaTexto} at ${hora}. We are ${jinetes} people. Modality: ${modalidadTexto}. Quote: $${totalCalculado.toLocaleString()} COP`;
+  const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(mensajeCotizador)}`;
   const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("Hello! I want information about the horseback riding tours in Medellin. 🐎")}`;
   
   const isValidPhone = telefono.trim().length >= 7;
@@ -152,7 +155,7 @@ export default function EnglishPage() {
         phone: telefono,
         date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
         totalValue: totalCalculado,
-        notes: `🇬🇧 Speaks English (Web EN) | Modality: ${esGrupal ? 'Group' : 'Private'} | ${jinetes} Riders.`,
+        notes: `🇬🇧 Speaks English (Web EN) - Modality: ${modalidadTexto} - ${jinetes} Riders.`,
         brand: MARCA_SITIO,
         funnelStage: 'Nueva'
       };
@@ -173,10 +176,10 @@ export default function EnglishPage() {
     "@type": "FAQPage",
     "mainEntity": data.faqs.map((faq: any) => ({
       "@type": "Question",
-      "name": faq.qEn || faq.q,
+      "name": faq.qEn ? faq.qEn : faq.q,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": faq.aEn || faq.a
+        "text": faq.aEn ? faq.aEn : faq.a
       }
     }))
   } : null;
@@ -213,10 +216,10 @@ export default function EnglishPage() {
 
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-24 md:pb-12 text-center md:text-left">
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tighter drop-shadow-xl">
-            {data.heroTitleEn || "Ecological Horseback Riding"}
+            {data.heroTitleEn ? data.heroTitleEn : "Ecological Horseback Riding"}
           </h1>
           <p className="text-zinc-100 text-xl md:text-2xl font-medium mb-10 tracking-wide drop-shadow-md max-w-2xl">
-            {data.heroSubtitleEn || "Unique mountain experiences in Antioquia, Colombia."}
+            {data.heroSubtitleEn ? data.heroSubtitleEn : "Unique mountain experiences in Antioquia, Colombia."}
           </p>
           <a 
             href={linkGancho} 
@@ -373,17 +376,17 @@ export default function EnglishPage() {
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-zinc-50/50 to-white/50">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">{data.businessName || 'Medellin Horseback Riding'}</h2>
+                  <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">{data.businessName ? data.businessName : 'Medellin Horseback Riding'}</h2>
                   <BadgeCheck className="w-6 h-6 text-blue-500 fill-current" />
                 </div>
-                <p className="text-zinc-600 font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> {data.mapAddressEn || 'Caldas, Antioquia (40 mins from Medellin)'}</p>
+                <p className="text-zinc-600 font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> {data.mapAddressEn ? data.mapAddressEn : 'Caldas, Antioquia (40 mins from Medellin)'}</p>
               </div>
               <div className="flex flex-col items-center md:items-end">
                 <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-zinc-100">
-                   <span className="text-3xl font-extrabold text-zinc-900 tracking-tight">{data.googleRating || '5.0'}</span>
+                   <span className="text-3xl font-extrabold text-zinc-900 tracking-tight">{data.googleRating ? data.googleRating : '5.0'}</span>
                    <div className="flex text-amber-400"><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /></div>
                 </div>
-                <p className="text-sm font-medium text-zinc-500 mt-3">Based on {data.googleReviewCount || '150'}+ reviews</p>
+                <p className="text-sm font-medium text-zinc-500 mt-3">Based on {data.googleReviewCount ? data.googleReviewCount : '150'}+ reviews</p>
               </div>
             </div>
             
@@ -415,7 +418,7 @@ export default function EnglishPage() {
                 <div key={review.id} className="min-w-[300px] bg-white p-7 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 snap-center flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 mb-4">{[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}</div>
-                    <p className="text-zinc-600 italic mb-5 text-sm leading-relaxed tracking-wide">"{review.textEn || review.text}"</p>
+                    <p className="text-zinc-600 italic mb-5 text-sm leading-relaxed tracking-wide">"{review.textEn ? review.textEn : review.text}"</p>
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-5 border-t border-zinc-100">
                     <span className="font-bold text-sm text-zinc-900">{review.author}</span>
@@ -438,8 +441,8 @@ export default function EnglishPage() {
             <div className="space-y-4 max-w-3xl mx-auto">
               {data.faqs.map((faq: any) => (
                 <details key={faq.id} className="group bg-white rounded-2xl border border-zinc-200 cursor-pointer overflow-hidden shadow-sm transition-all hover:border-zinc-300 [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex justify-between items-center font-bold p-6 text-zinc-800 bg-white group-open:bg-zinc-50/50 transition-colors">{faq.qEn || faq.q}</summary>
-                  <div className="text-zinc-600 px-6 pb-6 bg-zinc-50/50 pt-2 border-t border-zinc-100 leading-relaxed">{faq.aEn || faq.a}</div>
+                  <summary className="flex justify-between items-center font-bold p-6 text-zinc-800 bg-white group-open:bg-zinc-50/50 transition-colors">{faq.qEn ? faq.qEn : faq.q}</summary>
+                  <div className="text-zinc-600 px-6 pb-6 bg-zinc-50/50 pt-2 border-t border-zinc-100 leading-relaxed">{faq.aEn ? faq.aEn : faq.a}</div>
                 </details>
               ))}
             </div>
@@ -488,15 +491,15 @@ export default function EnglishPage() {
       </a>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-zinc-200/50 px-2 py-3 pb-safe z-50 grid grid-cols-5 gap-1 text-center md:hidden shadow-[0_-10px_40px_rgba(0,0,0,0.05)] items-center">
-        <a href={data?.navLink1 || '#inicio'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><Home className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel1En || 'Home'}</span></a>
-        <a href={data?.navLink2 || '#cotizador'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><Calendar className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel2En || 'Quote'}</span></a>
+        <a href={data?.navLink1 ? data.navLink1 : '#inicio'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><Home className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel1En ? data.navLabel1En : 'Home'}</span></a>
+        <a href={data?.navLink2 ? data.navLink2 : '#cotizador'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><Calendar className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel2En ? data.navLabel2En : 'Quote'}</span></a>
         <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Nav_Movil_EN')} className="relative -mt-8 flex justify-center">
           <div className="bg-white rounded-full shadow-[0_8px_20px_rgba(34,197,94,0.3)] animate-pulse border-4 border-white flex items-center justify-center p-1">
             <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={48} height={48} />
           </div>
         </a>
-        <a href={data?.navLink3 || '#ubicacion'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><MapPin className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel3En || 'Location'}</span></a>
-        <a href={data?.navLink4 || '#faq'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><Info className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel4En || 'FAQ'}</span></a>
+        <a href={data?.navLink3 ? data.navLink3 : '#ubicacion'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><MapPin className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel3En ? data.navLabel3En : 'Location'}</span></a>
+        <a href={data?.navLink4 ? data.navLink4 : '#faq'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><Info className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel4En ? data.navLabel4En : 'FAQ'}</span></a>
       </nav>
     </div>
   );
