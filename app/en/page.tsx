@@ -146,27 +146,28 @@ export default function EnglishPage() {
 
   const handleReservaWhatsApp = async (e: React.MouseEvent) => {
     e.preventDefault(); 
-    if (!isValidPhone) return;
     trackWhatsAppClick('Boton_Cotizador_EN');
 
-    try {
-      const payload = {
-        clientName: "Lead Web EN 🇺🇸 (Quote)",
-        phone: telefono,
-        date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
-        totalValue: totalCalculado,
-        notes: `🇬🇧 Speaks English (Web EN) - Modality: ${modalidadTexto} - ${jinetes} Riders.`,
-        brand: MARCA_SITIO,
-        funnelStage: 'Nueva'
-      };
+    if (isValidPhone) {
+      try {
+        const payload = {
+          clientName: "Lead Web EN 🇺🇸 (Quote)",
+          phone: telefono,
+          date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
+          totalValue: totalCalculado,
+          notes: `🇬🇧 Speaks English (Web EN) - Modality: ${modalidadTexto} - ${jinetes} Riders.`,
+          brand: MARCA_SITIO,
+          funnelStage: 'Nueva'
+        };
 
-      await fetch('https://admin.cabalgatas.co/api/reservas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-    } catch (error) {
-      console.error("Error saving reservation in ERP:", error);
+        await fetch('https://admin.cabalgatas.co/api/reservas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (error) {
+        console.error("Error saving reservation in ERP:", error);
+      }
     }
     window.open(linkCotizador, '_blank');
   };
@@ -242,7 +243,7 @@ export default function EnglishPage() {
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 flex items-center gap-3 tracking-tight">
               <Calendar className="text-amber-600 w-8 h-8" aria-hidden="true" /> Quote & Book
             </h2>
-            {data.urgencyTextEn && (
+            {data.urgencyTextEn && esFinDeSemana && (
               <div className="bg-amber-50 text-amber-900 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border border-amber-200">
                 <Clock className="w-4 h-4 text-amber-600" aria-hidden="true"/>{data.urgencyTextEn}
               </div>
@@ -283,6 +284,7 @@ export default function EnglishPage() {
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Phone className="h-5 w-5 text-zinc-400" /></div>
                   <input id="telefono-reserva" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ex: +1 234 567 8900" className="w-full pl-12 p-4 border border-zinc-200/50 rounded-2xl bg-white/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all shadow-sm placeholder-zinc-400"/>
                 </div>
+                <p className="text-xs font-medium text-zinc-500 mt-2">Optional, but recommended to speed up your booking.</p>
               </div>
             </div>
             
@@ -297,11 +299,10 @@ export default function EnglishPage() {
               
               <button 
                 onClick={handleReservaWhatsApp} 
-                disabled={!isValidPhone}
-                className={`mt-8 block w-full text-center font-extrabold py-5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ${isValidPhone ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'}`}
+                className="mt-8 block w-full text-center font-extrabold py-5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 bg-green-600 hover:bg-green-700 text-white cursor-pointer"
               >
                 <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} className="w-6 h-6"/> 
-                {isValidPhone ? 'Send via WhatsApp' : 'Enter your number first'}
+                Send via WhatsApp
               </button>
             </div>
           </div>
