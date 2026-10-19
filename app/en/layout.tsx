@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
 
-// MOTOR SEO ESTRATÉGICO - INGLÉS
+const URL_SITIO = 'https://cabalgatamedellin.com';
+
 export const metadata: Metadata = {
-  title: 'Horseback Riding Medellin | Ecological & Private Tours',
-  description: 'Experience the best ecological horseback riding tours near Medellin, Colombia. Book private rides, group tours, and VIP packages with transport included.',
-  keywords: 'horseback riding medellin, medellin horse tours, things to do in medellin, medellin day trips, horseback riding colombia, medellin tours',
+  title: 'Horseback Riding in Medellin | Private & Eco Tours',
+  description: 'Disconnect from the city and enjoy an ecological horseback riding experience in the mountains of Caldas, Antioquia (40 mins from Medellin). Medical insurance included.',
+  keywords: 'horseback riding medellin, horse tours medellin, eco tours antioquia, ride horses colombia, things to do in medellin',
+  alternates: {
+    canonical: `${URL_SITIO}/en`,
+    languages: {
+      'es-CO': URL_SITIO,
+      'en-US': `${URL_SITIO}/en`,
+      'x-default': URL_SITIO,
+    },
+  },
   openGraph: {
-    title: 'Horseback Riding Medellin | Ecological & Private Tours',
-    description: 'Experience the best ecological horseback riding tours near Medellin, Colombia.',
-    url: 'https://cabalgatamedellin.com/en',
-    siteName: 'Horseback Riding Medellin',
+    title: 'Horseback Riding in Medellin | Private & Eco Tours',
+    description: 'The best ecological horseback riding experience near Medellin. Gentle horses, mountain views, and full medical insurance.',
+    url: `${URL_SITIO}/en`,
+    siteName: 'Medellin Horseback Riding',
     locale: 'en_US',
     type: 'website',
   },
