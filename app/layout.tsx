@@ -3,7 +3,6 @@ import Script from "next/script";
 import "./globals.css";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 
-// 🔥 CONFIGURACIÓN DE MARCA E IDs DE SEGUIMIENTO
 const MARCA_SITIO = 'cabalgatamedellin.com';
 const URL_SITIO = 'https://cabalgatamedellin.com';
 const META_PIXEL_ID = '1105267645313250';
@@ -12,21 +11,22 @@ const GOOGLE_ADS_ID = 'AW-10958714047';
 
 export const metadata: Metadata = {
   metadataBase: new URL(URL_SITIO),
-  title: 'Cabalgatas en Medellín | Alquiler de Caballos y Tours',
-  description: 'Las mejores cabalgatas en Medellín. Disfruta de alquiler de caballos, paseos ecológicos y la mejor experiencia de montar caballo cerca a la ciudad.',
-  keywords: 'cabalgatas medellin, alquiler de caballos en medellin, montar caballo en medellin, paseos a caballo medellin, tours ecologicos medellin',
+  title: 'Cabalgata Medellín | Alquiler de Caballos y Tours Ecológicos',
+  description: 'La mejor cabalgata en Medellín y Caldas, Antioquia (a 40 min de El Poblado). Disfruta de paseos ecológicos a caballo, planes privados, grupales y seguro médico incluido.',
+  keywords: 'cabalgata medellin, cabalgata en caldas antioquia, alquiler de caballos en medellin, montar caballo en medellin, paseos a caballo medellin, tours ecologicos medellin',
   alternates: {
     canonical: URL_SITIO,
     languages: {
       'es-CO': URL_SITIO,
       'en-US': `${URL_SITIO}/en`,
+      'x-default': URL_SITIO,
     },
   },
   openGraph: {
-    title: 'Cabalgatas en Medellín | Alquiler de Caballos y Tours',
-    description: 'La mejor experiencia de montar caballo cerca a Medellín. Planes privados, grupales y románticos.',
+    title: 'Cabalgata Medellín | Alquiler de Caballos y Tours Ecológicos',
+    description: 'La mejor experiencia de montar caballo cerca a Medellín. Planes privados, grupales y románticos con seguro incluido.',
     url: URL_SITIO,
-    siteName: 'Cabalgatas Medellín',
+    siteName: 'Cabalgata Medellín',
     locale: 'es_CO',
     type: 'website',
   },
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 async function getBrandSettings() {
   try {
     const res = await fetch(`https://admin.cabalgatas.co/api/ajustes?brandName=${MARCA_SITIO}`, {
-      next: { revalidate: 300 } // Refresca cada 5 minutos
+      next: { revalidate: 300 } 
     });
     if (res.ok) return await res.json();
   } catch (error) {
@@ -49,7 +49,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   
   const businessName = settings?.businessName && settings.businessName !== 'Nombre del Negocio'
     ? settings.businessName
-    : "Cabalgatas Medellín";
+    : "Cabalgata Medellín";
     
   const telephone = settings?.whatsappNumber 
     ? `+${settings.whatsappNumber.replace(/\D/g, '')}` 
@@ -80,11 +80,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       </head>
       <body className="antialiased font-sans">
         
-        {/* ========================================== */}
-        {/* 🚀 CÓDIGOS DE MARKETING DIGITAL (PÍXELES) */}
-        {/* ========================================== */}
-        
-        {/* 1. Píxel de Meta (Facebook/Instagram Ads) */}
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -101,7 +96,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           `}
         </Script>
 
-        {/* 2. Etiqueta Global de Google (Analytics 4 + Google Ads) */}
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`} strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
@@ -113,8 +107,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             gtag('config', '${GOOGLE_ADS_ID}', { 'allow_enhanced_conversions': true });
           `}
         </Script>
-        
-        {/* ========================================== */}
 
         <LanguageSwitcher />
         {children}

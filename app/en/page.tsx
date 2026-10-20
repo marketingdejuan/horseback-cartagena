@@ -10,6 +10,34 @@ import PricingSectionEn from '../../components/PlanesEn';
 
 const MARCA_SITIO = 'cabalgatamedellin.com';
 
+const FAQS_EN = [
+  { 
+    id: 'faq-1', 
+    q: 'How long is the experience and what is the trail like?', 
+    a: 'The horseback ride lasts approximately 2 hours through ecological trails, native forests, and beautiful mountain viewpoints south of the Aburrá Valley. Please allow 2.5 hours in total for the welcome, safety briefing, and horse matching.' 
+  },
+  { 
+    id: 'faq-2', 
+    q: 'Are there any weight or age limits for riders?', 
+    a: 'Yes. For the welfare and health of our horses (our top priority), the maximum weight limit is 110 kg (240 lbs). We welcome children starting from 3 years old, who must be accompanied by an adult. No prior riding experience is required!' 
+  },
+  { 
+    id: 'faq-3', 
+    q: 'What happens if it rains on the day of my booking?', 
+    a: 'Since this is an outdoor nature adventure, we operate normally in light rain (we will provide plastic ponchos). However, in the event of thunderstorms or severe weather that compromises safety, we will gladly reschedule your booking at no extra cost.' 
+  },
+  { 
+    id: 'faq-4', 
+    q: 'Do I need previous horseback riding experience?', 
+    a: 'No prior experience is needed. Our horses are gentle and trained for ecological tourism, and before heading out you will receive a practical briefing from our guides.' 
+  },
+  { 
+    id: 'faq-5', 
+    q: 'How far is the ranch from Medellin?', 
+    a: 'We are located in Caldas (South of the Aburrá Valley), approximately 35 to 45 minutes by car or Uber from El Poblado and Laureles.' 
+  }
+];
+
 const DATOS_BASE_EN = {
   businessName: 'Medellin Horseback Riding',
   whatsappNumber: '573000000000',
@@ -41,28 +69,6 @@ const DATOS_BASE_EN = {
       author: 'Family Traveler',
       rating: 5,
       textEn: 'It was our first time riding horses and we felt safe from the very first minute. 100% recommended!'
-    }
-  ],
-  faqs: [
-    {
-      id: 'faq-1',
-      qEn: 'Do I need previous horseback riding experience?',
-      aEn: 'No prior experience is needed. Our horses are gentle and trained for ecological tourism, and before heading out you will receive a practical briefing from our guides.'
-    },
-    {
-      id: 'faq-2',
-      qEn: 'What should I wear for the tour?',
-      aEn: 'Long pants (jeans or comfortable pants covering your legs) and closed-toe shoes (sneakers or boots) are mandatory. We also recommend sunscreen and a hat.'
-    },
-    {
-      id: 'faq-3',
-      qEn: 'What is the difference between a group ride and a private ride?',
-      aEn: 'Group rides take place on Saturdays and Sundays at 2:00 PM with no extra guide fee. At any other time or weekday, the tour is 100% private and exclusive for your group.'
-    },
-    {
-      id: 'faq-4',
-      qEn: 'How far is the ranch from Medellin?',
-      aEn: 'We are located in Caldas (South of the Aburrá Valley), approximately 35 to 45 minutes by car or Uber from El Poblado and Laureles.'
     }
   ],
   gallery: []
@@ -172,28 +178,23 @@ export default function EnglishPage() {
     window.open(linkCotizador, '_blank');
   };
 
-  const faqSchema = data?.faqs?.length > 0 ? {
+  const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": data.faqs.map((faq: any) => ({
+    "mainEntity": FAQS_EN.map((faq: any) => ({
       "@type": "Question",
-      "name": faq.qEn ? faq.qEn : faq.q,
+      "name": faq.q,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": faq.aEn ? faq.aEn : faq.a
+        "text": faq.a
       }
     }))
-  } : null;
+  };
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] font-sans selection:bg-amber-200 text-zinc-900">
       
-      {faqSchema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-        />
-      )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <section id="inicio" className="relative h-[85vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center">
         <div 
@@ -377,7 +378,7 @@ export default function EnglishPage() {
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-zinc-50/50 to-white/50">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">{data.businessName ? data.businessName : 'Medellin Horseback Riding'}</h2>
+                  <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">Medellin Horseback Riding</h2>
                   <BadgeCheck className="w-6 h-6 text-blue-500 fill-current" />
                 </div>
                 <p className="text-zinc-600 font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> {data.mapAddressEn ? data.mapAddressEn : 'Caldas, Antioquia (40 mins from Medellin)'}</p>
@@ -436,25 +437,23 @@ export default function EnglishPage() {
           </section>
         )}
 
-        {data.faqs && data.faqs.length > 0 && (
-          <section id="faq" className="pb-16 scroll-mt-20">
-            <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Frequently Asked Questions</h2>
-            <div className="space-y-4 max-w-3xl mx-auto">
-              {data.faqs.map((faq: any) => (
-                <details key={faq.id} className="group bg-white rounded-2xl border border-zinc-200 cursor-pointer overflow-hidden shadow-sm transition-all hover:border-zinc-300 [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex justify-between items-center font-bold p-6 text-zinc-800 bg-white group-open:bg-zinc-50/50 transition-colors">{faq.qEn ? faq.qEn : faq.q}</summary>
-                  <div className="text-zinc-600 px-6 pb-6 bg-zinc-50/50 pt-2 border-t border-zinc-100 leading-relaxed">{faq.aEn ? faq.aEn : faq.a}</div>
-                </details>
-              ))}
-            </div>
-            <div className="text-center mt-12">
-              <p className="text-zinc-500 mb-5 font-medium tracking-wide">Still have questions?</p>
-              <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ_EN')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
-                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} className="w-5 h-5"/> Talk to an advisor now
-              </a>
-            </div>
-          </section>
-        )}
+        <section id="faq" className="pb-16 scroll-mt-20">
+          <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Frequently Asked Questions</h2>
+          <div className="space-y-4 max-w-3xl mx-auto">
+            {FAQS_EN.map((faq: any) => (
+              <details key={faq.id} className="group bg-white rounded-2xl border border-zinc-200 cursor-pointer overflow-hidden shadow-sm transition-all hover:border-zinc-300 [&_summary::-webkit-details-marker]:hidden">
+                <summary className="flex justify-between items-center font-bold p-6 text-zinc-800 bg-white group-open:bg-zinc-50/50 transition-colors">{faq.q}</summary>
+                <div className="text-zinc-600 px-6 pb-6 bg-zinc-50/50 pt-2 border-t border-zinc-100 leading-relaxed">{faq.a}</div>
+              </details>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <p className="text-zinc-500 mb-5 font-medium tracking-wide">Still have questions?</p>
+            <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ_EN')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+              <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} className="w-5 h-5"/> Talk to an advisor now
+            </a>
+          </div>
+        </section>
       </main>
 
       <footer className="bg-zinc-950 text-zinc-400 py-16 text-center relative z-20 mt-12 border-t border-zinc-800">
@@ -496,7 +495,7 @@ export default function EnglishPage() {
         <a href={data?.navLink2 ? data.navLink2 : '#cotizador'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><Calendar className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel2En ? data.navLabel2En : 'Quote'}</span></a>
         <a href={linkGancho} target="_blank" rel="noreferrer" onClick={() => trackWhatsAppClick('Boton_Nav_Movil_EN')} className="relative -mt-8 flex justify-center">
           <div className="bg-white rounded-full shadow-[0_8px_20px_rgba(34,197,94,0.3)] animate-pulse border-4 border-white flex items-center justify-center p-1">
-            <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={48} height={48} />
+            <Image src="/logo-whatsapp.webp" alt="WhatsApp Móvil" width={48} height={48} />
           </div>
         </a>
         <a href={data?.navLink3 ? data.navLink3 : '#ubicacion'} className="flex flex-col items-center text-zinc-500 hover:text-amber-600 transition-colors"><MapPin className="w-5 h-5 mb-1" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel3En ? data.navLabel3En : 'Location'}</span></a>

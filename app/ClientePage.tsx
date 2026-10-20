@@ -3,12 +3,40 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { 
   Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, 
-  Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone,
+  Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone, 
   Coffee, Compass, CheckCircle2, Shield, Heart, Sun
 } from 'lucide-react';
 import PricingSection from '../components/Planes';
 
 const MARCA_SITIO = 'cabalgatamedellin.com';
+
+const FAQS_ES = [
+  { 
+    id: 'faq-1', 
+    q: '¿Cuánto dura la experiencia y por dónde pasa la ruta?', 
+    a: 'El recorrido a caballo dura aproximadamente 2 horas a través de senderos ecológicos, bosques nativos y miradores en las montañas del sur del Valle de Aburrá. Te recomendamos disponer de unas 2.5 horas en total para incluir la bienvenida, la inducción de seguridad y la asignación de tu caballo ideal.' 
+  },
+  { 
+    id: 'faq-2', 
+    q: '¿Tienen límite de peso o edad mínima para los jinetes?', 
+    a: 'Sí. Por el bienestar y la salud de nuestros caballos (nuestra prioridad), el peso máximo permitido es de 110 kg. Recibimos niños a partir de los 3 años, quienes deben ir acompañados de un adulto. No se requiere experiencia previa.' 
+  },
+  { 
+    id: 'faq-3', 
+    q: '¿Qué pasa si llueve el día de mi reserva?', 
+    a: 'Al ser una aventura en la naturaleza, operamos con normalidad bajo lluvia ligera (te proporcionaremos ponchos plásticos). Sin embargo, en caso de tormenta eléctrica o clima severo que comprometa la seguridad, reprogramaremos tu reserva sin ningún costo adicional.' 
+  },
+  { 
+    id: 'faq-4', 
+    q: '¿Necesito experiencia previa montando a caballo?', 
+    a: 'No necesitas experiencia previa. Nuestros caballos son mansos y entrenados para el turismo ecológico, y antes de salir recibirás una inducción práctica por parte de nuestros guías.' 
+  },
+  { 
+    id: 'faq-5', 
+    q: '¿A cuánto tiempo están de Medellín y cómo llegar?', 
+    a: 'Estamos ubicados en Caldas (Sur del Valle de Aburrá), a unos 35 a 45 minutos en carro particular, taxi o aplicaciones de transporte desde sectores como El Poblado y Laureles.' 
+  }
+];
 
 export default function ClientePage({ initialData }: { initialData: any }) {
   
@@ -20,7 +48,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
 
-  // 🔥 SINCRONIZACIÓN AUTOMÁTICA DE PRECIOS, WHATSAPP Y BLOG DESDE EL SÚPER ERP
   useEffect(() => {
     const sincronizarConERP = async () => {
       try {
@@ -102,7 +129,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   
   const isValidPhone = telefono.trim().length >= 7;
 
-  // 🔥 ENVÍO AL CRM KANBAN SI PONE TELÉFONO, Y APERTURA DIRECTA DE WHATSAPP SIEMPRE
   const handleReservaWhatsApp = async (e: React.MouseEvent) => {
     e.preventDefault(); 
     trackWhatsAppClick('Boton_Cotizador');
@@ -132,6 +158,40 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     window.open(linkCotizador, '_blank');
   };
 
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "TouristAttraction",
+    "name": "Cabalgata Medellín",
+    "description": data?.heroSubtitle ? data.heroSubtitle : "Experiencias únicas a caballo en los paisajes de Antioquia.",
+    "url": "https://cabalgatamedellin.com",
+    "image": "https://cabalgatamedellin.com/cabalgatas-en-medellin-y-caldas.webp",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Caldas",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "COP",
+      "price": precioBase.toString(),
+      "availability": "https://schema.org/InStock"
+    }
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS_ES.map((faq: any) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  };
+
   if (!data) {
     return (
       <div className="min-h-screen bg-zinc-900 font-sans selection:bg-amber-200">
@@ -144,8 +204,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] font-sans selection:bg-amber-200 text-zinc-900">
-      
-      {/* HEADER DIFUMINADO ESTILO APPLE */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+
       <section id="inicio" className="relative h-[85vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center">
         <div 
           className="absolute inset-0 w-full h-full"
@@ -168,7 +229,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-24 md:pb-12 text-center md:text-left">
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tighter drop-shadow-xl">
-            {data.heroTitle ? data.heroTitle : "Cabalgatas Ecológicas"}
+            {data.heroTitle ? data.heroTitle : "Cabalgata Ecológica"}
           </h1>
           <p className="text-zinc-100 text-xl md:text-2xl font-medium mb-10 tracking-wide drop-shadow-md max-w-2xl">
             {data.heroSubtitle ? data.heroSubtitle : "Experiencias únicas en Antioquia."}
@@ -190,7 +251,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
       <main className="max-w-4xl mx-auto px-4 mt-[-60px] md:mt-[-120px] relative z-20 space-y-16">
         
-        {/* COTIZADOR SIN FRICCIÓN */}
         <section id="cotizador" className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-10 border border-white scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4 border-b border-zinc-200/50 pb-6">
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 flex items-center gap-3 tracking-tight">
@@ -239,7 +299,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   </div>
                   <input id="telefono-reserva" aria-label="Ingresar número de WhatsApp" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej: 300 123 4567" className="w-full pl-12 p-4 border border-zinc-200/50 rounded-2xl bg-white/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all shadow-sm placeholder-zinc-400"/>
                 </div>
-                <p className="text-xs font-medium text-zinc-500 mt-2">Recomendado para enviarte la cotización detallada.</p>
+                <p className="text-xs font-medium text-zinc-500 mt-2">Opcional, pero recomendado para agilizar tu reserva.</p>
               </div>
             </div>
             
@@ -275,7 +335,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </div>
         </section>
 
-        {/* SECCIÓN: LA EXPERIENCIA Y PREPARACIÓN */}
         <section className="grid md:grid-cols-2 gap-6 scroll-mt-20">
           <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
             <h3 className="text-2xl font-extrabold text-zinc-900 mb-6 tracking-tight flex items-center gap-2">
@@ -345,11 +404,11 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-zinc-50/50 to-white/50">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">{data.businessName ? data.businessName : 'Cabalgatas Medellín'}</h2>
+                  <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">Cabalgata Medellín</h2>
                   <BadgeCheck className="w-6 h-6 text-blue-500 fill-current" aria-hidden="true" />
                 </div>
                 <p className="text-zinc-600 font-medium flex items-center gap-2">
-                  <MapPin className="w-4 h-4" aria-hidden="true"/> {data.mapAddress ? data.mapAddress : 'Caldas, Antioquia'}
+                  <MapPin className="w-4 h-4" aria-hidden="true"/> {data.mapAddress ? data.mapAddress : 'Caldas, Antioquia (A 40 min de Medellín)'}
                 </p>
               </div>
               <div className="flex flex-col items-center md:items-end">
@@ -479,26 +538,24 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </section>
         )}
 
-        {data.faqs && data.faqs.length > 0 && (
-          <section id="faq" className="pb-16 scroll-mt-20">
-            <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Preguntas Frecuentes</h2>
-            <div className="space-y-4 max-w-3xl mx-auto">
-              {data.faqs.map((faq: any) => (
-                <details key={faq.id} className="group bg-white rounded-2xl border border-zinc-200 cursor-pointer overflow-hidden shadow-sm transition-all hover:border-zinc-300 [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex justify-between items-center font-bold p-6 text-zinc-800 bg-white group-open:bg-zinc-50/50 transition-colors">{faq.q}</summary>
-                  <div className="text-zinc-600 px-6 pb-6 bg-zinc-50/50 pt-2 border-t border-zinc-100 leading-relaxed">{faq.a}</div>
-                </details>
-              ))}
-            </div>
-            <div className="text-center mt-12">
-              <p className="text-zinc-500 mb-5 font-medium tracking-wide">¿Aún tienes dudas?</p>
-              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Hablar con un asesor por WhatsApp para resolver dudas" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
-                <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
-                Habla con un asesor ahora
-              </a>
-            </div>
-          </section>
-        )}
+        <section id="faq" className="pb-16 scroll-mt-20">
+          <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Preguntas Frecuentes</h2>
+          <div className="space-y-4 max-w-3xl mx-auto">
+            {FAQS_ES.map((faq: any) => (
+              <details key={faq.id} className="group bg-white rounded-2xl border border-zinc-200 cursor-pointer overflow-hidden shadow-sm transition-all hover:border-zinc-300 [&_summary::-webkit-details-marker]:hidden">
+                <summary className="flex justify-between items-center font-bold p-6 text-zinc-800 bg-white group-open:bg-zinc-50/50 transition-colors">{faq.q}</summary>
+                <div className="text-zinc-600 px-6 pb-6 bg-zinc-50/50 pt-2 border-t border-zinc-100 leading-relaxed">{faq.a}</div>
+              </details>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <p className="text-zinc-500 mb-5 font-medium tracking-wide">¿Aún tienes dudas?</p>
+            <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Hablar con un asesor por WhatsApp para resolver dudas" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+              <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
+              Habla con un asesor ahora
+            </a>
+          </div>
+        </section>
       </main>
 
       <footer className="bg-zinc-950 text-zinc-400 py-16 text-center relative z-20 mt-12 border-t border-zinc-800">
@@ -509,7 +566,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               href="https://www.instagram.com/cabalgataseco" 
               target="_blank" 
               rel="noreferrer" 
-              aria-label="Instagram de Cabalgatas Medellín" 
+              aria-label="Instagram de Cabalgata Medellín" 
               className="bg-zinc-900 p-4 rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300 hover:scale-110 flex items-center justify-center border border-zinc-800 hover:border-pink-500"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
@@ -519,13 +576,13 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               href="https://web.facebook.com/Cabalgatasmedellin" 
               target="_blank" 
               rel="noreferrer" 
-              aria-label="Facebook de Cabalgatas Medellín" 
+              aria-label="Facebook de Cabalgata Medellín" 
               className="bg-zinc-900 p-4 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 hover:scale-110 flex items-center justify-center border border-zinc-800 hover:border-blue-500"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
           </div>
-          <p className="text-sm font-medium tracking-wide text-zinc-500">© {new Date().getFullYear()} Cabalgatas Medellín. Todos los derechos reservados.</p>
+          <p className="text-sm font-medium tracking-wide text-zinc-500">© {new Date().getFullYear()} Cabalgata Medellín. Todos los derechos reservados.</p>
         </div>
       </footer>
 
