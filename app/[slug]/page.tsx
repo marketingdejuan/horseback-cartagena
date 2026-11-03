@@ -4,8 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { 
-  Calendar, ShieldCheck, Star, Clock, MapPin, BadgeCheck, 
-  CheckCircle2, Shield, Compass, ArrowRight, Home, ChevronRight 
+  Calendar, BadgeCheck, CheckCircle2, Compass, ArrowRight, Home, ChevronRight 
 } from 'lucide-react';
 
 const URL_SITIO = 'https://cabalgatamedellin.com';
@@ -208,7 +207,7 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     whatsappMsg: '¡Hola! Quiero información para hacer una cabalgata familiar con niños. 👨‍👩‍👧‍👦🐎',
     introH2: 'Seguridad extrema para niños, abuelos y principiantes',
     parrafos: [
-      'Sabemos que cuando buscas una cabalgata familiar en Medellín, tu prioridad número uno es la tranquilidad y seguridad de tus hijos. En Cabalgata Medellín no alquilamos caballos brioso ni de fiesta: nuestra manada está entrenada específicamente para el turismo ecológico y familiar.',
+      'Sabemos que cuando buscas una cabalgata familiar en Medellín, tu prioridad número uno es la tranquilidad y seguridad de tus hijos. En Cabalgata Medellín no alquilamos caballos briosos ni de fiesta: nuestra manada está entrenada específicamente para el turismo ecológico y familiar.',
       'Recibimos niños a partir de los 3 años de edad (acompañados por un adulto). Antes de iniciar la ruta, nuestros guías evalúan la edad y confianza de cada niño e integrante de la familia para asignarle el caballo perfecto por mansedumbre y tamaño.',
       'Además, todas nuestras salidas cuentan con cobertura de asistencia médica a través de Magenta Seguros, y en los planes grupales de más de 6 personas con almuerzo te obsequiamos la decoración si están celebrando un cumpleaños familiar.'
     ],
@@ -440,10 +439,92 @@ export const PAGINAS_SEO: PaginaSEO[] = [
         a: 'Yes! On weekdays we often have same-day or next-day availability for private rides at 10:00 AM, 2:00 PM, or 4:00 PM. Just message us on WhatsApp to confirm your spot.'
       }
     ]
+  },
+  {
+    slug: 'reservar',
+    enlaceCorto: 'Reservar Cabalgata en Línea',
+    metaTitle: 'Reservar Cabalgata en Medellín y Caldas | Confirmación por WhatsApp',
+    metaDescription: 'Reserva tu cabalgata ecológica o tour de cuatrimotos en Medellín y Caldas (a 30 min de El Poblado). Horarios 10:00 AM, 2:00 PM y 4:00 PM desde $100.000 COP.',
+    badge: '📅 Reserva Rápida — Cupos Diarios 10 AM, 2 PM y 4 PM',
+    h1: 'Reservar Cabalgata en Medellín y Caldas, Antioquia',
+    subtitle: 'Asegura tus cupos en menos de 2 minutos para cabalgatas privadas, grupales de fin de semana, planes románticos o tours en cuatrimoto.',
+    precioTexto: 'Desde $100.000 COP / persona',
+    precioNumero: '100000',
+    whatsappMsg: '¡Hola! Quiero hacer una reserva de cabalgata en Medellín / Caldas. 📅🐎',
+    introH2: '¿Cómo funciona el proceso de reserva en Cabalgata Medellín?',
+    parrafos: [
+      'Reservar tu experiencia a caballo en la Vereda Salinas de Caldas (a solo 30 minutos de El Poblado y Laureles sin peajes) es totalmente rápido y seguro. Solo debes elegir la fecha, el horario (10:00 AM, 2:00 PM o 4:00 PM) y el número de jinetes.',
+      'Recuerda que los sábados y domingos a las 2:00 PM contamos con modalidad de Cabalgata Grupal ($100.000 COP por persona, sin costo extra de guía). En cualquier otro día u horario disfrutarás de una Cabalgata 100% Privada para tu grupo adicionando únicamente $80.000 COP por el guía exclusivo.',
+      'Todas las reservas incluyen inducción práctica para principiantes, caballo asignado según tu nivel y póliza de asistencia médica individual con Magenta Seguros.'
+    ],
+    incluye: [
+      'Reserva garantizada de caballos criollos mansos para la fecha y hora elegida.',
+      'Póliza de asistencia médica activa con Magenta Seguros.',
+      'Envío inmediato del pin exacto de ubicación en Google Maps / Waze.',
+      'Opción de adicionar almuerzo ($30.000 COP) o Transporte VIP ($130.000 COP).',
+      'Reprogramación sin costo en caso de tormenta eléctrica o clima severo.'
+    ],
+    detallesH2: 'Políticas de reserva, niños y bienestar animal',
+    detallesTexto: 'Recibimos niños desde los 3 años de edad acompañados de un adulto. Por bienestar de nuestros caballos, el peso máximo permitido es de 110 kg por jinete.',
+    faqs: [
+      {
+        q: '¿Con cuánto dinero se separa la reserva?',
+        a: 'Escríbenos por WhatsApp o usa nuestro cotizador en línea para verificar disponibilidad inmediata en tu fecha y coordinar el abono de confirmación.'
+      },
+      {
+        q: '¿Puedo reservar para hoy mismo o para mañana?',
+        a: 'Sí, de lunes a viernes solemos tener disponibilidad el mismo día, y los fines de semana recomendamos reservar con al menos 24 a 48 horas de anticipación.'
+      },
+      {
+        q: '¿Qué pasa si llueve el día de mi reserva?',
+        a: 'En lluvia suave entregamos ponchos impermeables gratuitos. Si hay tormenta fuerte antes de iniciar, puedes reprogramar tu fecha sin ninguna penalidad.'
+      }
+    ]
+  },
+  {
+    slug: 'consultar',
+    enlaceCorto: 'Consultar Disponibilidad y Dudas',
+    metaTitle: 'Consultar Disponibilidad, Precios y Horarios | Cabalgata Medellín',
+    metaDescription: 'Consulta disponibilidad en tiempo real, tarifas de grupos, requisitos de peso/edad y transporte para tu cabalgata en Medellín y Caldas, Antioquia.',
+    badge: '💬 Atención Inmediata y Cotizaciones Personalizadas',
+    h1: 'Consultar Disponibilidad y Tarifas de Cabalgatas en Medellín',
+    subtitle: 'Resuelve todas tus dudas sobre horarios, transporte desde El Poblado o Laureles, planes para niños, grupos empresariales y celebraciones especiales.',
+    precioTexto: 'Planes desde $100.000 COP / persona',
+    precioNumero: '100000',
+    whatsappMsg: '¡Hola! Quiero consultar disponibilidad y precios para una cabalgata. 💬🐎',
+    introH2: 'Información clave antes de tu visita a la Vereda Salinas, Caldas',
+    parrafos: [
+      'En esta página reunimos toda la información operativa que necesitas consultar antes de vivir nuestra cabalgata ecológica de 2 horas en el Sur del Valle de Aburrá. Estamos ubicados en la Vereda Salinas de Caldas, Antioquia, a tan solo 30 minutos de El Poblado, Envigado, Sabaneta y Laureles.',
+      'Si viajas en vehículo particular, taxi o Uber, llegarás por vía pavimentada sin pagar un solo peaje. Si prefieres que nos encarguemos de todo, puedes consultar por nuestro Plan Aventura VIP que incluye transporte privado ida y vuelta desde tu hotel o Airbnb.',
+      'También atendemos consultas para eventos corporativos, despedidas y cumpleaños, donde los grupos de más de 6 personas que toman el Plan Celebración reciben la decoración festiva completamente gratis.'
+    ],
+    incluye: [
+      'Asesoría personalizada en español e inglés vía WhatsApp.',
+      'Cotización transparente sin cobros ocultos para parejas, familias o empresas.',
+      'Información detallada de rutas a caballo (2 horas) y cuatrimotos (1.5 horas).',
+      'Cobertura médica con Magenta Seguros en todos los planes.',
+      'Parqueadero privado gratuito en nuestra finca de Caldas.'
+    ],
+    detallesH2: 'Resumen rápido de requisitos operativos',
+    detallesTexto: 'Edad mínima: 3 años. Peso máximo: 110 kg. Vestuario obligatorio: pantalón largo y zapatos cerrados. Horarios diarios: 10:00 AM, 2:00 PM y 4:00 PM.',
+    faqs: [
+      {
+        q: '¿Cómo consulto si hay cupo para este fin de semana?',
+        a: 'Haz clic en el botón verde de WhatsApp en esta página indicando cuántos jinetes son y si prefieres el horario de las 10:00 AM, 2:00 PM o 4:00 PM.'
+      },
+      {
+        q: '¿Tienen guías que hablen inglés para turistas extranjeros?',
+        a: 'Sí, atendemos turistas extranjeros todos los días y contamos con información completa en inglés en nuestra sección Horseback Riding Medellin.'
+      },
+      {
+        q: '¿Se puede ir sin saber montar a caballo?',
+        a: 'Sí, el 100% de nuestras rutas incluyen inducción previa y caballos mansos aptos para personas sin ninguna experiencia.'
+      }
+    ]
   }
 ];
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   return PAGINAS_SEO.map((pagina) => ({
@@ -453,7 +534,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: any }): Promise<Metadata> {
   const resolvedParams = await Promise.resolve(params);
-  const pagina = PAGINAS_SEO.find((p) => p.slug === resolvedParams.slug);
+  const rawSlug = decodeURIComponent(resolvedParams?.slug || '').trim().toLowerCase();
+  const pagina = PAGINAS_SEO.find((p) => p.slug === rawSlug);
 
   if (!pagina) {
     return { title: 'Página no encontrada | Cabalgata Medellín' };
@@ -480,7 +562,8 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
 
 export default async function SEOLandingPage({ params }: { params: any }) {
   const resolvedParams = await Promise.resolve(params);
-  const pagina = PAGINAS_SEO.find((p) => p.slug === resolvedParams.slug);
+  const rawSlug = decodeURIComponent(resolvedParams?.slug || '').trim().toLowerCase();
+  const pagina = PAGINAS_SEO.find((p) => p.slug === rawSlug);
 
   if (!pagina) {
     notFound();
@@ -563,7 +646,6 @@ export default async function SEOLandingPage({ params }: { params: any }) {
     <div className="min-h-screen bg-[#fbfbfd] font-sans selection:bg-amber-200 text-zinc-900">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaGraph) }} />
 
-      {/* HERO DE LA LANDING SEO */}
       <section className="relative min-h-[75vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center pt-16 pb-20">
         <div 
           className="absolute inset-0 w-full h-full"
@@ -577,15 +659,15 @@ export default async function SEOLandingPage({ params }: { params: any }) {
             alt={pagina.h1} 
             fill 
             priority={true}
-            quality={75} 
+            fetchPriority="high"
+            quality={65} 
             className="absolute inset-0 w-full h-full object-cover" 
-            sizes="(max-width: 768px) 768px, 1200px" 
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 900px, 1200px" 
           />
           <div className="absolute inset-0 bg-black/55"></div>
         </div>
 
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6">
-          {/* MIGAS DE PAN (BREADCRUMBS PARA INTERLINKING) */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs md:text-sm font-bold text-zinc-300 mb-6">
             <Link href="/" className="hover:text-amber-400 flex items-center gap-1 transition-colors">
               <Home className="w-4 h-4" /> Inicio
@@ -594,7 +676,7 @@ export default async function SEOLandingPage({ params }: { params: any }) {
             <span className="text-amber-400 truncate">{pagina.enlaceCorto}</span>
           </nav>
 
-          <span className="inline-block bg-amber-500/20 backdrop-blur-md border border-amber-400/30 text-amber-200 text-xs md:text-sm font-bold px-4 py-1.5 rounded-full mb-4">
+          <span className="inline-block bg-amber-500/20 border border-amber-400/30 text-amber-200 text-xs md:text-sm font-bold px-4 py-1.5 rounded-full mb-4">
             {pagina.badge}
           </span>
 
@@ -618,7 +700,7 @@ export default async function SEOLandingPage({ params }: { params: any }) {
             </a>
             <Link 
               href="/#cotizador" 
-              className="inline-flex items-center justify-center gap-2 bg-white/90 hover:bg-white text-zinc-900 font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-900 font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
             >
               <Calendar className="w-5 h-5 text-amber-600" /> Ir al Cotizador en Línea
             </Link>
@@ -626,10 +708,9 @@ export default async function SEOLandingPage({ params }: { params: any }) {
         </div>
       </section>
 
-      {/* CONTENIDO PROFUNDO SEO */}
       <main className="max-w-4xl mx-auto px-4 mt-[-40px] relative z-20 space-y-12">
         
-        <article className="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-12 border border-white">
+        <article className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-12 border border-zinc-100">
           <div className="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-zinc-100">
             <div className="flex items-center gap-2">
               <BadgeCheck className="w-6 h-6 text-blue-500" />
@@ -671,7 +752,6 @@ export default async function SEOLandingPage({ params }: { params: any }) {
             {pagina.detallesTexto}
           </p>
 
-          {/* TABLA COMPARATIVA SEO LOCAL */}
           <div className="overflow-x-auto rounded-2xl border border-zinc-200 mb-8">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
@@ -723,8 +803,7 @@ export default async function SEOLandingPage({ params }: { params: any }) {
           </div>
         </article>
 
-        {/* PREGUNTAS FRECUENTES ESPECÍFICAS DE LA LANDING */}
-        <section className="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-12 border border-white">
+        <section className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-12 border border-zinc-100">
           <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 mb-8 tracking-tight">
             Preguntas Frecuentes: {pagina.enlaceCorto}
           </h2>
@@ -742,8 +821,7 @@ export default async function SEOLandingPage({ params }: { params: any }) {
           </div>
         </section>
 
-        {/* CLUSTER DE INTERLINKING (ENLACES INTERNOS ENTRE LAS 10 PÁGINAS) */}
-        <section className="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-12 border border-white">
+        <section className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-12 border border-zinc-100">
           <h2 className="text-2xl font-extrabold text-zinc-900 mb-3 tracking-tight flex items-center gap-2">
             <Compass className="w-6 h-6 text-amber-600" /> Explora Más Rutas y Planes en Medellín
           </h2>
@@ -753,16 +831,23 @@ export default async function SEOLandingPage({ params }: { params: any }) {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3.5">
             <Link 
               href="/" 
-              className="p-4 rounded-2xl border border-zinc-200 hover:border-amber-500 hover:bg-amber-50/30 transition-all flex items-center justify-between group"
+              className="p-4 rounded-2xl border border-zinc-200 hover:border-amber-500 hover:bg-amber-50/30 transition-colors flex items-center justify-between group"
             >
               <span className="font-bold text-sm text-zinc-800 group-hover:text-amber-700">Portada Principal y Cotizador</span>
+              <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-600" />
+            </Link>
+            <Link 
+              href="/blog" 
+              className="p-4 rounded-2xl border border-zinc-200 hover:border-amber-500 hover:bg-amber-50/30 transition-colors flex items-center justify-between group"
+            >
+              <span className="font-bold text-sm text-zinc-800 group-hover:text-amber-700">Guías y Blog de Cabalgatas</span>
               <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-600" />
             </Link>
             {PAGINAS_SEO.filter((p) => p.slug !== pagina.slug).map((otraPagina) => (
               <Link 
                 key={otraPagina.slug} 
                 href={`/${otraPagina.slug}`}
-                className="p-4 rounded-2xl border border-zinc-200 hover:border-amber-500 hover:bg-amber-50/30 transition-all flex items-center justify-between group"
+                className="p-4 rounded-2xl border border-zinc-200 hover:border-amber-500 hover:bg-amber-50/30 transition-colors flex items-center justify-between group"
               >
                 <span className="font-bold text-sm text-zinc-800 group-hover:text-amber-700">{otraPagina.enlaceCorto}</span>
                 <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-600 shrink-0 ml-2" />
@@ -772,7 +857,6 @@ export default async function SEOLandingPage({ params }: { params: any }) {
         </section>
       </main>
 
-      {/* FOOTER CON NAP COMPLETO */}
       <footer className="bg-zinc-950 text-zinc-400 py-14 mt-16 border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">

@@ -16,17 +16,6 @@ const nextConfig: NextConfig = {
         destination: '/',
         permanent: true,
       },
-      {
-        source: '/blog',
-        has: [
-          {
-            type: 'query',
-            key: 'tag',
-          },
-        ],
-        destination: '/blog',
-        permanent: true,
-      },
     ];
   },
 };
