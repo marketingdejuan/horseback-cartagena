@@ -3,7 +3,6 @@ import Script from "next/script";
 import "./globals.css";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 
-const MARCA_SITIO = 'cabalgatamedellin.com';
 const URL_SITIO = 'https://cabalgatamedellin.com';
 const META_PIXEL_ID = '1105267645313250';
 const GA4_ID = 'G-12762T7ZP0';
@@ -32,38 +31,16 @@ export const metadata: Metadata = {
   },
 };
 
-async function getBrandSettings() {
-  try {
-    const res = await fetch(`https://admin.cabalgatas.co/api/ajustes?brandName=${MARCA_SITIO}`, {
-      next: { revalidate: 300 } 
-    });
-    if (res.ok) return await res.json();
-  } catch (error) {
-    console.error("Error leyendo ajustes en layout:", error);
-  }
-  return null;
-}
-
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
-  const settings = await getBrandSettings();
-  
-  const businessName = settings?.businessName && settings.businessName !== 'Nombre del Negocio'
-    ? settings.businessName
-    : "Cabalgata Medellín";
-    
-  const telephone = settings?.whatsappNumber 
-    ? `+${settings.whatsappNumber.replace(/\D/g, '')}` 
-    : "+573000000000";
-
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   const jsonLdGraph = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": ["LocalBusiness", "TouristAttraction"],
         "@id": "https://cabalgatamedellin.com/#business",
-        "name": businessName,
+        "name": "Cabalgata Medellín",
         "url": "https://cabalgatamedellin.com/",
-        "telephone": telephone,
+        "telephone": "+573000000000",
         "description": "Cabalgatas ecológicas y tours en cuatrimoto en Caldas, Antioquia, a 30 minutos de Medellín. Caballos dóciles, guías expertos y póliza médica con Magenta Seguros.",
         "address": {
           "@type": "PostalAddress",
@@ -160,7 +137,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       </head>
       <body className="antialiased font-sans">
         
-        <Script id="meta-pixel" strategy="afterInteractive">
+        {/* 🔥 SCRIPTS EN LAZYONLOAD PARA MEJORAR LCP E INP EN MÓVILES */}
+        <Script id="meta-pixel" strategy="lazyOnload">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -176,8 +154,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           `}
         </Script>
 
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`} strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`} strategy="lazyOnload" />
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
