@@ -13,28 +13,28 @@ const MARCA_SITIO = 'cabalgatamedellin.com';
 const FAQS_ES = [
   { 
     id: 'faq-1', 
+    q: '¿Necesito experiencia previa para realizar la cabalgata?', 
+    a: 'No necesitas experiencia previa. Asignamos caballos nobles según tu nivel, brindamos inducción inicial y vas acompañado por un guía durante todo el recorrido con póliza de Magenta Seguros incluida.' 
+  },
+  { 
+    id: 'faq-2', 
+    q: '¿Dónde están ubicados y cuánto tarda llegar desde Medellín?', 
+    a: 'Estamos ubicados en la Vereda Salinas en Caldas, Antioquia (Sur del Valle de Aburrá), a solo 30 minutos de El Poblado y Laureles sin pagar peajes ni sufrir el tráfico del Oriente, con opción de transporte VIP puerta a puerta.' 
+  },
+  { 
+    id: 'faq-3', 
     q: '¿Cuánto dura la experiencia y por dónde pasa la ruta?', 
     a: 'El recorrido a caballo dura aproximadamente 2 horas a través de senderos ecológicos, bosques nativos y miradores en las montañas del sur del Valle de Aburrá. Te recomendamos disponer de unas 2.5 horas en total para incluir la bienvenida, la inducción de seguridad y la asignación de tu caballo ideal.' 
   },
   { 
-    id: 'faq-2', 
-    q: '¿Tienen límite de peso o edad mínima para los jinetes?', 
-    a: 'Sí. Por el bienestar y la salud de nuestros caballos (nuestra prioridad), el peso máximo permitido es de 110 kg. Recibimos niños a partir de los 3 años, quienes deben ir acompañados de un adulto. No se requiere experiencia previa.' 
-  },
-  { 
-    id: 'faq-3', 
-    q: '¿Qué pasa si llueve el día de mi reserva?', 
-    a: 'Al ser una aventura en la naturaleza, operamos con normalidad bajo lluvia ligera (te proporcionaremos ponchos plásticos). Sin embargo, en caso de tormenta eléctrica o clima severo que comprometa la seguridad, reprogramaremos tu reserva sin ningún costo adicional.' 
-  },
-  { 
     id: 'faq-4', 
-    q: '¿Necesito experiencia previa montando a caballo?', 
-    a: 'No necesitas experiencia previa. Nuestros caballos son mansos y entrenados para el turismo ecológico, y antes de salir recibirás una inducción práctica por parte de nuestros guías.' 
+    q: '¿Tienen límite de peso o edad mínima para los jinetes?', 
+    a: 'Sí. Por el bienestar y la salud de nuestros caballos (nuestra prioridad), el peso máximo permitido es de 110 kg. Recibimos niños a partir de los 3 años, quienes deben ir acompañados de un adulto.' 
   },
   { 
     id: 'faq-5', 
-    q: '¿A cuánto tiempo están de Medellín y cómo llegar?', 
-    a: 'Estamos ubicados en Caldas (Sur del Valle de Aburrá), a unos 35 a 45 minutos en carro particular, taxi o aplicaciones de transporte desde sectores como El Poblado y Laureles.' 
+    q: '¿Qué pasa si llueve el día de mi reserva?', 
+    a: 'Al ser una aventura en la naturaleza, operamos con normalidad bajo lluvia ligera (te proporcionaremos ponchos plásticos). Sin embargo, en caso de tormenta eléctrica o clima severo que comprometa la seguridad, reprogramaremos tu reserva sin ningún costo adicional.' 
   }
 ];
 
@@ -125,7 +125,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
   
   const mensajeReserva = `Hola, quiero reservar el ${fechaTexto} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${modalidadTexto}. Cotización: $${totalCalculado.toLocaleString()}`;
   const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(mensajeReserva)}`;
-  const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas. 🐎")}`;
+  const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas en Medellín y Caldas. 🐎")}`;
   
   const isValidPhone = telefono.trim().length >= 7;
 
@@ -158,40 +158,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     window.open(linkCotizador, '_blank');
   };
 
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "TouristAttraction",
-    "name": "Cabalgata Medellín",
-    "description": data?.heroSubtitle ? data.heroSubtitle : "Experiencias únicas a caballo en los paisajes de Antioquia.",
-    "url": "https://cabalgatamedellin.com",
-    "image": "https://cabalgatamedellin.com/cabalgatas-en-medellin-y-caldas.webp",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Caldas",
-      "addressRegion": "Antioquia",
-      "addressCountry": "CO"
-    },
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "COP",
-      "price": precioBase.toString(),
-      "availability": "https://schema.org/InStock"
-    }
-  };
-
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": FAQS_ES.map((faq: any) => ({
-      "@type": "Question",
-      "name": faq.q,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.a
-      }
-    }))
-  };
-
   if (!data) {
     return (
       <div className="min-h-screen bg-zinc-900 font-sans selection:bg-amber-200">
@@ -204,8 +170,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] font-sans selection:bg-amber-200 text-zinc-900">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <section id="inicio" className="relative h-[85vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center">
         <div 
@@ -217,22 +181,25 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         >
           <Image 
             src="/cabalgatas-en-medellin-y-caldas.webp" 
-            alt="Jinetes cabalgando por los paisajes de Caldas, Antioquia" 
+            alt="Cabalgatas en Medellín y Caldas, Antioquia - Jinetes en ruta ecológica" 
             fill 
             priority={true}
             quality={75} 
             className="absolute inset-0 w-full h-full object-cover" 
             sizes="(max-width: 768px) 768px, 1200px" 
           />
-          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-black/45"></div>
         </div>
 
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6 pb-24 md:pb-12 text-center md:text-left">
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tighter drop-shadow-xl">
-            {data.heroTitle ? data.heroTitle : "Cabalgata Ecológica"}
+          <span className="inline-block bg-amber-500/20 backdrop-blur-md border border-amber-400/30 text-amber-200 text-xs md:text-sm font-bold px-4 py-1.5 rounded-full mb-4">
+            📍 A solo 30 min de El Poblado y Laureles (Sin peajes)
+          </span>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tighter drop-shadow-xl">
+            Cabalgatas en Medellín: Rutas Ecológicas y Tradicionales en Caldas, Antioquia
           </h1>
-          <p className="text-zinc-100 text-xl md:text-2xl font-medium mb-10 tracking-wide drop-shadow-md max-w-2xl">
-            {data.heroSubtitle ? data.heroSubtitle : "Experiencias únicas en Antioquia."}
+          <p className="text-zinc-100 text-lg md:text-2xl font-medium mb-10 tracking-wide drop-shadow-md max-w-2xl">
+            {data.heroSubtitle ? data.heroSubtitle : "Desconéctate de la ciudad a solo 30 minutos del sur de Medellín. Caballos dóciles, guías expertos y seguro médico incluido."}
           </p>
           
           <a 
@@ -251,6 +218,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
       <main className="max-w-4xl mx-auto px-4 mt-[-60px] md:mt-[-120px] relative z-20 space-y-16">
         
+        {/* COTIZADOR CON ESPACIADO DOM OPTIMIZADO PARA GOOGLEBOT */}
         <section id="cotizador" className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-10 border border-white scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4 border-b border-zinc-200/50 pb-6">
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 flex items-center gap-3 tracking-tight">
@@ -307,18 +275,18 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <div>
                 <p className="text-xs font-bold text-amber-500 mb-5 bg-amber-500/10 inline-block px-4 py-2 rounded-xl uppercase tracking-wider">{tipoCabalgataStr}</p>
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-zinc-400 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}</span>
+                  <span className="text-zinc-400 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}: </span>
                   <span className="font-bold text-xl text-white">${(jinetes * precioBase).toLocaleString()}</span>
                 </div>
                 {!esGrupal && (
                   <div className="flex justify-between items-center mb-4 text-red-300 bg-red-500/10 p-4 rounded-xl border border-red-500/10">
-                    <span className="font-semibold text-sm">Costo Guía Exclusivo</span>
+                    <span className="font-semibold text-sm">Costo Guía Exclusivo: </span>
                     <span className="font-bold">+${costoGuia.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="border-t border-zinc-800 my-6"></div>
                 <div className="flex justify-between items-end">
-                  <span className="text-lg text-zinc-400 font-medium tracking-tight">Total estimado</span>
+                  <span className="text-lg text-zinc-400 font-medium tracking-tight">Total estimado: </span>
                   <span className="text-5xl font-extrabold text-amber-500 tracking-tighter">${totalCalculado.toLocaleString()}</span>
                 </div>
               </div>
@@ -338,28 +306,28 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         <section className="grid md:grid-cols-2 gap-6 scroll-mt-20">
           <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 border border-white">
             <h3 className="text-2xl font-extrabold text-zinc-900 mb-6 tracking-tight flex items-center gap-2">
-              <Compass className="w-7 h-7 text-amber-600"/> La Experiencia
+              <Compass className="w-7 h-7 text-amber-600"/> La Experiencia en Caldas
             </h3>
             <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[1.1rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-zinc-200 before:to-transparent">
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Coffee className="w-4 h-4" /></div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
-                  <h4 className="font-bold text-zinc-900">1. Bienvenida</h4>
-                  <p className="text-sm text-zinc-500 mt-1">Llegada a la finca, inducción rápida y tinto campesino.</p>
+                  <h4 className="font-bold text-zinc-900">1. Llegada Rápida (30 min)</h4>
+                  <p className="text-sm text-zinc-500 mt-1">A solo 30 minutos de El Poblado y Laureles en la Vereda Salinas, Caldas (sin peajes ni trancones).</p>
                 </div>
               </div>
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Heart className="w-4 h-4" /></div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
-                  <h4 className="font-bold text-zinc-900">2. Conexión</h4>
-                  <p className="text-sm text-zinc-500 mt-1">Te asignamos el caballo ideal según tu nivel de experiencia.</p>
+                  <h4 className="font-bold text-zinc-900">2. Inducción y Conexión</h4>
+                  <p className="text-sm text-zinc-500 mt-1">Tinto campesino de bienvenida y asignación de un caballo dócil según tu nivel (desde 3 años de edad).</p>
                 </div>
               </div>
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Camera className="w-4 h-4" /></div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
-                  <h4 className="font-bold text-zinc-900">3. El Recorrido</h4>
-                  <p className="text-sm text-zinc-500 mt-1">Ruta guiada por miradores, senderos ecológicos y naturaleza pura.</p>
+                  <h4 className="font-bold text-zinc-900">3. Recorrido Ecológico (2h)</h4>
+                  <p className="text-sm text-zinc-500 mt-1">Ruta guiada por miradores, senderos ecológicos, quebradas y bosques nativos de Antioquia.</p>
                 </div>
               </div>
             </div>
@@ -373,15 +341,15 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <ul className="space-y-4">
                 <li className="flex items-center gap-4 bg-white/60 p-3 rounded-2xl border border-zinc-100 shadow-sm">
                   <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-50"><Sun className="w-5 h-5 text-amber-500"/></div>
-                  <span className="font-medium text-zinc-700">Bloqueador solar y gorra</span>
+                  <span className="font-medium text-zinc-700">Bloqueador solar y gorra o sombrero</span>
                 </li>
                 <li className="flex items-center gap-4 bg-white/60 p-3 rounded-2xl border border-zinc-100 shadow-sm">
                   <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-50"><ShieldCheck className="w-5 h-5 text-zinc-500"/></div>
-                  <span className="font-medium text-zinc-700">Pantalón largo (jean o sudadera)</span>
+                  <span className="font-medium text-zinc-700">Pantalón largo cómodo (jean o sudadera)</span>
                 </li>
                 <li className="flex items-center gap-4 bg-white/60 p-3 rounded-2xl border border-zinc-100 shadow-sm">
                   <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-50"><MapPin className="w-5 h-5 text-zinc-500"/></div>
-                  <span className="font-medium text-zinc-700">Zapatos cerrados (botas o tenis)</span>
+                  <span className="font-medium text-zinc-700">Zapatos cerrados (botas o tenis con buen agarre)</span>
                 </li>
               </ul>
             </div>
@@ -391,7 +359,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <h3 className="text-xl font-extrabold mb-2 tracking-tight">Viaja Asegurado</h3>
               <p className="text-zinc-300 text-sm leading-relaxed mb-5">Tu bienestar es nuestra prioridad. Todas nuestras rutas incluyen póliza de asistencia médica con <b>Magenta Seguros</b>.</p>
               <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 font-bold px-4 py-2.5 rounded-xl text-sm border border-green-500/30">
-                <ShieldCheck className="w-4 h-4"/> Cobertura Total Incluida
+                <ShieldCheck className="w-4 h-4"/> Cobertura Médica Incluida
               </div>
             </div>
           </div>
@@ -399,6 +367,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
         <PricingSection />
 
+        {/* SECCIÓN UBICACIÓN CON IFRAME REAL DE GOOGLE MAPS */}
         <section id="ubicacion" className="pt-4 scroll-mt-20">
           <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-white overflow-hidden">
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-zinc-50/50 to-white/50">
@@ -408,7 +377,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   <BadgeCheck className="w-6 h-6 text-blue-500 fill-current" aria-hidden="true" />
                 </div>
                 <p className="text-zinc-600 font-medium flex items-center gap-2">
-                  <MapPin className="w-4 h-4" aria-hidden="true"/> {data.mapAddress ? data.mapAddress : 'Caldas, Antioquia (A 40 min de Medellín)'}
+                  <MapPin className="w-4 h-4 text-amber-600" aria-hidden="true"/> Vereda Salinas, Caldas, Antioquia (A 30 min de El Poblado)
                 </p>
               </div>
               <div className="flex flex-col items-center md:items-end">
@@ -426,29 +395,25 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               </div>
             </div>
             
-            <div className="w-full h-[320px] relative bg-zinc-200 flex items-center justify-center overflow-hidden border-t border-zinc-100">
-              <Image 
-                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" 
-                alt="Imagen de fondo del mapa de ubicación" 
-                fill 
-                quality={75}
-                className="object-cover opacity-60 blur-[3px]" 
-                sizes="(max-width: 768px) 100vw, 800px" 
+            <div className="w-full h-[360px] relative bg-zinc-200 border-t border-zinc-100">
+              <iframe
+                title="Ubicación Cabalgata Medellín en Vereda Salinas, Caldas, Antioquia"
+                src="https://www.google.com/maps?q=6.0911,-75.6358&hl=es&z=14&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-full"
               />
-              <div className="absolute inset-0 bg-zinc-900/20"></div>
-              
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="bg-white/90 backdrop-blur-md p-4 rounded-full shadow-2xl mb-4 animate-bounce border border-white/50">
-                  <MapPin className="w-8 h-8 text-amber-600" aria-hidden="true" />
-                </div>
-                {data.mapEmbedUrl ? (
-                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" aria-label="Abrir ubicación en Google Maps" className="bg-zinc-900/90 backdrop-blur-md text-white font-bold py-3 px-6 rounded-2xl shadow-xl transition-all hover:scale-105 flex items-center gap-2 hover:bg-black">
-                    Abrir en Google Maps
+              {data.mapEmbedUrl && (
+                <div className="absolute bottom-4 right-4 z-10">
+                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" aria-label="Abrir ubicación en Google Maps" className="bg-zinc-900/90 backdrop-blur-md text-white text-sm font-bold py-3 px-5 rounded-2xl shadow-xl transition-all hover:scale-105 flex items-center gap-2 hover:bg-black">
+                    <MapPin className="w-4 h-4 text-amber-400" /> Abrir en Google Maps
                   </a>
-                ) : (
-                  <span className="bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl font-bold text-zinc-600 shadow-lg border border-white/50">Mapa no configurado</span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -482,7 +447,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         {data.blogPosts && data.blogPosts.length > 0 && (
           <section id="blog" className="pt-4 scroll-mt-20">
             <h2 className="text-3xl font-extrabold text-zinc-900 mb-8 flex items-center gap-3 tracking-tight">
-              <BookOpen className="w-8 h-8 text-amber-600" aria-hidden="true" /> Nuestro Blog
+              <BookOpen className="w-8 h-8 text-amber-600" aria-hidden="true" /> Guías y Artículos
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               {data.blogPosts.slice(0, 2).map((post: any) => (
@@ -538,11 +503,12 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </section>
         )}
 
+        {/* SECCIÓN FAQ VISIBLE EN EL HTML INICIAL */}
         <section id="faq" className="pb-16 scroll-mt-20">
-          <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Preguntas Frecuentes</h2>
+          <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Preguntas Frecuentes sobre las Cabalgatas en Medellín</h2>
           <div className="space-y-4 max-w-3xl mx-auto">
             {FAQS_ES.map((faq: any) => (
-              <details key={faq.id} className="group bg-white rounded-2xl border border-zinc-200 cursor-pointer overflow-hidden shadow-sm transition-all hover:border-zinc-300 [&_summary::-webkit-details-marker]:hidden">
+              <details key={faq.id} open className="group bg-white rounded-2xl border border-zinc-200 cursor-pointer overflow-hidden shadow-sm transition-all hover:border-zinc-300 [&_summary::-webkit-details-marker]:hidden">
                 <summary className="flex justify-between items-center font-bold p-6 text-zinc-800 bg-white group-open:bg-zinc-50/50 transition-colors">{faq.q}</summary>
                 <div className="text-zinc-600 px-6 pb-6 bg-zinc-50/50 pt-2 border-t border-zinc-100 leading-relaxed">{faq.a}</div>
               </details>
@@ -558,31 +524,64 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         </section>
       </main>
 
-      <footer className="bg-zinc-950 text-zinc-400 py-16 text-center relative z-20 mt-12 border-t border-zinc-800">
-        <div className="max-w-4xl mx-auto px-4">
-          <h3 className="text-white text-2xl font-bold mb-8 tracking-tight">Síguenos en nuestras redes</h3>
-          <div className="flex justify-center gap-6 mb-10">
+      {/* FOOTER CON DATOS NAP COMPLETOS Y ENLACES INDEXABLES (E-E-A-T) */}
+      <footer className="bg-zinc-950 text-zinc-400 py-16 relative z-20 mt-12 border-t border-zinc-800">
+        <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-left mb-12">
+          <div>
+            <h3 className="text-white text-xl font-extrabold mb-4 tracking-tight">Cabalgata Medellín</h3>
+            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+              Rutas ecológicas a caballo y tours en cuatrimoto en el Sur del Valle de Aburrá. Póliza de asistencia médica con Magenta Seguros incluida.
+            </p>
+            <p className="text-xs text-zinc-500 font-semibold">
+              Operador Turístico Autorizado en Antioquia (Cumplimiento Ley 300 de Turismo y RNT).
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-white text-base font-bold mb-4">Contacto y Ubicación (NAP)</h4>
+            <ul className="space-y-2.5 text-sm text-zinc-400">
+              <li><strong className="text-zinc-200">Dirección:</strong> Vereda Salinas, Caldas, Antioquia, Colombia</li>
+              <li><strong className="text-zinc-200">Referencia:</strong> A 30 min de El Poblado y Laureles (Sin peajes)</li>
+              <li><strong className="text-zinc-200">WhatsApp / Teléfono:</strong> +{whatsappNum}</li>
+              <li><strong className="text-zinc-200">Horario:</strong> Lunes a Domingo (Salidas 10:00 AM, 2:00 PM y 4:00 PM)</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white text-base font-bold mb-4">Explora Nuestras Experiencias</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><a href="/" className="hover:text-amber-400 transition-colors">Cabalgatas en Medellín y Caldas</a></li>
+              <li><a href="/blog" className="hover:text-amber-400 transition-colors">Guía y Blog de Cabalgatas</a></li>
+              <li><a href="/en" className="hover:text-amber-400 transition-colors">Horseback Riding Medellin (English)</a></li>
+              <li><a href="#cotizador" className="hover:text-amber-400 transition-colors">Cotizador de Planes y Precios</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-6 pt-8 border-t border-zinc-800/80 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p className="text-sm font-medium tracking-wide text-zinc-500">
+            © {new Date().getFullYear()} Cabalgata Medellín (cabalgatamedellin.com). Todos los derechos reservados.
+          </p>
+          <div className="flex justify-center gap-4">
             <a 
               href="https://www.instagram.com/cabalgataseco" 
               target="_blank" 
               rel="noreferrer" 
               aria-label="Instagram de Cabalgata Medellín" 
-              className="bg-zinc-900 p-4 rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300 hover:scale-110 flex items-center justify-center border border-zinc-800 hover:border-pink-500"
+              className="bg-zinc-900 p-3 rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300 flex items-center justify-center border border-zinc-800"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
-            
             <a 
               href="https://web.facebook.com/Cabalgatasmedellin" 
               target="_blank" 
               rel="noreferrer" 
               aria-label="Facebook de Cabalgata Medellín" 
-              className="bg-zinc-900 p-4 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 hover:scale-110 flex items-center justify-center border border-zinc-800 hover:border-blue-500"
+              className="bg-zinc-900 p-3 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center border border-zinc-800"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
           </div>
-          <p className="text-sm font-medium tracking-wide text-zinc-500">© {new Date().getFullYear()} Cabalgata Medellín. Todos los derechos reservados.</p>
         </div>
       </footer>
 
