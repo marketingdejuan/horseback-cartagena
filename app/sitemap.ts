@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { ARTICULOS_BLOG_SEO } from '../lib/blogArticulos';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://cabalgatamedellin.com';
@@ -36,6 +37,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'cabalgatas-grupos-empresas-medellin',
     'donde-montar-a-caballo-cerca-de-medellin',
     'en-horseback-riding-medellin-tours',
+    'reservar',
+    'consultar',
   ];
 
   const paginasSEO: MetadataRoute.Sitemap = slugsSEO.map((slug) => ({
@@ -45,5 +48,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  return [...paginasPrincipales, ...paginasSEO];
+  const paginasBlog: MetadataRoute.Sitemap = ARTICULOS_BLOG_SEO.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: fechaActual,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
+  return [...paginasPrincipales, ...paginasSEO, ...paginasBlog];
 }
