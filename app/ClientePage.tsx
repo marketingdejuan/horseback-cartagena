@@ -1,10 +1,11 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { 
   Calendar, ShieldCheck, Info, Star, PlayCircle, Camera, X, Gift, Clock, 
   Home, MapPin, BadgeCheck, BookOpen, Image as ImageIcon, Phone, 
-  Coffee, Compass, CheckCircle2, Shield, Heart, Sun
+  Coffee, Compass, CheckCircle2, Shield, Heart, Sun, ArrowRight
 } from 'lucide-react';
 import PricingSection from '../components/Planes';
 
@@ -36,6 +37,19 @@ const FAQS_ES = [
     q: '¿Qué pasa si llueve el día de mi reserva?', 
     a: 'Al ser una aventura en la naturaleza, operamos con normalidad bajo lluvia ligera (te proporcionaremos ponchos plásticos). Sin embargo, en caso de tormenta eléctrica o clima severo que comprometa la seguridad, reprogramaremos tu reserva sin ningún costo adicional.' 
   }
+];
+
+const PAGINAS_INTERLINKING = [
+  { href: '/planes-cabalgatas-medellin', titulo: 'Planes y Precios de Cabalgatas', tag: 'Planes 2026' },
+  { href: '/tour-cuatrimotos-medellin-caldas', titulo: 'Tour de Cuatrimotos en Medellín y Caldas', tag: 'Adrenalina 1.5h' },
+  { href: '/cabalgatas-caldas-antioquia', titulo: 'Cabalgatas en Caldas, Antioquia (Vereda Salinas)', tag: 'Sur sin peajes' },
+  { href: '/cabalgata-romantica-parejas-medellin', titulo: 'Cabalgata Romántica para Parejas', tag: 'Aniversarios' },
+  { href: '/cabalgatas-ninos-familias-medellin', titulo: 'Cabalgatas para Niños y Familias', tag: 'Desde 3 años' },
+  { href: '/cabalgata-vip-transporte-el-poblado-laureles', titulo: 'Cabalgata VIP con Transporte Incluido', tag: 'El Poblado / Laureles' },
+  { href: '/alquiler-caballos-medellin-precios', titulo: 'Alquiler de Caballos en Medellín por Horas', tag: 'Tarifas' },
+  { href: '/cabalgatas-grupos-empresas-medellin', titulo: 'Cabalgatas para Grupos y Empresas', tag: 'Eventos 6+ pax' },
+  { href: '/donde-montar-a-caballo-cerca-de-medellin', titulo: 'Dónde Montar a Caballo Cerca de Medellín', tag: 'Guía Comparativa' },
+  { href: '/en-horseback-riding-medellin-tours', titulo: 'Private Horseback Riding Medellin (English)', tag: 'English Tours' }
 ];
 
 export default function ClientePage({ initialData }: { initialData: any }) {
@@ -135,12 +149,13 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     
     if (isValidPhone) {
       try {
+        const notaReserva = `Cotización Web (${modalidadTexto}) - ${jinetes} Jinetes.`;
         const payload = {
           clientName: "Lead Web (Cotizador)",
           phone: telefono,
           date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
           totalValue: totalCalculado,
-          notes: `Cotización Web - Modalidad: ${modalidadTexto} - ${jinetes} Jinetes.`,
+          notes: notaReserva,
           brand: MARCA_SITIO,
           funnelStage: 'Nueva'
         };
@@ -234,7 +249,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           <div className="grid md:grid-cols-2 gap-10">
             <div className="space-y-8">
               <div>
-                <label htmlFor="fecha-reserva" className="block text-sm font-bold text-zinc-800 mb-3">1. Selecciona Fecha y Hora</label>
+                <label htmlFor="fecha-reserva" className="block text-sm font-bold text-zinc-800 mb-3">
+                  <span>1. Selecciona Fecha y Hora</span>
+                </label>
                 <div className="flex gap-3">
                   <input id="fecha-reserva" aria-label="Seleccionar fecha" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full p-4 border border-zinc-200/50 rounded-2xl bg-white/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all shadow-sm" />
                   <select id="hora-reserva" aria-label="Seleccionar hora" value={hora} onChange={(e) => setHora(e.target.value)} className="w-full p-4 border border-zinc-200/50 rounded-2xl bg-white/50 text-zinc-900 font-bold outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 transition-all shadow-sm">
@@ -251,7 +268,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               </div>
               
               <div>
-                <label className="block text-sm font-bold text-zinc-800 mb-3">2. Número de Jinetes</label>
+                <label className="block text-sm font-bold text-zinc-800 mb-3">
+                  <span>2. Número de Jinetes</span>
+                </label>
                 <div className="flex items-center gap-4 bg-white/50 p-2 rounded-2xl border border-zinc-200/50 w-fit shadow-sm">
                   <button aria-label="Disminuir número de jinetes" onClick={() => setJinetes(Math.max(1, jinetes - 1))} className="w-12 h-12 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-extrabold shadow-sm border border-zinc-100 transition-all">-</button>
                   <span aria-live="polite" className="w-8 text-center font-extrabold text-2xl text-zinc-900">{jinetes}</span>
@@ -260,7 +279,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               </div>
 
               <div>
-                <label htmlFor="telefono-reserva" className="block text-sm font-bold text-zinc-800 mb-3">3. Tu número de WhatsApp</label>
+                <label htmlFor="telefono-reserva" className="block text-sm font-bold text-zinc-800 mb-3">
+                  <span>3. Tu número de WhatsApp</span>
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Phone className="h-5 w-5 text-zinc-400" aria-hidden="true" />
@@ -312,21 +333,21 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Coffee className="w-4 h-4" /></div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
-                  <h4 className="font-bold text-zinc-900">1. Llegada Rápida (30 min)</h4>
+                  <h4 className="font-bold text-zinc-900"><span>1. Llegada Rápida (30 min)</span></h4>
                   <p className="text-sm text-zinc-500 mt-1">A solo 30 minutos de El Poblado y Laureles en la Vereda Salinas, Caldas (sin peajes ni trancones).</p>
                 </div>
               </div>
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Heart className="w-4 h-4" /></div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
-                  <h4 className="font-bold text-zinc-900">2. Inducción y Conexión</h4>
+                  <h4 className="font-bold text-zinc-900"><span>2. Inducción y Conexión</span></h4>
                   <p className="text-sm text-zinc-500 mt-1">Tinto campesino de bienvenida y asignación de un caballo dócil según tu nivel (desde 3 años de edad).</p>
                 </div>
               </div>
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-100 text-amber-600 shadow shrink-0 z-10"><Camera className="w-4 h-4" /></div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white/60 p-4 rounded-2xl border border-zinc-100 shadow-sm">
-                  <h4 className="font-bold text-zinc-900">3. Recorrido Ecológico (2h)</h4>
+                  <h4 className="font-bold text-zinc-900"><span>3. Recorrido Ecológico (2h)</span></h4>
                   <p className="text-sm text-zinc-500 mt-1">Ruta guiada por miradores, senderos ecológicos, quebradas y bosques nativos de Antioquia.</p>
                 </div>
               </div>
@@ -504,7 +525,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         )}
 
         {/* SECCIÓN FAQ VISIBLE EN EL HTML INICIAL */}
-        <section id="faq" className="pb-16 scroll-mt-20">
+        <section id="faq" className="pb-8 scroll-mt-20">
           <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Preguntas Frecuentes sobre las Cabalgatas en Medellín</h2>
           <div className="space-y-4 max-w-3xl mx-auto">
             {FAQS_ES.map((faq: any) => (
@@ -522,9 +543,40 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             </a>
           </div>
         </section>
+
+        {/* SECCIÓN DE INTERLINKING SEO (LAS 10 PÁGINAS POR INTENCIÓN DE BÚSQUEDA) */}
+        <section className="pb-16">
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-10 border border-white">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 mb-3 tracking-tight flex items-center gap-2">
+              <Compass className="w-7 h-7 text-amber-600" aria-hidden="true" /> Rutas Especializadas y Planes por Tipo de Viajero
+            </h2>
+            <p className="text-zinc-500 text-sm md:text-base mb-8">
+              Explora nuestras guías detalladas según tu plan ideal en Medellín y Caldas, Antioquia:
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {PAGINAS_INTERLINKING.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group bg-zinc-50/80 hover:bg-amber-50/40 border border-zinc-200/80 hover:border-amber-400 p-4 rounded-2xl flex items-center justify-between transition-all shadow-sm"
+                >
+                  <div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 bg-amber-100/80 px-2.5 py-0.5 rounded-full">
+                      {item.tag}
+                    </span>
+                    <h3 className="font-bold text-zinc-900 group-hover:text-amber-800 text-sm md:text-base mt-1.5">
+                      {item.titulo}
+                    </h3>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-zinc-400 group-hover:text-amber-600 group-hover:translate-x-1 transition-all shrink-0 ml-3" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* FOOTER CON DATOS NAP COMPLETOS Y ENLACES INDEXABLES (E-E-A-T) */}
+      {/* FOOTER CON DATOS NAP COMPLETOS Y LAS 10 URLS INDEXABLES */}
       <footer className="bg-zinc-950 text-zinc-400 py-16 relative z-20 mt-12 border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-left mb-12">
           <div>
@@ -548,12 +600,18 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </div>
 
           <div>
-            <h4 className="text-white text-base font-bold mb-4">Explora Nuestras Experiencias</h4>
-            <ul className="space-y-2.5 text-sm">
-              <li><a href="/" className="hover:text-amber-400 transition-colors">Cabalgatas en Medellín y Caldas</a></li>
-              <li><a href="/blog" className="hover:text-amber-400 transition-colors">Guía y Blog de Cabalgatas</a></li>
-              <li><a href="/en" className="hover:text-amber-400 transition-colors">Horseback Riding Medellin (English)</a></li>
-              <li><a href="#cotizador" className="hover:text-amber-400 transition-colors">Cotizador de Planes y Precios</a></li>
+            <h4 className="text-white text-base font-bold mb-4">Rutas, Planes y Guías</h4>
+            <ul className="space-y-2 text-xs text-zinc-400">
+              <li><Link href="/planes-cabalgatas-medellin" className="hover:text-amber-400 transition-colors">Planes y Precios de Cabalgatas</Link></li>
+              <li><Link href="/tour-cuatrimotos-medellin-caldas" className="hover:text-amber-400 transition-colors">Tour de Cuatrimotos en Medellín y Caldas</Link></li>
+              <li><Link href="/cabalgatas-caldas-antioquia" className="hover:text-amber-400 transition-colors">Cabalgatas en Caldas, Antioquia</Link></li>
+              <li><Link href="/cabalgata-romantica-parejas-medellin" className="hover:text-amber-400 transition-colors">Cabalgata Romántica para Parejas</Link></li>
+              <li><Link href="/cabalgatas-ninos-familias-medellin" className="hover:text-amber-400 transition-colors">Cabalgatas para Niños y Familias</Link></li>
+              <li><Link href="/cabalgata-vip-transporte-el-poblado-laureles" className="hover:text-amber-400 transition-colors">Cabalgata VIP con Transporte (El Poblado)</Link></li>
+              <li><Link href="/alquiler-caballos-medellin-precios" className="hover:text-amber-400 transition-colors">Alquiler de Caballos en Medellín</Link></li>
+              <li><Link href="/cabalgatas-grupos-empresas-medellin" className="hover:text-amber-400 transition-colors">Cabalgatas para Grupos y Empresas</Link></li>
+              <li><Link href="/donde-montar-a-caballo-cerca-de-medellin" className="hover:text-amber-400 transition-colors">Dónde Montar a Caballo Cerca de Medellín</Link></li>
+              <li><Link href="/en-horseback-riding-medellin-tours" className="hover:text-amber-400 transition-colors">Private Horseback Riding Tours (EN)</Link></li>
             </ul>
           </div>
         </div>
