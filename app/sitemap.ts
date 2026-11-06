@@ -13,6 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
+      url: `${baseUrl}/cabalgatas-caldas`,
+      lastModified: fechaActual,
+      changeFrequency: 'weekly',
+      priority: 1.0,
+    },
+    {
       url: `${baseUrl}/en`,
       lastModified: fechaActual,
       changeFrequency: 'weekly',

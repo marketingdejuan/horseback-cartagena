@@ -40,9 +40,10 @@ const FAQS_ES = [
 ];
 
 const PAGINAS_INTERLINKING = [
+  { href: '/cabalgatas-caldas', titulo: 'Cabalgatas Caldas, Antioquia (Guía Completa)', tag: 'Destacado Sur' },
   { href: '/planes-cabalgatas-medellin', titulo: 'Planes y Precios de Cabalgatas', tag: 'Planes 2026' },
   { href: '/tour-cuatrimotos-medellin-caldas', titulo: 'Tour de Cuatrimotos en Medellín y Caldas', tag: 'Adrenalina 1.5h' },
-  { href: '/cabalgatas-caldas-antioquia', titulo: 'Cabalgatas en Caldas, Antioquia (Vereda Salinas)', tag: 'Sur sin peajes' },
+  { href: '/cabalgatas-caldas-antioquia', titulo: 'Cabalgatas en la Vereda Salinas, Caldas', tag: 'Sur sin peajes' },
   { href: '/cabalgata-romantica-parejas-medellin', titulo: 'Cabalgata Romántica para Parejas', tag: 'Aniversarios' },
   { href: '/cabalgatas-ninos-familias-medellin', titulo: 'Cabalgatas para Niños y Familias', tag: 'Desde 3 años' },
   { href: '/cabalgata-vip-transporte-el-poblado-laureles', titulo: 'Cabalgata VIP con Transporte Incluido', tag: 'El Poblado / Laureles' },
@@ -538,7 +539,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </div>
         </section>
 
-        {/* SECCIÓN DE INTERLINKING SEO (LAS 10 PÁGINAS POR INTENCIÓN DE BÚSQUEDA) */}
+        {/* SECCIÓN DE INTERLINKING SEO (INCLUYE /cabalgatas-caldas EN PRIMERA POSICIÓN) */}
         <section className="pb-16">
           <div className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-10 border border-zinc-100">
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 mb-3 tracking-tight flex items-center gap-2">
@@ -570,7 +571,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         </section>
       </main>
 
-      {/* FOOTER CON DATOS NAP COMPLETOS Y LAS 10 URLS INDEXABLES */}
+      {/* FOOTER CON DATOS NAP COMPLETOS Y LAS URLS INDEXABLES */}
       <footer className="bg-zinc-950 text-zinc-400 py-16 relative z-20 mt-12 border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-left mb-12">
           <div>
@@ -596,9 +597,10 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           <div>
             <h4 className="text-white text-base font-bold mb-4">Rutas, Planes y Guías</h4>
             <ul className="space-y-2 text-xs text-zinc-400">
+              <li><Link href="/cabalgatas-caldas" className="text-amber-400 font-bold hover:underline transition-colors">Cabalgatas Caldas, Antioquia (Guía Oficial)</Link></li>
               <li><Link href="/planes-cabalgatas-medellin" className="hover:text-amber-400 transition-colors">Planes y Precios de Cabalgatas</Link></li>
               <li><Link href="/tour-cuatrimotos-medellin-caldas" className="hover:text-amber-400 transition-colors">Tour de Cuatrimotos en Medellín y Caldas</Link></li>
-              <li><Link href="/cabalgatas-caldas-antioquia" className="hover:text-amber-400 transition-colors">Cabalgatas en Caldas, Antioquia</Link></li>
+              <li><Link href="/cabalgatas-caldas-antioquia" className="hover:text-amber-400 transition-colors">Cabalgatas en la Vereda Salinas, Caldas</Link></li>
               <li><Link href="/cabalgata-romantica-parejas-medellin" className="hover:text-amber-400 transition-colors">Cabalgata Romántica para Parejas</Link></li>
               <li><Link href="/cabalgatas-ninos-familias-medellin" className="hover:text-amber-400 transition-colors">Cabalgatas para Niños y Familias</Link></li>
               <li><Link href="/cabalgata-vip-transporte-el-poblado-laureles" className="hover:text-amber-400 transition-colors">Cabalgata VIP con Transporte (El Poblado)</Link></li>
