@@ -10,6 +10,12 @@ import {
 const URL_SITIO = 'https://cabalgatamedellin.com';
 const WHATSAPP_DEFAULT = '573000000000';
 
+interface FilaComparativa {
+  criterio: string;
+  nosotros: string;
+  otros: string;
+}
+
 interface PaginaSEO {
   slug: string;
   enlaceCorto: string;
@@ -26,66 +32,79 @@ interface PaginaSEO {
   incluye: string[];
   detallesH2: string;
   detallesTexto: string;
+  tablaTitulo: string;
+  tablaColNosotros: string;
+  tablaColOtros: string;
+  tablaFilas: FilaComparativa[];
   faqs: { q: string; a: string }[];
 }
 
 export const PAGINAS_SEO: PaginaSEO[] = [
   {
     slug: 'planes-cabalgatas-medellin',
-    enlaceCorto: 'Planes y Precios de Cabalgatas',
-    metaTitle: 'Planes de Cabalgatas en Medellín y Precios 2026 | Desde $100.000',
-    metaDescription: 'Conoce nuestros planes de cabalgatas en Medellín y Caldas: Cabalgata Grupal ($100.000), Privada Exclusiva, Plan Celebración con almuerzo y Aventura VIP con transporte.',
-    badge: '🐎 Planes desde $100.000 COP por persona',
-    h1: 'Planes y Precios de Cabalgatas en Medellín y Caldas, Antioquia',
-    subtitle: 'Elige entre cabalgatas grupales de fin de semana, recorridos 100% privados a tu propio ritmo o planes todo incluido con almuerzo, decoración y transporte.',
-    precioTexto: 'Desde $100.000 COP / persona',
+    enlaceCorto: 'Planes y Paquetes de Cabalgatas',
+    metaTitle: 'Planes de Cabalgatas en Medellín: Grupal, Privado, Romántico y VIP',
+    metaDescription: 'Compara nuestros 4 paquetes de cabalgatas en Medellín y Caldas: Plan Grupal de fin de semana, Plan Privado Exclusivo, Plan Celebración con almuerzo y Plan VIP con transporte.',
+    badge: '🐎 4 Paquetes Diseñados para Cada Tipo de Viajero',
+    h1: 'Planes y Paquetes de Cabalgatas en Medellín y Caldas, Antioquia',
+    subtitle: 'Elige entre recorridos grupales de fin de semana, cabalgatas 100% privadas a tu propio ritmo o paquetes todo incluido con almuerzo campestre, decoración y transporte.',
+    precioTexto: 'Paquetes desde $100.000 COP / persona',
     precioNumero: '100000',
-    whatsappMsg: '¡Hola! Quiero cotizar uno de los planes de cabalgatas en Medellín y Caldas. 🐎',
-    introH2: '¿Qué incluyen nuestros planes de cabalgatas cerca de Medellín?',
+    whatsappMsg: '¡Hola! Quiero cotizar uno de los paquetes de cabalgatas en Medellín y Caldas. 🐎',
+    introH2: '¿Cuál de nuestros 4 planes de cabalgata se adapta mejor a tu grupo?',
     parrafos: [
-      'En Cabalgata Medellín hemos diseñado 4 modalidades pensadas para cada tipo de viajero, pareja, familia o grupo de amigos. A diferencia de los recorridos masivos, operamos en la Vereda Salinas de Caldas, Antioquia, a solo 30 minutos de El Poblado y Laureles sin pagar peajes.',
-      'Nuestro Plan Grupal ($100.000 COP por persona) está disponible los sábados y domingos a las 2:00 PM sin cobro adicional de guía. Si prefieres exclusividad total y elegir tu propio horario (10:00 AM, 2:00 PM o 4:00 PM cualquier día de la semana), el Plan Privado asigna un guía exclusivo para tu grupo por una tarifa única de $80.000 COP.',
-      'También contamos con el Plan Celebración (que suma almuerzo típico o especial por $30.000 COP y decoración para cumpleaños o aniversarios) y el Plan Aventura VIP con transporte privado ida y vuelta desde tu hotel o residencia en el Área Metropolitana.'
+      'En Cabalgata Medellín hemos estructurado 4 paquetes completos en la Vereda Salinas de Caldas, Antioquia, a solo 30 minutos de El Poblado y Laureles sin pagar peajes.',
+      '1) Plan Grupal ($100.000 COP/persona): disponible sábados y domingos a las 2:00 PM sin cobro adicional de guía. 2) Plan Privado Exclusivo ($100.000 COP/persona + $80.000 guía del grupo): disponible todos los días a las 10:00 AM, 2:00 PM y 4:00 PM exclusivamente para ti y tus acompañantes.',
+      '3) Plan Celebración (+$30.000 COP almuerzo y decoración festiva, gratis para grupos de 6 o más personas) y 4) Plan Aventura VIP (+$130.000 COP por vehículo privado ida y vuelta desde tu hotel en El Poblado o Laureles).'
     ],
     incluye: [
-      'Caballo criollo manso asignado según tu nivel de experiencia (2 horas de recorrido).',
-      'Inducción práctica de manejo y seguridad antes de salir a la montaña.',
-      'Póliza de asistencia médica total con Magenta Seguros para cada jinete.',
-      'Acompañamiento de guía montado experto conocedor de los senderos ecológicos.',
-      'Paradas en miradores naturales del Sur del Valle de Aburrá para fotografías.'
+      'Recorrido guiado de 2 horas por senderos ecológicos y miradores de Caldas.',
+      'Inducción práctica de manejo equino y asignación de caballo según tu nivel.',
+      'Póliza de asistencia médica individual con Magenta Seguros.',
+      'Acompañamiento de guía baquiano experto durante toda la ruta.',
+      'Opciones adicionales de almuerzo típico ($30.000) y transporte VIP ($130.000).'
     ],
-    detallesH2: 'Transparencia total en tarifas y bienestar animal',
-    detallesTexto: 'No tenemos costos ocultos. Nuestros caballos descansan entre recorridos, reciben atención veterinaria permanente y manejamos un límite estricto de 110 kg por jinete para garantizar su bienestar.',
+    detallesH2: 'Diferencias clave entre modalidad grupal y paquetes privados',
+    detallesTexto: 'Si viajas en pareja, con niños pequeños o deseas paradas fotográficas a tu propio ritmo, te recomendamos los paquetes privados (Privado, Celebración o VIP). Si vienes con amigos un fin de semana a las 2:00 PM, el Plan Grupal te permite ahorrar el costo del guía.',
+    tablaTitulo: 'Comparativa de Paquetes en Cabalgata Medellín',
+    tablaColNosotros: 'Modalidad / Paquete',
+    tablaColOtros: 'Tarifa y Beneficio Principal',
+    tablaFilas: [
+      { criterio: 'Plan Grupal (Sáb y Dom 2 PM)', nosotros: '$100.000 COP / persona', otros: 'Guía incluido ($0 costo extra)' },
+      { criterio: 'Plan Privado (Lun a Dom)', nosotros: '$100.000 COP + $80.000 guía grupo', otros: '100% exclusivo (10 AM, 2 PM o 4 PM)' },
+      { criterio: 'Plan Celebración con Almuerzo', nosotros: '$130.000 COP + guía grupo', otros: 'Decoración GRATIS desde 6 personas' },
+      { criterio: 'Plan Aventura VIP con Transporte', nosotros: 'Plan + $130.000 transporte carro', otros: 'Recogida puerta a puerta en hotel' }
+    ],
     faqs: [
       {
         q: '¿Cuál es la diferencia entre el Plan Grupal y el Plan Privado?',
-        a: 'El Plan Grupal se realiza únicamente sábados y domingos a las 2:00 PM y no tiene costo extra de guía ($100.000 por persona). El Plan Privado se puede reservar cualquier día a las 10:00 AM, 2:00 PM o 4:00 PM exclusivamente para ti y tus acompañantes, sumando un único pago de $80.000 por el guía privado del grupo.'
+        a: 'El Plan Grupal se realiza únicamente sábados y domingos a las 2:00 PM y no tiene costo extra de guía ($100.000 por persona). El Plan Privado se puede reservar cualquier día a las 10:00 AM, 2:00 PM o 4:00 PM exclusivamente para tu grupo, sumando un único pago de $80.000 por el guía privado.'
       },
       {
-        q: '¿Con cuánta anticipación debo reservar mi plan?',
-        a: 'Para fines de semana y festivos recomendamos reservar con al menos 24 a 48 horas de anticipación debido a que manejamos cupos limitados por bienestar animal. Entre semana puedes reservar incluso el mismo día sujeto a disponibilidad.'
+        q: '¿Con cuánta anticipación debo reservar mi paquete?',
+        a: 'Para fines de semana y festivos recomendamos reservar con 24 a 48 horas de anticipación. Entre semana puedes reservar incluso el mismo día sujeto a disponibilidad.'
       },
       {
         q: '¿Qué métodos de pago aceptan para confirmar la reserva?',
-        a: 'Puedes reservar fácilmente por WhatsApp realizando un abono por transferencia bancaria (Bancolombia, Nequi) o pago acordado con nuestro asesor, y pagar el saldo restante al llegar a la finca.'
+        a: 'Puedes confirmar por WhatsApp mediante transferencia por Bancolombia o Nequi y cancelar el saldo restante al llegar a la finca.'
       }
     ]
   },
   {
     slug: 'tour-cuatrimotos-medellin-caldas',
     enlaceCorto: 'Tour de Cuatrimotos en Medellín',
-    metaTitle: 'Tour de Cuatrimotos en Medellín y Caldas | 1.5 Horas de Adrenalina',
-    metaDescription: 'Vive el mejor tour de cuatrimotos cerca de Medellín en Caldas, Antioquia (a 30 min de El Poblado). 1.5 horas por trochas de montaña desde $250.000 COP.',
+    metaTitle: 'Tour de Cuatrimotos en Medellín y Caldas | 1.5 Horas de Adrenalina ($250.000)',
+    metaDescription: 'Vive el mejor tour de cuatrimotos cerca de Medellín en Caldas, Antioquia (a 30 min de El Poblado). 1.5 horas por trochas de montaña desde $250.000 COP por máquina.',
     badge: '🏍️ Ruta Off-Road de 1.5 Horas en Montaña',
     h1: 'Tour de Cuatrimotos en Medellín y Caldas, Antioquia: Aventura Off-Road',
-    subtitle: 'Domina trochas reales de montaña, barro, bosques nativos y miradores panorámicos a solo 30 minutos del sur de Medellín.',
+    subtitle: 'Domina trochas reales de montaña, barro, bosques nativos y miradores panorámicos en cuatrimotos automáticas a solo 30 minutos del sur de Medellín.',
     precioTexto: '$250.000 COP / cuatrimoto (+ $50.000 parrillero)',
     precioNumero: '250000',
     whatsappMsg: '¡Hola! Quiero reservar el Tour de Cuatrimotos en Caldas, Antioquia. 🏍️',
     introH2: 'Adrenalina pura en cuatrimotos a 30 minutos de El Poblado',
     parrafos: [
-      'Si buscas un plan extremo cerca de la ciudad sin perder horas en el tráfico hacia el Oriente antioqueño, nuestro Tour de Cuatrimotos en la Vereda Salinas (Caldas, Antioquia) te ofrece terrenos off-road auténticos a tan solo 30 minutos de El Poblado, Envigado, Sabaneta y Laureles.',
-      'Durante 1.5 horas conducirás cuatrimotos automáticas de alto torque por senderos veredales, ascensos de montaña, pasos de agua y miradores naturales del Sur del Valle de Aburrá. Puedes ir solo en tu cuatrimoto por $250.000 COP o llevar un acompañante (copiloto/parrillero) por solo $50.000 COP adicionales.',
+      'Si buscas un plan de motor y aventura cerca de la ciudad sin perder horas en el tráfico hacia el Oriente antioqueño, nuestro Tour de Cuatrimotos en la Vereda Salinas (Caldas, Antioquia) te ofrece terrenos off-road auténticos a tan solo 30 minutos de El Poblado y Laureles.',
+      'Durante 1.5 horas conducirás cuatrimotos automáticas de alto torque por senderos veredales, ascensos de montaña, pasos de agua y miradores naturales del Sur del Valle de Aburrá. El alquiler por máquina para 1 conductor es de $250.000 COP, y puedes llevar un acompañante (parrillero) por solo $50.000 COP adicionales ($300.000 COP en total para 2 personas).',
       'Además, somos el único operador en el sur del Valle de Aburrá donde puedes combinar en un mismo día un tour de cuatrimotos con una cabalgata ecológica para grupos mixtos.'
     ],
     incluye: [
@@ -95,8 +114,18 @@ export const PAGINAS_SEO: PaginaSEO[] = [
       'Póliza de asistencia médica con Magenta Seguros incluida.',
       'Opción de agregar parrillero/acompañante por solo $50.000 COP adicionales.'
     ],
-    detallesH2: 'Requisitos para el Tour en Cuatrimoto',
-    detallesTexto: 'No necesitas pase de moto ni experiencia previa en cuatrimotos automáticas, ya que hacemos una prueba práctica antes de salir. Es obligatorio usar calzado cerrado y ropa cómoda que puedas ensuciar.',
+    detallesH2: 'Requisitos técnicos y de seguridad para el Tour en Cuatrimoto',
+    detallesTexto: 'Las cuatrimotos son 100% automáticas (acelerador y freno). El conductor debe ser mayor de edad (o adolescente de 16+ años con autorización de sus padres presente) y los niños desde los 8 años pueden ir como acompañantes (parrilleros). Es obligatorio usar calzado cerrado.',
+    tablaTitulo: 'Especificaciones del Tour de Cuatrimotos en Caldas',
+    tablaColNosotros: 'Nuestro Tour en Caldas (Sur)',
+    tablaColOtros: 'Alquileres en Oriente Antioqueño',
+    tablaFilas: [
+      { criterio: 'Tarifa por Cuatrimoto (1.5 Horas)', nosotros: '$250.000 COP (Guía incluido)', otros: '$280.000 a $350.000 COP (1 Hora)' },
+      { criterio: 'Tarifa Acompañante (Parrillero)', nosotros: '+$50.000 COP ($300.000 pareja)', otros: '+$80.000 a $100.000 COP' },
+      { criterio: 'Distancia desde El Poblado', nosotros: '30 minutos (Sin peajes)', otros: '60 a 90 minutos (+ Peajes)' },
+      { criterio: 'Edad Conductor / Parrillero', nosotros: 'Conductor adulto / Parrillero 8+ años', otros: 'Restricciones variables' },
+      { criterio: 'Equipamiento y Seguro', nosotros: 'Casco certificado + Magenta Seguros', otros: 'Básico' }
+    ],
     faqs: [
       {
         q: '¿Es difícil manejar las cuatrimotos si soy principiante?',
@@ -104,52 +133,11 @@ export const PAGINAS_SEO: PaginaSEO[] = [
       },
       {
         q: '¿Pueden ir dos personas en una misma cuatrimoto?',
-        a: 'Sí, nuestras máquinas tienen fuerza suficiente para dos adultos. El valor para el conductor es de $250.000 COP y el copiloto adicional tiene un costo de $50.000 COP ($300.000 COP en total por la pareja).'
+        a: 'Sí, nuestras máquinas tienen fuerza suficiente para dos personas. El valor para el conductor es de $250.000 COP y el acompañante (parrillero) tiene un costo adicional de $50.000 COP ($300.000 COP en total por la pareja).'
       },
       {
         q: '¿Podemos combinar cuatrimotos y cabalgata en el mismo grupo?',
         a: '¡Por supuesto! Si en tu grupo algunos prefieren montar a caballo y otros quieren adrenalina en cuatrimoto, pueden agendar ambas experiencias en nuestra sede de Caldas.'
-      }
-    ]
-  },
-  {
-    slug: 'cabalgatas-caldas-antioquia',
-    enlaceCorto: 'Cabalgatas en Caldas, Antioquia',
-    metaTitle: 'Cabalgatas en Caldas, Antioquia | Vereda Salinas (A 30 min de Medellín)',
-    metaDescription: 'Disfruta de las mejores cabalgatas en Caldas, Antioquia (Vereda Salinas). Senderos ecológicos reales, caballos bien cuidados y seguro médico a 30 min de Medellín.',
-    badge: '📍 Vereda Salinas, Caldas — Sur del Valle de Aburrá',
-    h1: 'Cabalgatas en Caldas, Antioquia: Naturaleza Pura en la Vereda Salinas',
-    subtitle: 'Descubre el secreto mejor guardado del Sur del Valle de Aburrá: montañas verdes, aire puro, tradición cafetera y senderos sin pavimento a minutos de Medellín.',
-    precioTexto: 'Desde $100.000 COP / persona',
-    precioNumero: '100000',
-    whatsappMsg: '¡Hola! Quiero información sobre las cabalgatas en la Vereda Salinas de Caldas. 🐎',
-    introH2: '¿Por qué Caldas, Antioquia es el mejor destino para cabalgar cerca de Medellín?',
-    parrafos: [
-      'El municipio de Caldas, ubicado en el extremo sur del Valle de Aburrá, conserva la topografía montañosa, los nacimientos de agua y los caminos reales de herradura tradicionales de Antioquia. En nuestra sede de la Vereda Salinas cabalgas por tierra, bosque nativo y senderos ecológicos reales, lejos del ruido vehicular.',
-      'Para quienes viven o se hospedan en Medellín, Envigado, Sabaneta, Itagüí o La Estrella, llegar a Caldas toma apenas 30 minutos por la Autopista Sur, ahorrando el pago de peajes costosos y evitando los trancones de fin de semana hacia Rionegro o Santa Elena.',
-      'Al finalizar tu recorrido de 2 horas a caballo, puedes disfrutar del ambiente campestre de nuestra finca, tomar un café tradicional o almorzar en familia.'
-    ],
-    incluye: [
-      'Recorrido guiado de 2 horas por los senderos de la Vereda Salinas en Caldas.',
-      'Bienvenida con tinto campesino e inducción de manejo equino.',
-      'Caballos dóciles en excelente estado nutricional y sanitario.',
-      'Cobertura médica integral con Magenta Seguros.',
-      'Parqueadero en la finca y fácil acceso en carro particular, Uber o taxi.'
-    ],
-    detallesH2: 'Cómo llegar a nuestra pesebrera en la Vereda Salinas, Caldas',
-    detallesTexto: 'Una vez confirmas tu reserva por WhatsApp, te enviamos el pin exacto de Google Maps y Waze. Puedes llegar en cualquier vehículo particular, moto, taxi o contratando nuestro transporte VIP.',
-    faqs: [
-      {
-        q: '¿Hay que pagar peajes desde Medellín hasta la finca en Caldas?',
-        a: 'No. A diferencia de las cabalgatas en el Oriente antioqueño (Guarne, Rionegro o El Retiro), para llegar a Caldas desde Medellín, El Poblado o Laureles no pagas un solo peaje.'
-      },
-      {
-        q: '¿El camino hasta la finca sirve para automóviles bajos?',
-        a: 'Sí, la vía hasta nuestro punto de encuentro en Caldas permite el ingreso de automóviles particulares, taxis y camionetas sin inconvenientes.'
-      },
-      {
-        q: '¿En qué horarios salen las cabalgatas en Caldas?',
-        a: 'Tenemos salidas todos los días a las 10:00 AM, 2:00 PM y 4:00 PM en modalidad privada, y sábados y domingos a las 2:00 PM en modalidad grupal.'
       }
     ]
   },
@@ -161,24 +149,33 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     badge: '❤️ Plan Exclusivo para Parejas, Aniversarios y Propuestas',
     h1: 'Cabalgata Romántica para Parejas en Medellín: Plan Privado y Celebración',
     subtitle: 'Escápate de la rutina con un recorrido a caballo 100% privado por las montañas de Antioquia, almuerzo especial y decoración para sorprender a tu persona favorita.',
-    precioTexto: 'Plan Privado Pareja + Almuerzo ($30.000) y Decoración',
-    precioNumero: '100000',
+    precioTexto: 'Pareja Privada ($280.000) o Con Almuerzo y Decoración ($390.000)',
+    precioNumero: '280000',
     whatsappMsg: '¡Hola! Quiero cotizar una Cabalgata Romántica para pareja (Aniversario / Celebración). ❤️🐎',
     introH2: 'El plan romántico más original a 30 minutos de El Poblado',
     parrafos: [
       'Si estás cansado de los mismos restaurantes en Provenza o El Poblado para celebrar un aniversario, cumpleaños o pedir matrimonio, una cabalgata privada al aire libre por los miradores de Caldas es una experiencia que tu pareja jamás olvidará.',
       'En nuestro Plan Celebración para parejas, ustedes dos cabalgan de forma 100% exclusiva (sin desconocidos en el grupo). Nuestro guía los acompaña a una distancia prudente para garantizar su seguridad, guiarlos por los paisajes más bonitos del bosque y tomarles fotografías y videos increíbles juntos.',
-      'Al regresar del recorrido de 2 horas, los espera una mesa reservada con decoración especial ($50.000 COP, o gratis para grupos de más de 6 personas) y almuerzo ($30.000 COP por persona).'
+      'Al regresar del recorrido de 2 horas, los espera una mesa reservada con decoración especial ($50.000 COP) y almuerzo campestre ($30.000 COP por persona).'
     ],
     incluye: [
       'Recorrido 100% privado para la pareja en el horario que elijas (10 AM, 2 PM o 4 PM).',
       'Guía exclusivo que actúa como fotógrafo de la pareja en los miradores.',
       'Opción de almuerzo especial ($30.000 COP/persona) al finalizar la ruta.',
-      'Opción de mesa decorada con globos/detalles para cumpleaños o aniversario ($50.000 COP).',
+      'Opción de mesa decorada con globos y detalles para aniversario o cumpleaños ($50.000 COP).',
       'Seguro médico Magenta Seguros para ambos jinetes.'
     ],
-    detallesH2: 'Mejor horario para una cabalgata en pareja',
-    detallesTexto: 'Te recomendamos el turno de las 4:00 PM si deseas disfrutar la luz dorada del atardecer en las montañas de Antioquia, o el turno de las 10:00 AM para cerrar con un almuerzo campestre.',
+    detallesH2: 'Mejor horario para una cabalgata romántica en pareja',
+    detallesTexto: 'Te recomendamos el turno de las 4:00 PM si deseas disfrutar la luz dorada del atardecer en las montañas de Antioquia, o el turno de las 10:00 AM para cerrar con un almuerzo campestre privado.',
+    tablaTitulo: 'Opciones de Cabalgata Romántica para 2 Personas',
+    tablaColNosotros: 'Detalle para la Pareja (2 Personas)',
+    tablaColOtros: 'Tarifa Total Pareja',
+    tablaFilas: [
+      { criterio: 'Cabalgata Privada Base (2 Jinetes + Guía)', nosotros: '2 horas privadas + fotos en mirador', otros: '$280.000 COP Total Pareja' },
+      { criterio: 'Plan Pareja + 2 Almuerzos Campestres', nosotros: 'Ruta privada + 2 almuerzos completos', otros: '$340.000 COP Total Pareja' },
+      { criterio: 'Plan Celebración Completo (Con Decoración)', nosotros: 'Ruta privada + 2 almuerzos + mesa decorada', otros: '$390.000 COP Total Pareja' },
+      { criterio: 'Adicional Transporte VIP Puerta a Puerta', nosotros: 'Recogida ida y regreso en hotel / casa', otros: '+$130.000 COP por el vehículo' }
+    ],
     faqs: [
       {
         q: '¿Mi pareja nunca ha montado a caballo, es seguro para ella/él?',
@@ -209,7 +206,7 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     parrafos: [
       'Sabemos que cuando buscas una cabalgata familiar en Medellín, tu prioridad número uno es la tranquilidad y seguridad de tus hijos. En Cabalgata Medellín no alquilamos caballos briosos ni de fiesta: nuestra manada está entrenada específicamente para el turismo ecológico y familiar.',
       'Recibimos niños a partir de los 3 años de edad (acompañados por un adulto). Antes de iniciar la ruta, nuestros guías evalúan la edad y confianza de cada niño e integrante de la familia para asignarle el caballo perfecto por mansedumbre y tamaño.',
-      'Además, todas nuestras salidas cuentan con cobertura de asistencia médica a través de Magenta Seguros, y en los planes grupales de más de 6 personas con almuerzo te obsequiamos la decoración si están celebrando un cumpleaños familiar.'
+      'Además, todas nuestras salidas cuentan con cobertura de asistencia médica a través de Magenta Seguros, y en los planes familiares de más de 6 personas con almuerzo te obsequiamos la decoración si están celebrando un cumpleaños.'
     ],
     incluye: [
       'Caballos seleccionados por su temperamento dócil para niños (desde 3 años) y principiantes.',
@@ -220,6 +217,15 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     ],
     detallesH2: 'Recomendaciones para ir con niños a la cabalgata',
     detallesTexto: 'Los niños deben llevar pantalón largo (sudadera o jean cómodo), tenis cerrados, bloqueador solar y gorra. El peso máximo permitido para los adultos es de 110 kg.',
+    tablaTitulo: 'Estándares de Seguridad Familiar en Nuestra Finca',
+    tablaColNosotros: 'Cabalgata Medellín (Sede Caldas)',
+    tablaColOtros: 'Cabalgatas Informales / Ferias',
+    tablaFilas: [
+      { criterio: 'Edad Mínima Permitida', nosotros: 'Desde los 3 años (Con acompañamiento)', otros: 'Sin protocolo infantil claro' },
+      { criterio: 'Temperamento del Caballo', nosotros: 'Mansos, nobles y de paso suave', otros: 'Caballos briosos o cansados' },
+      { criterio: 'Asistencia Médica', nosotros: 'Póliza individual Magenta Seguros', otros: 'Sin cobertura médica' },
+      { criterio: 'Terreno del Recorrido', nosotros: 'Sendero ecológico sin carros', otros: 'Calles pavimentadas con tráfico' }
+    ],
     faqs: [
       {
         q: '¿Desde qué edad pueden montar a caballo los niños?',
@@ -261,6 +267,15 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     ],
     detallesH2: 'Cobertura del transporte VIP en el Área Metropolitana',
     detallesTexto: 'Cubrimos sin recargo extra toda la zona sur del Valle de Aburrá (El Poblado, Envigado, Sabaneta, Itagüí, La Estrella, Caldas) y hasta el sector de Laureles / Estadio en Medellín.',
+    tablaTitulo: 'Logística de Transporte hacia Nuestra Finca en Caldas',
+    tablaColNosotros: 'Nuestro Transporte VIP ($130.000 ida y vuelta)',
+    tablaColOtros: 'Transporte por Cuenta Propia',
+    tablaFilas: [
+      { criterio: 'Recogida en El Poblado / Laureles', nosotros: 'En la puerta de tu Hotel o Airbnb', otros: 'Debes solicitar taxi o Uber de ida' },
+      { criterio: 'Regreso desde la Vereda Salinas', nosotros: 'El conductor te espera en la finca', otros: 'Baja disponibilidad de apps en vereda' },
+      { criterio: 'Tiempo de Trayecto', nosotros: '30 minutos directo (0 Peajes)', otros: '30 a 45 minutos según espera' },
+      { criterio: 'Capacidad del Vehículo', nosotros: 'Hasta 4 pasajeros por automóvil', otros: 'Variable' }
+    ],
     faqs: [
       {
         q: '¿El precio de $130.000 COP de transporte es por persona o por el carro?',
@@ -278,42 +293,51 @@ export const PAGINAS_SEO: PaginaSEO[] = [
   },
   {
     slug: 'alquiler-caballos-medellin-precios',
-    enlaceCorto: 'Alquiler de Caballos en Medellín',
-    metaTitle: 'Alquiler de Caballos en Medellín por Horas | Precios 2026 ($100.000)',
-    metaDescription: '¿Buscas alquiler de caballos en Medellín? Paseos guiados de 2 horas por senderos ecológicos desde $100.000 COP con seguro médico incluido. ¡Reserva hoy!',
-    badge: '💰 Mejor Relación Calidad-Precio en Antioquia',
-    h1: 'Alquiler de Caballos en Medellín: Precios, Horarios y Rutas Guiadas',
-    subtitle: 'Alquila caballos criollos dóciles y bien cuidados para paseos ecológicos de 2 horas en la montaña, siempre acompañados por guías profesionales y póliza de seguro.',
-    precioTexto: '$100.000 COP por caballo (Ruta de 2 horas)',
+    enlaceCorto: 'Alquiler de Caballos por Horas',
+    metaTitle: 'Alquiler de Caballos en Medellín por Horas | Tarifas por Jinete y Requisitos',
+    metaDescription: 'Servicio formal de alquiler de caballos en Medellín por horas: ejemplares criollos mansos, aperaje completo, guía baquiano y seguro médico en Caldas, Antioquia.',
+    badge: '🐎 Alquiler Equino Formal por Horas con Aperaje Completo',
+    h1: 'Alquiler de Caballos en Medellín por Horas: Tarifas por Tiempo y Requisitos',
+    subtitle: 'Alquila caballos criollos dóciles, bien herrados y descansados para travesías de 2 horas en montaña, con silla acolchada, estribos a medida y seguro médico.',
+    precioTexto: '$100.000 COP por caballo (Bloque de 2 horas)',
     precioNumero: '100000',
-    whatsappMsg: '¡Hola! Quiero consultar disponibilidad para alquiler de caballos en Medellín. 🐎',
-    introH2: '¿Cuánto vale alquilar un caballo en Medellín en 2026?',
+    whatsappMsg: '¡Hola! Quiero consultar disponibilidad para alquiler de caballos por horas. 🐎',
+    introH2: '¿Cómo funciona el alquiler de caballos por horas cerca de Medellín?',
     parrafos: [
-      'El valor del alquiler de caballos en Medellín con ruta ecológica completa de 2 horas es de $100.000 COP por persona. A diferencia de los potreros cerrados donde das vueltas en círculo por 20 minutos, con nosotros sales a una verdadera travesía de montaña por la Vereda Salinas en Caldas.',
-      'Por seguridad de los jinetes y bienestar de nuestros ejemplares, el alquiler siempre incluye el aperaje completo (silla cómoda, freno y estribos ajustados a tu estatura), inducción previa, acompañamiento de guía y seguro médico de accidentes con Magenta Seguros.',
-      'Si reservas para el sábado o domingo a las 2:00 PM en grupo compartido, solo pagas los $100.000 COP por caballo. Si deseas alquilar los caballos en horario privado para ti y tus amigos cualquier día de la semana, solo se adiciona $80.000 COP por el guía privado.'
+      'A diferencia de los potreros cerrados donde alquilas un caballo por 15 o 30 minutos para dar vueltas en círculo, nuestro servicio de alquiler de caballos en la Vereda Salinas (Caldas) comprende un bloque completo de 2 horas de travesía real por senderos de montaña.',
+      'La tarifa de alquiler es de $100.000 COP por caballo ensillado (equivalente a $50.000 COP por cada hora efectiva de monta). Incluye el aperaje tradicional antioqueño revisado antes de cada salida, freno suave, inducción técnica y póliza de accidentes de Magenta Seguros.',
+      'En el turno grupal de sábados y domingos a las 2:00 PM solo pagas el valor de cada caballo ($100.000 COP). Si prefieres alquilar los caballos en un turno privado para tu grupo cualquier día de la semana, solo agregas $80.000 COP por el guía baquiano acompañante.'
     ],
     incluye: [
-      'Alquiler de caballo ensillado durante 2 horas efectivas de ruta ecológica.',
-      'Ajuste personalizado de estribos y asignación de ejemplar según peso (máx. 110 kg) y experiencia.',
-      'Póliza médica activa durante toda la actividad con Magenta Seguros.',
-      'Guía baquiano acompañante durante todo el trayecto.',
-      'Hidratación de bienvenida (tinto tradicional) en la pesebrera.'
+      'Alquiler de caballo criollo durante 2 horas continuas de senderismo ecuestre.',
+      'Aperaje completo: silla acolchada, zamarros/estribos ajustados a tu estatura y riendas.',
+      'Emparejamiento técnico según peso del jinete (máximo 110 kg) y nivel de monta.',
+      'Póliza médica activa durante las 2 horas con Magenta Seguros.',
+      'Guía montado de apoyo para abrir ruta en los senderos de la Vereda Salinas.'
     ],
-    detallesH2: 'Por qué elegir un operador formal de alquiler equino',
-    detallesTexto: 'Alquilar caballos informales en carretera sin seguro médico ni guías capacitados es un riesgo innecesario. En Cabalgata Medellín garantizamos caballos sanos, herrados correctamente y respaldo legal.',
+    detallesH2: 'Protocolo de bienestar equino y requisitos para alquilar',
+    detallesTexto: 'No alquilamos caballos para cabalgatas urbanas con licor ni sobre pavimento. Cada ejemplar cumple turnos estrictos de descanso y pastoreo, con un tope máximo de 110 kg por jinete.',
+    tablaTitulo: 'Desglose de Tarifas de Alquiler por Número de Jinetes (2 Horas)',
+    tablaColNosotros: 'Modalidad Privada (Cualquier Día)',
+    tablaColOtros: 'Modalidad Grupal (Sáb/Dom 2 PM)',
+    tablaFilas: [
+      { criterio: 'Alquiler para 1 Jinete (2 Horas)', nosotros: '$180.000 COP ($100k caballo + $80k guía)', otros: '$100.000 COP Total' },
+      { criterio: 'Alquiler para 2 Jinetes (2 Horas)', nosotros: '$280.000 COP ($140.000 por persona)', otros: '$200.000 COP Total' },
+      { criterio: 'Alquiler para 4 Jinetes (2 Horas)', nosotros: '$480.000 COP ($120.000 por persona)', otros: '$400.000 COP Total' },
+      { criterio: 'Alquiler para 6 Jinetes (2 Horas)', nosotros: '$680.000 COP ($113.300 por persona)', otros: '$600.000 COP Total' }
+    ],
     faqs: [
       {
         q: '¿Alquilan caballos sin guía para salir solos?',
-        a: 'Por normatividad de seguridad turística y para activar la cobertura de la póliza de Magenta Seguros, todos los recorridos van acompañados por nuestro guía experto, quien se adapta al ritmo que ustedes deseen llevar.'
+        a: 'Por normatividad de seguridad turística y para mantener activa la cobertura de la póliza de Magenta Seguros, todos los alquileres van acompañados por nuestro guía baquiano, quien se adapta al paso que ustedes deseen llevar.'
       },
       {
         q: '¿Cuál es el peso máximo permitido para alquilar un caballo?',
         a: 'Por respeto y cuidado de la columna de nuestros caballos criollos, el peso máximo permitido por jinete es de 110 kilogramos.'
       },
       {
-        q: '¿Tienen descuento para grupos grandes?',
-        a: 'En grupos privados el costo del guía ($80.000 COP) se divide entre todos los integrantes, y para grupos de más de 6 personas que tomen el Plan Celebración, la decoración festiva es totalmente gratis.'
+        q: '¿Se puede alquilar por menos de 2 horas?',
+        a: 'La ruta ecológica por los miradores y bosques de la Vereda Salinas está diseñada para completarse en un circuito de 2 horas, por lo que manejamos tarifa unificada de $100.000 COP por recorrido completo.'
       }
     ]
   },
@@ -343,6 +367,15 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     ],
     detallesH2: 'Cómo cotizar una salida grupal o empresarial',
     detallesTexto: 'Usa nuestro cotizador en línea o escríbenos por WhatsApp indicando la fecha tentativa y el número de asistentes para bloquear tus cupos y preparar el menú de almuerzo.',
+    tablaTitulo: 'Beneficios para Grupos y Eventos Corporativos',
+    tablaColNosotros: 'Grupos de 6 o Más Personas',
+    tablaColOtros: 'Grupos de 2 a 5 Personas',
+    tablaFilas: [
+      { criterio: 'Tarifa Base Cabalgata (2 Horas)', nosotros: '$100.000 COP por participante', otros: '$100.000 COP por participante' },
+      { criterio: 'Costo de Guía Exclusivo', nosotros: '$80.000 COP dividido en todo el grupo', otros: '$80.000 COP por el grupo' },
+      { criterio: 'Decoración en Plan Celebración', nosotros: '¡GRATIS! (Ahorras $50.000 COP)', otros: '+$50.000 COP opcional' },
+      { criterio: 'Póliza Magenta Seguros y Soporte', nosotros: 'Incluida para cada integrante + Cuenta cobro', otros: 'Incluida para cada integrante' }
+    ],
     faqs: [
       {
         q: '¿Cuál es el número máximo de personas que pueden ir en un mismo grupo?',
@@ -384,6 +417,15 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     ],
     detallesH2: 'Consejos clave antes de elegir dónde cabalgar en Medellín',
     detallesTexto: 'Verifica siempre tres cosas antes de reservar: 1) Que el precio incluya póliza de asistencia médica real, 2) Que el recorrido sea por senderos ecológicos y no por calles pavimentadas que lastiman las patas de los caballos, y 3) El tiempo real de desplazamiento desde tu ubicación.',
+    tablaTitulo: 'Comparativa de Zonas Ecuestres Cerca de Medellín',
+    tablaColNosotros: 'Caldas - Vereda Salinas (Sur)',
+    tablaColOtros: 'Oriente Antioqueño (Rionegro / Guarne)',
+    tablaFilas: [
+      { criterio: 'Tiempo desde El Poblado / Laureles', nosotros: '30 minutos por Autopista Sur', otros: '60 a 90 minutos según tráfico' },
+      { criterio: 'Peajes Ida y Regreso', nosotros: '$0 COP (Sin peajes)', otros: '$34.000 a $48.000 COP' },
+      { criterio: 'Superficie del Camino', nosotros: 'Tierra blanda y bosque nativo', otros: 'Tramos altos de rieles de concreto' },
+      { criterio: 'Tarifa Base (2 Horas con Seguro)', nosotros: '$100.000 COP (Magenta Seguros)', otros: '$130.000 a $160.000 COP' }
+    ],
     faqs: [
       {
         q: '¿Cuál es el lugar más cercano a El Poblado para montar a caballo?',
@@ -425,6 +467,15 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     ],
     detallesH2: 'Transparent Local Pricing in Colombian Pesos (COP)',
     detallesTexto: 'We charge fair local prices with no "gringo tax": $100,000 COP per rider (~$25 USD) plus a one-time $80,000 COP (~$20 USD) private guide fee per group on private schedules, or $0 guide fee on Saturday/Sunday 2:00 PM group rides.',
+    tablaTitulo: 'Quick Comparison: Our Caldas Ranch vs. Eastern Medellin Tours',
+    tablaColNosotros: 'Medellin Horseback Riding (Caldas - South)',
+    tablaColOtros: 'Other Operators (East / Rionegro)',
+    tablaFilas: [
+      { criterio: 'Drive Time from El Poblado', nosotros: '30 minutes (Zero highway tolls)', otros: '60 to 90 minutes (+ Tolls)' },
+      { criterio: 'Base Price (2-Hour Ride)', nosotros: '$100,000 COP (~$25 USD)', otros: '$150,000 - $220,000 COP' },
+      { criterio: 'Medical Insurance', nosotros: 'Included (Magenta Seguros)', otros: 'Often not included' },
+      { criterio: 'Min. Age / Max. Rider Weight', nosotros: 'From 3 years old / Up to 110 kg (240 lbs)', otros: 'Varies' }
+    ],
     faqs: [
       {
         q: 'How do I get to the ranch from El Poblado or Laureles?',
@@ -466,6 +517,14 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     ],
     detallesH2: 'Políticas de reserva, niños y bienestar animal',
     detallesTexto: 'Recibimos niños desde los 3 años de edad acompañados de un adulto. Por bienestar de nuestros caballos, el peso máximo permitido es de 110 kg por jinete.',
+    tablaTitulo: 'Resumen de Horarios y Turnos de Reserva',
+    tablaColNosotros: 'Horario de Salida',
+    tablaColOtros: 'Modalidades Disponibles',
+    tablaFilas: [
+      { criterio: 'Turno Mañana (10:00 AM)', nosotros: 'Lunes a Domingo', otros: 'Cabalgata Privada, VIP y Cuatrimotos' },
+      { criterio: 'Turno Tarde (2:00 PM)', nosotros: 'Lunes a Viernes Privada / Sáb-Dom Grupal', otros: 'Grupal ($0 guía) o Privada exclusiva' },
+      { criterio: 'Turno Atardecer (4:00 PM)', nosotros: 'Lunes a Domingo', otros: 'Cabalgata Privada, Romántica y Cuatrimotos' }
+    ],
     faqs: [
       {
         q: '¿Con cuánto dinero se separa la reserva?',
@@ -507,6 +566,15 @@ export const PAGINAS_SEO: PaginaSEO[] = [
     ],
     detallesH2: 'Resumen rápido de requisitos operativos',
     detallesTexto: 'Edad mínima: 3 años. Peso máximo: 110 kg. Vestuario obligatorio: pantalón largo y zapatos cerrados. Horarios diarios: 10:00 AM, 2:00 PM y 4:00 PM.',
+    tablaTitulo: 'Ficha Técnica Rápida de Nuestras Experiencias',
+    tablaColNosotros: 'Servicio / Regla Operativa',
+    tablaColOtros: 'Detalle Verificado',
+    tablaFilas: [
+      { criterio: 'Ubicación Exacta', nosotros: 'Vereda Salinas, Caldas, Antioquia', otros: 'A 30 min de El Poblado (Sin peajes)' },
+      { criterio: 'Cabalgata Ecológica (2 Horas)', nosotros: '$100.000 COP por jinete', otros: 'Niños desde 3 años / Peso máx. 110 kg' },
+      { criterio: 'Tour de Cuatrimotos (1.5 Horas)', nosotros: '$250.000 COP máquina (+$50k parrillero)', otros: 'Automáticas / Casco incluido' },
+      { criterio: 'Asistencia Médica', nosotros: 'Magenta Seguros', otros: 'Incluida en el 100% de las reservas' }
+    ],
     faqs: [
       {
         q: '¿Cómo consulto si hay cupo para este fin de semana?',
@@ -542,19 +610,27 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
   }
 
   const urlCompleta = `${URL_SITIO}/${pagina.slug}`;
+  const isEnglish = pagina.slug.startsWith('en-');
 
   return {
     title: pagina.metaTitle,
     description: pagina.metaDescription,
     alternates: {
       canonical: urlCompleta,
+      languages: isEnglish
+        ? {
+            'es-CO': URL_SITIO,
+            'en-US': urlCompleta,
+            'x-default': URL_SITIO,
+          }
+        : undefined,
     },
     openGraph: {
       title: pagina.metaTitle,
       description: pagina.metaDescription,
       url: urlCompleta,
-      siteName: 'Cabalgata Medellín',
-      locale: pagina.slug.startsWith('en-') ? 'en_US' : 'es_CO',
+      siteName: isEnglish ? 'Medellin Horseback Riding' : 'Cabalgata Medellín',
+      locale: isEnglish ? 'en_US' : 'es_CO',
       type: 'website',
     },
   };
@@ -568,6 +644,8 @@ export default async function SEOLandingPage({ params }: { params: any }) {
   if (!pagina) {
     notFound();
   }
+
+  const isEnglish = pagina.slug.startsWith('en-');
 
   let whatsappNum = WHATSAPP_DEFAULT;
   try {
@@ -594,7 +672,7 @@ export default async function SEOLandingPage({ params }: { params: any }) {
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Cabalgatas en Medellín",
+            "name": isEnglish ? "Medellin Horseback Riding" : "Cabalgatas en Medellín",
             "item": URL_SITIO
           },
           {
@@ -613,7 +691,7 @@ export default async function SEOLandingPage({ params }: { params: any }) {
         "image": `${URL_SITIO}/cabalgatas-en-medellin-y-caldas.webp`,
         "brand": {
           "@type": "Brand",
-          "name": "Cabalgata Medellín"
+          "name": isEnglish ? "Medellin Horseback Riding" : "Cabalgata Medellín"
         },
         "offers": {
           "@type": "Offer",
@@ -643,10 +721,42 @@ export default async function SEOLandingPage({ params }: { params: any }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd] font-sans selection:bg-amber-200 text-zinc-900">
+    <div lang={isEnglish ? 'en' : 'es'} className="min-h-screen bg-[#fbfbfd] font-sans selection:bg-amber-200 text-zinc-900">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaGraph) }} />
 
-      <section className="relative min-h-[75vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center pt-16 pb-20">
+      {/* BARRA DE NAVEGACIÓN SUPERIOR COMPLETA PARA EVITAR PÁGINAS HUÉRFANAS */}
+      <header className="sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800 text-white">
+        <div className="max-w-5xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+          <Link href={isEnglish ? "/en" : "/"} className="font-extrabold text-base md:text-lg tracking-tight text-white hover:text-amber-400 transition-colors">
+            🐎 {isEnglish ? "Medellin Horseback Riding" : "Cabalgata Medellín"}
+          </Link>
+          <nav aria-label={isEnglish ? "Main Navigation" : "Navegación Principal"} className="flex flex-wrap items-center gap-3 md:gap-5 text-xs md:text-sm font-bold text-zinc-300">
+            <Link href={isEnglish ? "/en" : "/"} className="hover:text-amber-400 transition-colors">
+              {isEnglish ? "Home" : "Inicio"}
+            </Link>
+            <Link href="/planes-cabalgatas-medellin" className="hover:text-amber-400 transition-colors">
+              {isEnglish ? "Packages" : "Planes"}
+            </Link>
+            <Link href="/cabalgatas-caldas" className="hover:text-amber-400 transition-colors">
+              Caldas
+            </Link>
+            <Link href="/tour-cuatrimotos-medellin-caldas" className="hover:text-amber-400 transition-colors">
+              {isEnglish ? "ATV Tour" : "Cuatrimotos"}
+            </Link>
+            <Link href="/cabalgata-romantica-parejas-medellin" className="hover:text-amber-400 transition-colors hidden sm:inline">
+              {isEnglish ? "Couples" : "Parejas"}
+            </Link>
+            <Link href="/blog" className="hover:text-amber-400 transition-colors hidden md:inline">
+              Blog
+            </Link>
+            <Link href="/reservar" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 px-3.5 py-1.5 rounded-full font-extrabold transition-colors">
+              {isEnglish ? "Book Now" : "Reservar"}
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      <section className="relative min-h-[72vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center pt-12 pb-20">
         <div 
           className="absolute inset-0 w-full h-full"
           style={{
@@ -669,8 +779,8 @@ export default async function SEOLandingPage({ params }: { params: any }) {
 
         <div className="relative z-20 w-full max-w-4xl mx-auto px-6">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs md:text-sm font-bold text-zinc-300 mb-6">
-            <Link href="/" className="hover:text-amber-400 flex items-center gap-1 transition-colors">
-              <Home className="w-4 h-4" /> Inicio
+            <Link href={isEnglish ? "/en" : "/"} className="hover:text-amber-400 flex items-center gap-1 transition-colors">
+              <Home className="w-4 h-4" /> {isEnglish ? "Home" : "Inicio"}
             </Link>
             <ChevronRight className="w-4 h-4 text-zinc-500" />
             <span className="text-amber-400 truncate">{pagina.enlaceCorto}</span>
@@ -692,17 +802,17 @@ export default async function SEOLandingPage({ params }: { params: any }) {
             <a 
               href={linkWhatsApp} 
               target="_blank" 
-              rel="noreferrer" 
+              rel="noopener noreferrer" 
               className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
             >
               <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} className="w-5 h-5"/> 
-              Reservar por WhatsApp
+              {isEnglish ? "Book via WhatsApp" : "Reservar por WhatsApp"}
             </a>
             <Link 
-              href="/#cotizador" 
+              href={isEnglish ? "/en#cotizador" : "/#cotizador"} 
               className="inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-900 font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
             >
-              <Calendar className="w-5 h-5 text-amber-600" /> Ir al Cotizador en Línea
+              <Calendar className="w-5 h-5 text-amber-600" /> {isEnglish ? "Online Price Calculator" : "Ir al Cotizador en Línea"}
             </Link>
           </div>
         </div>
@@ -714,10 +824,12 @@ export default async function SEOLandingPage({ params }: { params: any }) {
           <div className="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-zinc-100">
             <div className="flex items-center gap-2">
               <BadgeCheck className="w-6 h-6 text-blue-500" />
-              <span className="font-bold text-zinc-800 text-sm">Operador Verificado en Caldas, Antioquia</span>
+              <span className="font-bold text-zinc-800 text-sm">
+                {isEnglish ? "Verified Ranch Operator in Caldas, Antioquia" : "Operador Verificado en Caldas, Antioquia"}
+              </span>
             </div>
             <div className="bg-amber-50 border border-amber-200 text-amber-900 font-extrabold px-4 py-2 rounded-xl text-sm">
-              Tarifa: {pagina.precioTexto}
+              {isEnglish ? "Rate:" : "Tarifa:"} {pagina.precioTexto}
             </div>
           </div>
 
@@ -733,7 +845,7 @@ export default async function SEOLandingPage({ params }: { params: any }) {
 
           <div className="bg-zinc-50 rounded-3xl p-6 md:p-8 border border-zinc-200/60 mb-10">
             <h3 className="text-xl font-extrabold text-zinc-900 mb-5 flex items-center gap-2">
-              <CheckCircle2 className="w-6 h-6 text-green-600" /> ¿Qué incluye esta experiencia?
+              <CheckCircle2 className="w-6 h-6 text-green-600" /> {isEnglish ? "What Is Included in This Experience?" : "¿Qué incluye esta experiencia?"}
             </h3>
             <ul className="space-y-3.5">
               {pagina.incluye.map((item, idx) => (
@@ -752,60 +864,57 @@ export default async function SEOLandingPage({ params }: { params: any }) {
             {pagina.detallesTexto}
           </p>
 
+          {/* TABLA COMPARATIVA PERSONALIZADA POR INTENCIÓN DE BÚSQUEDA */}
+          <h3 className="text-lg font-extrabold text-zinc-900 mb-3">
+            {pagina.tablaTitulo}
+          </h3>
           <div className="overflow-x-auto rounded-2xl border border-zinc-200 mb-8">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="bg-zinc-900 text-white">
-                  <th className="p-4 font-bold">Criterio</th>
-                  <th className="p-4 font-bold text-amber-400">Cabalgata Medellín (Caldas - Sur)</th>
-                  <th className="p-4 font-bold text-zinc-400">Otros (Oriente Antioqueño)</th>
+                  <th className="p-4 font-bold">{isEnglish ? "Feature" : "Criterio"}</th>
+                  <th className="p-4 font-bold text-amber-400">{pagina.tablaColNosotros}</th>
+                  <th className="p-4 font-bold text-zinc-300">{pagina.tablaColOtros}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 bg-white">
-                <tr>
-                  <td className="p-4 font-bold text-zinc-800">Tiempo desde El Poblado</td>
-                  <td className="p-4 text-green-700 font-bold">30 minutos (Sin peajes)</td>
-                  <td className="p-4 text-zinc-500">60 a 90 minutos (+ Peajes)</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-bold text-zinc-800">Precio Base (2 Horas)</td>
-                  <td className="p-4 text-green-700 font-bold">$100.000 COP</td>
-                  <td className="p-4 text-zinc-500">$120.000 - $160.000 COP</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-bold text-zinc-800">Póliza Médica</td>
-                  <td className="p-4 text-green-700 font-bold">Incluida (Magenta Seguros)</td>
-                  <td className="p-4 text-zinc-500">No siempre incluida</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-bold text-zinc-800">Edad Mínima / Peso Máx.</td>
-                  <td className="p-4 text-zinc-700 font-semibold">Desde 3 años / Hasta 110 kg</td>
-                  <td className="p-4 text-zinc-500">Variable</td>
-                </tr>
+                {pagina.tablaFilas.map((fila, idx) => (
+                  <tr key={idx}>
+                    <td className="p-4 font-bold text-zinc-800">{fila.criterio}</td>
+                    <td className="p-4 text-green-700 font-bold">{fila.nosotros}</td>
+                    <td className="p-4 text-zinc-600 font-medium">{fila.otros}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
           <div className="bg-zinc-900 rounded-3xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-2xl font-extrabold mb-2">¿Listo para agendar tu fecha?</h3>
-              <p className="text-zinc-300 text-sm">Reserva en menos de 2 minutos directamente con nuestro equipo en Caldas, Antioquia.</p>
+              <h3 className="text-2xl font-extrabold mb-2">
+                {isEnglish ? "Ready to book your date?" : "¿Listo para agendar tu fecha?"}
+              </h3>
+              <p className="text-zinc-300 text-sm">
+                {isEnglish 
+                  ? "Book in less than 2 minutes directly with our team in Caldas, Antioquia." 
+                  : "Reserva en menos de 2 minutos directamente con nuestro equipo en Caldas, Antioquia."}
+              </p>
             </div>
             <a 
               href={linkWhatsApp} 
               target="_blank" 
-              rel="noreferrer" 
+              rel="noopener noreferrer" 
               className="shrink-0 bg-green-600 hover:bg-green-700 text-white font-extrabold py-4 px-8 rounded-2xl shadow-lg flex items-center gap-2 transition-transform hover:scale-105"
             >
               <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} className="w-5 h-5"/> 
-              Confirmar Cupo Ahora
+              {isEnglish ? "Confirm Spot Now" : "Confirmar Cupo Ahora"}
             </a>
           </div>
         </article>
 
         <section className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-12 border border-zinc-100">
           <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 mb-8 tracking-tight">
-            Preguntas Frecuentes: {pagina.enlaceCorto}
+            {isEnglish ? `Frequently Asked Questions: ${pagina.enlaceCorto}` : `Preguntas Frecuentes: ${pagina.enlaceCorto}`}
           </h2>
           <div className="space-y-4">
             {pagina.faqs.map((faq, index) => (
@@ -823,24 +932,39 @@ export default async function SEOLandingPage({ params }: { params: any }) {
 
         <section className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-12 border border-zinc-100">
           <h2 className="text-2xl font-extrabold text-zinc-900 mb-3 tracking-tight flex items-center gap-2">
-            <Compass className="w-6 h-6 text-amber-600" /> Explora Más Rutas y Planes en Medellín
+            <Compass className="w-6 h-6 text-amber-600" /> {isEnglish ? "Explore More Routes & Packages in Medellin" : "Explora Más Rutas y Planes en Medellín"}
           </h2>
           <p className="text-zinc-500 text-sm mb-6">
-            Selecciona el plan que mejor se adapte a tu grupo, celebración o preferencia de aventura:
+            {isEnglish 
+              ? "Choose the experience that best fits your group, celebration, or adventure style:" 
+              : "Selecciona el plan que mejor se adapte a tu grupo, celebración o preferencia de aventura:"}
           </p>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3.5">
             <Link 
-              href="/" 
+              href={isEnglish ? "/en" : "/"} 
               className="p-4 rounded-2xl border border-zinc-200 hover:border-amber-500 hover:bg-amber-50/30 transition-colors flex items-center justify-between group"
             >
-              <span className="font-bold text-sm text-zinc-800 group-hover:text-amber-700">Portada Principal y Cotizador</span>
+              <span className="font-bold text-sm text-zinc-800 group-hover:text-amber-700">
+                {isEnglish ? "Main Page & Price Calculator" : "Portada Principal y Cotizador"}
+              </span>
               <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-600" />
+            </Link>
+            <Link 
+              href="/cabalgatas-caldas" 
+              className="p-4 rounded-2xl border border-amber-300 bg-amber-50/40 hover:border-amber-500 transition-colors flex items-center justify-between group"
+            >
+              <span className="font-bold text-sm text-amber-900">
+                {isEnglish ? "Caldas Ranch Guide (Vereda Salinas)" : "Cabalgatas Caldas, Antioquia (Guía Oficial)"}
+              </span>
+              <ArrowRight className="w-4 h-4 text-amber-600" />
             </Link>
             <Link 
               href="/blog" 
               className="p-4 rounded-2xl border border-zinc-200 hover:border-amber-500 hover:bg-amber-50/30 transition-colors flex items-center justify-between group"
             >
-              <span className="font-bold text-sm text-zinc-800 group-hover:text-amber-700">Guías y Blog de Cabalgatas</span>
+              <span className="font-bold text-sm text-zinc-800 group-hover:text-amber-700">
+                {isEnglish ? "Horseback Riding Blog & Tips" : "Guías y Blog de Cabalgatas"}
+              </span>
               <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-600" />
             </Link>
             {PAGINAS_SEO.filter((p) => p.slug !== pagina.slug).map((otraPagina) => (
@@ -857,14 +981,46 @@ export default async function SEOLandingPage({ params }: { params: any }) {
         </section>
       </main>
 
-      <footer className="bg-zinc-950 text-zinc-400 py-14 mt-16 border-t border-zinc-800">
-        <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-center md:text-left">
-            <p className="text-white font-extrabold text-lg">Cabalgata Medellín — Vereda Salinas, Caldas, Antioquia</p>
-            <p className="text-xs text-zinc-500 mt-1">A 30 minutos de El Poblado y Laureles (Sin peajes) • Póliza Magenta Seguros Incluida</p>
+      {/* FOOTER COMPLETO CON NAP TRADUCIDO SEGÚN IDIOMA DE LA URL */}
+      <footer className="bg-zinc-950 text-zinc-400 py-16 mt-16 border-t border-zinc-800">
+        <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-left mb-10">
+          <div>
+            <h3 className="text-white text-xl font-extrabold mb-3 tracking-tight">
+              {isEnglish ? "Medellin Horseback Riding" : "Cabalgata Medellín"}
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              {isEnglish 
+                ? "Ecological horseback riding trails and off-road ATV tours in Vereda Salinas, Caldas (30 mins south of El Poblado, zero tolls). Full medical insurance with Magenta Seguros included." 
+                : "Rutas ecológicas a caballo y tours en cuatrimoto en la Vereda Salinas, Caldas (a 30 min de El Poblado, sin peajes). Póliza de asistencia médica con Magenta Seguros incluida."}
+            </p>
           </div>
-          <Link href="/" className="text-amber-400 hover:underline text-sm font-bold">
-            ← Volver a cabalgatamedellin.com
+          <div>
+            <h4 className="text-white text-base font-bold mb-3">
+              {isEnglish ? "Location & Contact (NAP)" : "Contacto y Ubicación (NAP)"}
+            </h4>
+            <ul className="space-y-2 text-xs text-zinc-400">
+              <li><strong className="text-zinc-200">{isEnglish ? "Location:" : "Dirección:"}</strong> Vereda Salinas, Caldas, Antioquia, CO</li>
+              <li><strong className="text-zinc-200">WhatsApp:</strong> +{whatsappNum}</li>
+              <li><strong className="text-zinc-200">{isEnglish ? "Daily Departures:" : "Horarios:"}</strong> 10:00 AM, 2:00 PM & 4:00 PM</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white text-base font-bold mb-3">
+              {isEnglish ? "Main Links" : "Enlaces Directos"}
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li><Link href={isEnglish ? "/en" : "/"} className="hover:text-amber-400 transition-colors">{isEnglish ? "Home & Online Calculator" : "Portada y Cotizador"}</Link></li>
+              <li><Link href="/cabalgatas-caldas" className="hover:text-amber-400 transition-colors">{isEnglish ? "Caldas Ranch Guide" : "Cabalgatas en Caldas, Antioquia"}</Link></li>
+              <li><Link href="/planes-cabalgatas-medellin" className="hover:text-amber-400 transition-colors">{isEnglish ? "Packages & Pricing" : "Planes y Paquetes"}</Link></li>
+              <li><Link href="/tour-cuatrimotos-medellin-caldas" className="hover:text-amber-400 transition-colors">{isEnglish ? "ATV Tours (1.5 Hours)" : "Tour de Cuatrimotos"}</Link></li>
+              <li><Link href="/en-horseback-riding-medellin-tours" className="hover:text-amber-400 transition-colors">English Tour Guide 🇺🇸</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-4xl mx-auto px-6 pt-8 border-t border-zinc-800/80 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-zinc-500">
+          <p>© {new Date().getFullYear()} Cabalgata Medellín (cabalgatamedellin.com). {isEnglish ? "All rights reserved." : "Todos los derechos reservados."}</p>
+          <Link href={isEnglish ? "/en" : "/"} className="text-amber-400 hover:underline font-bold">
+            {isEnglish ? "← Back to Home (cabalgatamedellin.com/en)" : "← Volver a cabalgatamedellin.com"}
           </Link>
         </div>
       </footer>

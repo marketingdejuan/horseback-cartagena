@@ -35,7 +35,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const slugsSEO = [
     'planes-cabalgatas-medellin',
     'tour-cuatrimotos-medellin-caldas',
-    'cabalgatas-caldas-antioquia',
     'cabalgata-romantica-parejas-medellin',
     'cabalgatas-ninos-familias-medellin',
     'cabalgata-vip-transporte-el-poblado-laureles',

@@ -40,16 +40,15 @@ const FAQS_ES = [
 ];
 
 const PAGINAS_INTERLINKING = [
-  { href: '/cabalgatas-caldas', titulo: 'Cabalgatas Caldas, Antioquia (Guía Completa)', tag: 'Destacado Sur' },
-  { href: '/planes-cabalgatas-medellin', titulo: 'Planes y Precios de Cabalgatas', tag: 'Planes 2026' },
+  { href: '/cabalgatas-caldas', titulo: 'Cabalgatas en Caldas, Antioquia (Guía Oficial)', tag: 'Sede Vereda Salinas' },
+  { href: '/planes-cabalgatas-medellin', titulo: 'Planes y Paquetes de Cabalgatas', tag: 'Paquetes' },
   { href: '/tour-cuatrimotos-medellin-caldas', titulo: 'Tour de Cuatrimotos en Medellín y Caldas', tag: 'Adrenalina 1.5h' },
-  { href: '/cabalgatas-caldas-antioquia', titulo: 'Cabalgatas en la Vereda Salinas, Caldas', tag: 'Sur sin peajes' },
   { href: '/cabalgata-romantica-parejas-medellin', titulo: 'Cabalgata Romántica para Parejas', tag: 'Aniversarios' },
   { href: '/cabalgatas-ninos-familias-medellin', titulo: 'Cabalgatas para Niños y Familias', tag: 'Desde 3 años' },
   { href: '/cabalgata-vip-transporte-el-poblado-laureles', titulo: 'Cabalgata VIP con Transporte Incluido', tag: 'El Poblado / Laureles' },
-  { href: '/alquiler-caballos-medellin-precios', titulo: 'Alquiler de Caballos en Medellín por Horas', tag: 'Tarifas' },
+  { href: '/alquiler-caballos-medellin-precios', titulo: 'Alquiler de Caballos por Horas', tag: 'Tarifas por Tiempo' },
   { href: '/cabalgatas-grupos-empresas-medellin', titulo: 'Cabalgatas para Grupos y Empresas', tag: 'Eventos 6+ pax' },
-  { href: '/donde-montar-a-caballo-cerca-de-medellin', titulo: 'Dónde Montar a Caballo Cerca de Medellín', tag: 'Guía Comparativa' },
+  { href: '/donde-montar-a-caballo-cerca-de-medellin', titulo: 'Dónde Montar a Caballo Cerca de Medellín', tag: 'Comparativa Sur vs Oriente' },
   { href: '/en-horseback-riding-medellin-tours', titulo: 'Private Horseback Riding Medellin (English)', tag: 'English Tours' }
 ];
 
@@ -112,7 +111,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     }
   }, [data, hasShownPopup]);
 
-  // 🔥 EJECUCIÓN ASÍNCRONA NO BLOQUEANTE PARA CERO IMPACTO EN INP
   const trackWhatsAppClick = (ubicacionBoton: string) => {
     setTimeout(() => {
       if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -130,34 +128,39 @@ export default function ClientePage({ initialData }: { initialData: any }) {
     }, 0);
   };
 
-  const esFinDeSemana = fecha ? [6, 0].includes(new Date(fecha + 'T12:00:00').getDay()) : false;
-  const esDosPm = hora === '14:00';
+  // SANITIZACIÓN DE VALORES DEL COTIZADOR (PREVENCIÓN DOM XSS)
+  const jinetesSeguros = Math.min(30, Math.max(1, Number(jinetes) || 1));
+  const fechaSegura = fecha.replace(/[^0-9-]/g, '').slice(0, 10);
+  const horaSegura = ['10:00', '14:00', '16:00'].includes(hora) ? hora : '10:00';
+  const telefonoSeguro = telefono.replace(/[^0-9+\s-]/g, '').trim().slice(0, 20);
+
+  const esFinDeSemana = fechaSegura ? [6, 0].includes(new Date(fechaSegura + 'T12:00:00').getDay()) : false;
+  const esDosPm = horaSegura === '14:00';
   const esGrupal = esFinDeSemana && esDosPm;
-  const precioBase = data?.basePrice ? data.basePrice : 100000;
+  const precioBase = data?.basePrice ? Number(data.basePrice) : 100000;
   const costoGuia = esGrupal ? 0 : (data?.guidePrice ?? 80000);
-  const totalCalculado = (jinetes * precioBase) + costoGuia;
+  const totalCalculado = (jinetesSeguros * precioBase) + costoGuia;
   const tipoCabalgataStr = esGrupal ? 'Grupal (Sin cobro extra de guía)' : 'Privada (Incluye guía exclusivo)';
-  const whatsappNum = data?.whatsappNumber ? data.whatsappNumber : "573000000000";
-  const fechaTexto = fecha ? fecha : 'próximo fin de semana';
+  const whatsappNum = (data?.whatsappNumber ? String(data.whatsappNumber) : "573000000000").replace(/\D/g, '');
+  const fechaTexto = fechaSegura ? fechaSegura : 'próximo fin de semana';
   const modalidadTexto = esGrupal ? 'Grupal' : 'Privada';
   
-  const mensajeReserva = `Hola, quiero reservar el ${fechaTexto} a las ${hora}. Somos ${jinetes} personas. Modalidad: ${modalidadTexto}. Cotización: $${totalCalculado.toLocaleString()}`;
+  const mensajeReserva = `Hola, quiero reservar el ${fechaTexto} a las ${horaSegura}. Somos ${jinetesSeguros} personas. Modalidad: ${modalidadTexto}. Cotización: $${totalCalculado.toLocaleString()}`;
   const linkCotizador = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(mensajeReserva)}`;
   const linkGancho = `https://wa.me/${whatsappNum}?text=${encodeURIComponent("¡Hola! Quiero información sobre las cabalgatas en Medellín y Caldas. 🐎")}`;
   
-  const isValidPhone = telefono.trim().length >= 7;
+  const isValidPhone = telefonoSeguro.length >= 7;
 
-  // 🔥 ENVÍO NO BLOQUEANTE (KEEPALIVE) PARA QUE EL INP SEA < 50 MS
   const handleReservaWhatsApp = (e: React.MouseEvent) => {
     e.preventDefault(); 
     trackWhatsAppClick('Boton_Cotizador');
     
     if (isValidPhone) {
-      const notaReserva = `Cotización Web (${modalidadTexto}) - ${jinetes} Jinetes.`;
+      const notaReserva = `Cotización Web (${modalidadTexto}) - ${jinetesSeguros} Jinetes.`;
       const payload = {
         clientName: "Lead Web (Cotizador)",
-        phone: telefono,
-        date: fecha ? new Date(`${fecha}T${hora}:00-05:00`).toISOString() : new Date().toISOString(),
+        phone: telefonoSeguro,
+        date: fechaSegura ? new Date(`${fechaSegura}T${horaSegura}:00-05:00`).toISOString() : new Date().toISOString(),
         totalValue: totalCalculado,
         notes: notaReserva,
         brand: MARCA_SITIO,
@@ -172,14 +175,33 @@ export default function ClientePage({ initialData }: { initialData: any }) {
       }).catch((error) => console.error("Error guardando reserva en el ERP:", error));
     }
     
-    window.open(linkCotizador, '_blank');
+    window.open(linkCotizador, '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] font-sans selection:bg-amber-200 text-zinc-900">
 
-      {/* HERO OPTIMIZADO PARA LCP (< 2.5s EN MÓVIL) */}
-      <section id="inicio" className="relative h-[85vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center">
+      {/* BARRA DE NAVEGACIÓN SUPERIOR CON ACCESO DIRECTO A LAS PÁGINAS CLAVE */}
+      <header className="sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800 text-white">
+        <div className="max-w-5xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+          <Link href="/" className="font-extrabold text-base md:text-lg tracking-tight text-white hover:text-amber-400 transition-colors">
+            🐎 Cabalgata Medellín
+          </Link>
+          <nav aria-label="Navegación Principal" className="flex flex-wrap items-center gap-3 md:gap-5 text-xs md:text-sm font-bold text-zinc-300">
+            <a href="#cotizador" className="hover:text-amber-400 transition-colors">Cotizar</a>
+            <Link href="/planes-cabalgatas-medellin" className="hover:text-amber-400 transition-colors">Planes</Link>
+            <Link href="/cabalgatas-caldas" className="hover:text-amber-400 transition-colors">Sede Caldas</Link>
+            <Link href="/tour-cuatrimotos-medellin-caldas" className="hover:text-amber-400 transition-colors">Cuatrimotos</Link>
+            <Link href="/cabalgata-romantica-parejas-medellin" className="hover:text-amber-400 transition-colors hidden sm:inline">Parejas</Link>
+            <Link href="/blog" className="hover:text-amber-400 transition-colors hidden md:inline">Blog</Link>
+            <Link href="/reservar" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 px-3.5 py-1.5 rounded-full font-extrabold transition-colors">
+              Reservar
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      <section id="inicio" className="relative h-[82vh] bg-[#fbfbfd] overflow-hidden flex flex-col justify-center">
         <div 
           className="absolute inset-0 w-full h-full"
           style={{
@@ -214,7 +236,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           <a 
             href={linkGancho} 
             target="_blank" 
-            rel="noreferrer" 
+            rel="noopener noreferrer" 
             aria-label="Chatear con un asesor por WhatsApp" 
             onClick={() => trackWhatsAppClick('Boton_Principal_Hero')} 
             className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
@@ -227,7 +249,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
       <main className="max-w-4xl mx-auto px-4 mt-[-60px] md:mt-[-120px] relative z-20 space-y-16">
         
-        {/* COTIZADOR OPTIMIZADO SIN BLUR PESADO EN MÓVIL PARA REDUCIR INP */}
         <section id="cotizador" className="bg-white md:bg-white/90 md:backdrop-blur-xl rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 md:p-10 border border-zinc-100 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4 border-b border-zinc-200/50 pb-6">
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 flex items-center gap-3 tracking-tight">
@@ -266,9 +287,9 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   <span>2. Número de Jinetes</span>
                 </label>
                 <div className="flex items-center gap-4 bg-zinc-50 p-2 rounded-2xl border border-zinc-200 w-fit shadow-sm">
-                  <button type="button" aria-label="Disminuir número de jinetes" onClick={() => setJinetes(Math.max(1, jinetes - 1))} className="w-12 h-12 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-extrabold shadow-sm border border-zinc-200 transition-colors">-</button>
-                  <span aria-live="polite" className="w-8 text-center font-extrabold text-2xl text-zinc-900">{jinetes}</span>
-                  <button type="button" aria-label="Aumentar número de jinetes" onClick={() => setJinetes(jinetes + 1)} className="w-12 h-12 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-extrabold shadow-sm border border-zinc-200 transition-colors">+</button>
+                  <button type="button" aria-label="Disminuir número de jinetes" onClick={() => setJinetes(Math.max(1, jinetesSeguros - 1))} className="w-12 h-12 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-extrabold shadow-sm border border-zinc-200 transition-colors">-</button>
+                  <span aria-live="polite" className="w-8 text-center font-extrabold text-2xl text-zinc-900">{jinetesSeguros}</span>
+                  <button type="button" aria-label="Aumentar número de jinetes" onClick={() => setJinetes(Math.min(30, jinetesSeguros + 1))} className="w-12 h-12 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-extrabold shadow-sm border border-zinc-200 transition-colors">+</button>
                 </div>
               </div>
 
@@ -290,8 +311,8 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               <div>
                 <p className="text-xs font-bold text-amber-500 mb-5 bg-amber-500/10 inline-block px-4 py-2 rounded-xl uppercase tracking-wider">{tipoCabalgataStr}</p>
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-zinc-400 font-medium">{jinetes} Jinetes x ${precioBase.toLocaleString()}: </span>
-                  <span className="font-bold text-xl text-white">${(jinetes * precioBase).toLocaleString()}</span>
+                  <span className="text-zinc-400 font-medium">{jinetesSeguros} Jinetes x ${precioBase.toLocaleString()}: </span>
+                  <span className="font-bold text-xl text-white">${(jinetesSeguros * precioBase).toLocaleString()}</span>
                 </div>
                 {!esGrupal && (
                   <div className="flex justify-between items-center mb-4 text-red-300 bg-red-500/10 p-4 rounded-xl border border-red-500/10">
@@ -383,7 +404,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
 
         <PricingSection />
 
-        {/* SECCIÓN UBICACIÓN CON IFRAME REAL DE GOOGLE MAPS */}
         <section id="ubicacion" className="pt-4 scroll-mt-20">
           <div className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-zinc-100 overflow-hidden">
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-zinc-50/50 to-white/50">
@@ -425,7 +445,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               />
               {data.mapEmbedUrl && (
                 <div className="absolute bottom-4 right-4 z-10">
-                  <a href={data.mapEmbedUrl} target="_blank" rel="noreferrer" aria-label="Abrir ubicación en Google Maps" className="bg-zinc-900/90 text-white text-sm font-bold py-3 px-5 rounded-2xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2 hover:bg-black">
+                  <a href={data.mapEmbedUrl} target="_blank" rel="noopener noreferrer" aria-label="Abrir ubicación en Google Maps" className="bg-zinc-900/90 text-white text-sm font-bold py-3 px-5 rounded-2xl shadow-xl transition-transform hover:scale-105 flex items-center gap-2 hover:bg-black">
                     <MapPin className="w-4 h-4 text-amber-400" /> Abrir en Google Maps
                   </a>
                 </div>
@@ -452,7 +472,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               ))}
             </div>
             <div className="flex justify-center mt-2">
-              <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Pedir más información por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} className="bg-green-50 text-green-700 hover:bg-green-100 font-bold py-3.5 px-8 rounded-full flex items-center gap-2 transition-colors border border-green-200/50">
+              <a href={linkGancho} target="_blank" rel="noopener noreferrer" aria-label="Pedir más información por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Galeria')} className="bg-green-50 text-green-700 hover:bg-green-100 font-bold py-3.5 px-8 rounded-full flex items-center gap-2 transition-colors border border-green-200/50">
                 <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
                 Me gusta. Quiero más info.
               </a>
@@ -502,7 +522,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
                   <div className="flex items-center justify-between mt-4 pt-5 border-t border-zinc-100">
                     <span className="font-bold text-sm text-zinc-900">{review.author}</span>
                     {review.videoUrl && (
-                      <a href={review.videoUrl} target="_blank" rel="noreferrer" aria-label={`Ver video de testimonio de ${review.author}`} className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-3.5 py-2 rounded-xl transition-colors hover:bg-red-100">
+                      <a href={review.videoUrl} target="_blank" rel="noopener noreferrer" aria-label={`Ver video de testimonio de ${review.author}`} className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-3.5 py-2 rounded-xl transition-colors hover:bg-red-100">
                         <PlayCircle className="w-4 h-4" aria-hidden="true" /> Ver Video
                       </a>
                     )}
@@ -511,7 +531,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
               ))}
             </div>
             <div className="flex justify-center mt-2">
-              <a href={linkCotizador} target="_blank" rel="noreferrer" aria-label="Hacer una reserva por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Reviews')} className="bg-green-600 text-white hover:bg-green-700 font-bold py-4 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105">
+              <a href={linkCotizador} target="_blank" rel="noopener noreferrer" aria-label="Hacer una reserva por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Abajo_Reviews')} className="bg-green-600 text-white hover:bg-green-700 font-bold py-4 px-8 rounded-full flex items-center gap-2 shadow-lg transition-transform hover:scale-105">
                 <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
                 Únete a ellos, reserva aquí
               </a>
@@ -519,7 +539,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </section>
         )}
 
-        {/* SECCIÓN FAQ VISIBLE EN EL HTML INICIAL */}
         <section id="faq" className="pb-8 scroll-mt-20">
           <h2 className="text-3xl font-extrabold text-zinc-900 mb-10 text-center tracking-tight">Preguntas Frecuentes sobre las Cabalgatas en Medellín</h2>
           <div className="space-y-4 max-w-3xl mx-auto">
@@ -532,14 +551,13 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           </div>
           <div className="text-center mt-12">
             <p className="text-zinc-500 mb-5 font-medium tracking-wide">¿Aún tienes dudas?</p>
-            <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Hablar con un asesor por WhatsApp para resolver dudas" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+            <a href={linkGancho} target="_blank" rel="noopener noreferrer" aria-label="Hablar con un asesor por WhatsApp para resolver dudas" onClick={() => trackWhatsAppClick('Boton_Abajo_FAQ')} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
               <Image src="/logo-whatsapp.webp" alt="WhatsApp" width={24} height={24} aria-hidden="true" className="w-5 h-5"/> 
               Habla con un asesor ahora
             </a>
           </div>
         </section>
 
-        {/* SECCIÓN DE INTERLINKING SEO (INCLUYE /cabalgatas-caldas EN PRIMERA POSICIÓN) */}
         <section className="pb-16">
           <div className="bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-8 md:p-10 border border-zinc-100">
             <h2 className="text-2xl md:text-3xl font-extrabold text-zinc-900 mb-3 tracking-tight flex items-center gap-2">
@@ -571,7 +589,6 @@ export default function ClientePage({ initialData }: { initialData: any }) {
         </section>
       </main>
 
-      {/* FOOTER CON DATOS NAP COMPLETOS Y LAS URLS INDEXABLES */}
       <footer className="bg-zinc-950 text-zinc-400 py-16 relative z-20 mt-12 border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-left mb-12">
           <div>
@@ -597,14 +614,13 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           <div>
             <h4 className="text-white text-base font-bold mb-4">Rutas, Planes y Guías</h4>
             <ul className="space-y-2 text-xs text-zinc-400">
-              <li><Link href="/cabalgatas-caldas" className="text-amber-400 font-bold hover:underline transition-colors">Cabalgatas Caldas, Antioquia (Guía Oficial)</Link></li>
-              <li><Link href="/planes-cabalgatas-medellin" className="hover:text-amber-400 transition-colors">Planes y Precios de Cabalgatas</Link></li>
+              <li><Link href="/cabalgatas-caldas" className="text-amber-400 font-bold hover:underline transition-colors">Cabalgatas en Caldas, Antioquia (Guía Oficial)</Link></li>
+              <li><Link href="/planes-cabalgatas-medellin" className="hover:text-amber-400 transition-colors">Planes y Paquetes de Cabalgatas</Link></li>
               <li><Link href="/tour-cuatrimotos-medellin-caldas" className="hover:text-amber-400 transition-colors">Tour de Cuatrimotos en Medellín y Caldas</Link></li>
-              <li><Link href="/cabalgatas-caldas-antioquia" className="hover:text-amber-400 transition-colors">Cabalgatas en la Vereda Salinas, Caldas</Link></li>
               <li><Link href="/cabalgata-romantica-parejas-medellin" className="hover:text-amber-400 transition-colors">Cabalgata Romántica para Parejas</Link></li>
               <li><Link href="/cabalgatas-ninos-familias-medellin" className="hover:text-amber-400 transition-colors">Cabalgatas para Niños y Familias</Link></li>
               <li><Link href="/cabalgata-vip-transporte-el-poblado-laureles" className="hover:text-amber-400 transition-colors">Cabalgata VIP con Transporte (El Poblado)</Link></li>
-              <li><Link href="/alquiler-caballos-medellin-precios" className="hover:text-amber-400 transition-colors">Alquiler de Caballos en Medellín</Link></li>
+              <li><Link href="/alquiler-caballos-medellin-precios" className="hover:text-amber-400 transition-colors">Alquiler de Caballos por Horas</Link></li>
               <li><Link href="/cabalgatas-grupos-empresas-medellin" className="hover:text-amber-400 transition-colors">Cabalgatas para Grupos y Empresas</Link></li>
               <li><Link href="/donde-montar-a-caballo-cerca-de-medellin" className="hover:text-amber-400 transition-colors">Dónde Montar a Caballo Cerca de Medellín</Link></li>
               <li><Link href="/en-horseback-riding-medellin-tours" className="hover:text-amber-400 transition-colors">Private Horseback Riding Tours (EN)</Link></li>
@@ -620,7 +636,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <a 
               href="https://www.instagram.com/cabalgataseco" 
               target="_blank" 
-              rel="noreferrer" 
+              rel="noopener noreferrer" 
               aria-label="Instagram de Cabalgata Medellín" 
               className="bg-zinc-900 p-3 rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300 flex items-center justify-center border border-zinc-800"
             >
@@ -629,7 +645,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <a 
               href="https://web.facebook.com/Cabalgatasmedellin" 
               target="_blank" 
-              rel="noreferrer" 
+              rel="noopener noreferrer" 
               aria-label="Facebook de Cabalgata Medellín" 
               className="bg-zinc-900 p-3 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center border border-zinc-800"
             >
@@ -646,7 +662,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
             <div className="w-20 h-20 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-green-100"><Gift className="w-10 h-10" aria-hidden="true" /></div>
             <h3 className="text-2xl font-extrabold text-zinc-900 mb-3 tracking-tight">¡Espera! No te vayas 🐎</h3>
             <p className="text-zinc-500 mb-8 leading-relaxed">Resérvalo ahora mismo por WhatsApp y recibe un <b className="text-zinc-800">descuento sorpresa</b>.</p>
-            <a href={linkCotizador} target="_blank" rel="noreferrer" aria-label="Reclamar descuento por WhatsApp" onClick={() => { setShowExitPopup(false); trackWhatsAppClick('Boton_Exit_Intent'); }} className="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg transition-colors">
+            <a href={linkCotizador} target="_blank" rel="noopener noreferrer" aria-label="Reclamar descuento por WhatsApp" onClick={() => { setShowExitPopup(false); trackWhatsAppClick('Boton_Exit_Intent'); }} className="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg transition-colors">
               ¡Reclamar mi descuento!
             </a>
             <button onClick={() => setShowExitPopup(false)} aria-label="Cerrar descuento" className="mt-5 text-sm text-zinc-400 font-bold hover:text-zinc-700 transition-colors">No gracias</button>
@@ -655,7 +671,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
       )}
 
       <a 
-        href={linkGancho} target="_blank" rel="noreferrer" aria-label="Abrir chat flotante de WhatsApp" 
+        href={linkGancho} target="_blank" rel="noopener noreferrer" aria-label="Abrir chat flotante de WhatsApp" 
         onClick={() => trackWhatsAppClick('Boton_Flotante')} 
         className="fixed bottom-8 right-8 hover:scale-110 transition-transform z-50 hidden md:flex items-center justify-center drop-shadow-[0_8px_30px_rgba(34,197,94,0.4)]"
       >
@@ -670,7 +686,7 @@ export default function ClientePage({ initialData }: { initialData: any }) {
           <Calendar className="w-5 h-5 mb-1" aria-hidden="true" /><span className="text-[9px] font-bold truncate w-full">{data?.navLabel2 ? data.navLabel2 : 'Cotizar'}</span>
         </a>
         
-        <a href={linkGancho} target="_blank" rel="noreferrer" aria-label="Chatear por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Nav_Movil')} className="relative -mt-8 flex justify-center">
+        <a href={linkGancho} target="_blank" rel="noopener noreferrer" aria-label="Chatear por WhatsApp" onClick={() => trackWhatsAppClick('Boton_Nav_Movil')} className="relative -mt-8 flex justify-center">
           <div className="bg-white rounded-full shadow-[0_8px_20px_rgba(34,197,94,0.3)] border-4 border-white flex items-center justify-center p-1">
             <Image src="/logo-whatsapp.webp" alt="WhatsApp Móvil" width={48} height={48} aria-hidden="true" />
           </div>
