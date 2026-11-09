@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/cabalgatas-caldas",
+      "destination": "/cabalgatas-caldas-antioquia",
+      "permanent": true
+    }
+  ]
+}
