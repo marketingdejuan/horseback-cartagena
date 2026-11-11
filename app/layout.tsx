@@ -1,173 +1,87 @@
-import type { Metadata } from "next";
-import Script from "next/script";
-import "./globals.css";
-import LanguageSwitcher from "../components/LanguageSwitcher";
-
-const URL_SITIO = 'https://cabalgatamedellin.com';
-const META_PIXEL_ID = '1105267645313250';
-const GA4_ID = 'G-12762T7ZP0';
-const GOOGLE_ADS_ID = 'AW-10958714047';
+import type { Metadata } from 'next';
+import Script from 'next/script';
+import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(URL_SITIO),
-  title: 'Cabalgatas en Medellín y Caldas | Planes desde $100.000 (A 30 min del Poblado)',
-  description: 'Cabalgatas ecológicas y tours en cuatrimoto en Caldas, Antioquia, a 30 minutos de El Poblado y Laureles (sin peajes). Caballos dóciles, guías expertos y póliza médica con Magenta Seguros.',
-  keywords: 'cabalgatas en medellin, cabalgatas medellin, cabalgata en caldas antioquia, alquiler de caballos en medellin, tour cuatrimotos medellin, paseos a caballo medellin',
+  metadataBase: new URL('https://horsebackcartagena.com'),
+  title: 'Horseback Riding Cartagena | Manzanillo del Mar Beach Tours',
+  description:
+    'Book the best beach horseback riding in Cartagena, Colombia. Private and group tours in Manzanillo del Mar (North Zone), 20 mins from the Walled City. Zero tolls.',
   alternates: {
-    canonical: URL_SITIO,
+    canonical: 'https://horsebackcartagena.com',
     languages: {
-      'es-CO': URL_SITIO,
-      'en-US': `${URL_SITIO}/en`,
-      'x-default': URL_SITIO,
+      'en-US': 'https://horsebackcartagena.com',
+      'es-CO': 'https://horsebackcartagena.com/es',
     },
   },
   openGraph: {
-    title: 'Cabalgatas en Medellín y Caldas | Planes desde $100.000 (A 30 min del Poblado)',
-    description: 'Rutas ecológicas y tradicionales en Caldas, Antioquia. A solo 30 minutos del sur de Medellín con póliza médica Magenta Seguros incluida.',
-    url: URL_SITIO,
-    siteName: 'Cabalgata Medellín',
-    locale: 'es_CO',
+    title: 'Horseback Riding Cartagena | Beach & Mangrove Tours',
+    description:
+      'Ride gentle Paso Fino horses along the beaches of Manzanillo del Mar, just 20 minutes from Bocagrande and the Historic Center. No tolls.',
+    url: 'https://horsebackcartagena.com',
+    siteName: 'Horseback Cartagena',
+    locale: 'en_US',
     type: 'website',
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
-  const jsonLdGraph = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": ["LocalBusiness", "TouristAttraction"],
-        "@id": "https://cabalgatamedellin.com/#business",
-        "name": "Cabalgata Medellín",
-        "url": "https://cabalgatamedellin.com/",
-        "telephone": "+573000000000",
-        "description": "Cabalgatas ecológicas y tours en cuatrimoto en Caldas, Antioquia, a 30 minutos de Medellín. Caballos dóciles, guías expertos y póliza médica con Magenta Seguros.",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Vereda Salinas",
-          "addressLocality": "Caldas",
-          "addressRegion": "Antioquia",
-          "addressCountry": "CO"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": "6.0911",
-          "longitude": "-75.6358"
-        },
-        "areaServed": { "@type": "City", "name": "Medellín" },
-        "priceRange": "$100.000 - $250.000 COP",
-        "offers": [
-          {
-            "@type": "Offer",
-            "name": "Cabalgata Grupal Fin de Semana",
-            "price": "100000",
-            "priceCurrency": "COP",
-            "availability": "https://schema.org/InStock"
-          },
-          {
-            "@type": "Offer",
-            "name": "Cabalgata Privada Exclusiva",
-            "price": "100000",
-            "priceCurrency": "COP",
-            "description": "Tarifa por persona más $80.000 COP de guía exclusivo por grupo.",
-            "availability": "https://schema.org/InStock"
-          },
-          {
-            "@type": "Offer",
-            "name": "Tour Cuatrimoto (1.5 Horas)",
-            "price": "250000",
-            "priceCurrency": "COP",
-            "availability": "https://schema.org/InStock"
-          }
-        ]
+const globalSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['LocalBusiness', 'TouristAttraction', 'SportsActivityLocation'],
+      '@id': 'https://horsebackcartagena.com/#organization',
+      name: 'Horseback Cartagena',
+      url: 'https://horsebackcartagena.com',
+      telephone: '+573000000000',
+      priceRange: '$$',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Playas de Manzanillo del Mar, Zona Norte',
+        addressLocality: 'Cartagena de Indias',
+        addressRegion: 'Bolívar',
+        addressCountry: 'CO',
       },
-      {
-        "@type": "FAQPage",
-        "@id": "https://cabalgatamedellin.com/#faq",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "¿Necesito experiencia previa para realizar la cabalgata?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No necesitas experiencia previa. Asignamos caballos nobles según tu nivel, brindamos inducción inicial y vas acompañado por un guía durante todo el recorrido con póliza de Magenta Seguros incluida."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Dónde están ubicados y cuánto tarda llegar desde Medellín?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Estamos ubicados en la Vereda Salinas en Caldas, Antioquia (Sur del Valle de Aburrá), a solo 30 minutos de El Poblado y Laureles sin pagar peajes, con opción de transporte VIP puerta a puerta."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Cuánto dura la experiencia y por dónde pasa la ruta?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "El recorrido a caballo dura aproximadamente 2 horas a través de senderos ecológicos, bosques nativos y miradores en las montañas del sur del Valle de Aburrá. Te recomendamos disponer de unas 2.5 horas en total."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Tienen límite de peso o edad mínima para los jinetes?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Por el bienestar y la salud de nuestros caballos, el peso máximo permitido es de 110 kg. Recibimos niños a partir de los 3 años acompañados de un adulto."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Qué pasa si llueve el día de mi reserva?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Operamos con normalidad bajo lluvia ligera proporcionando ponchos plásticos. En caso de tormenta eléctrica o clima severo que comprometa la seguridad, reprogramaremos tu reserva sin costo adicional."
-            }
-          }
-        ]
-      }
-    ]
-  };
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: 10.5218,
+        longitude: -75.5015,
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '184',
+      },
+    },
+  ],
+};
 
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="en">
       <head>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }} />
+        <meta name="theme-color" content="#0f172a" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(globalSchema) }}
+        />
       </head>
-      <body className="antialiased font-sans">
-        
-        {/* 🔥 SCRIPTS EN LAZYONLOAD PARA MEJORAR LCP E INP EN MÓVILES */}
-        <Script id="meta-pixel" strategy="lazyOnload">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            
-            fbq('init', '${META_PIXEL_ID}'); 
-            fbq('track', 'PageView');
-          `}
-        </Script>
+      <body className="bg-slate-50 text-slate-900 antialiased">
+        {children}
 
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`} strategy="lazyOnload" />
-        <Script id="google-analytics" strategy="lazyOnload">
+        {/* Pilar 1: Cero bloqueo en móvil - Scripts con strategy="lazyOnload" */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-PENDIENTE"
+          strategy="lazyOnload"
+        />
+        <Script id="ga4-init" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            
-            gtag('config', '${GA4_ID}'); 
-            gtag('config', '${GOOGLE_ADS_ID}', { 'allow_enhanced_conversions': true });
+            gtag('config', 'G-PENDIENTE');
           `}
         </Script>
-
-        <LanguageSwitcher />
-        {children}
       </body>
     </html>
   );

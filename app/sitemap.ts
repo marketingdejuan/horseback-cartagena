@@ -1,64 +1,54 @@
-import { MetadataRoute } from 'next';
-import { ARTICULOS_BLOG_SEO } from '../lib/blogArticulos';
+import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://cabalgatamedellin.com';
-  const fechaActual = new Date();
+  const baseUrl = 'https://horsebackcartagena.com';
+  const lastModified = new Date();
 
-  const paginasPrincipales: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: fechaActual,
-      changeFrequency: 'weekly',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/cabalgatas-caldas`,
-      lastModified: fechaActual,
-      changeFrequency: 'weekly',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/en`,
-      lastModified: fechaActual,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: fechaActual,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
+  const mainPages = [
+    { url: `${baseUrl}`, priority: 1.0, changeFrequency: 'daily' as const },
+    { url: `${baseUrl}/es`, priority: 0.95, changeFrequency: 'daily' as const },
+    { url: `${baseUrl}/cabalgatas-manzanillo-del-mar`, priority: 0.95, changeFrequency: 'weekly' as const },
   ];
 
-  const slugsSEO = [
-    'planes-cabalgatas-medellin',
-    'tour-cuatrimotos-medellin-caldas',
-    'cabalgata-romantica-parejas-medellin',
-    'cabalgatas-ninos-familias-medellin',
-    'cabalgata-vip-transporte-el-poblado-laureles',
-    'alquiler-caballos-medellin-precios',
-    'cabalgatas-grupos-empresas-medellin',
-    'donde-montar-a-caballo-cerca-de-medellin',
-    'en-horseback-riding-medellin-tours',
+  const intentLandings = [
+    'planes-cabalgatas-cartagena',
+    'alquiler-caballos-cartagena-precios',
+    'tour-cuatrimotos-cartagena-manzanillo',
+    'cabalgata-romantica-parejas-cartagena',
+    'cabalgatas-ninos-familias-cartagena',
+    'cabalgata-vip-transporte-bocagrande-centro-morros',
+    'cabalgatas-grupos-empresas-cartagena',
+    'donde-montar-a-caballo-cerca-de-cartagena',
+    'en-horseback-riding-cartagena-tours',
     'reservar',
     'consultar',
-  ];
-
-  const paginasSEO: MetadataRoute.Sitemap = slugsSEO.map((slug) => ({
+  ].map((slug) => ({
     url: `${baseUrl}/${slug}`,
-    lastModified: fechaActual,
-    changeFrequency: 'weekly',
-    priority: 0.9,
+    lastModified,
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
   }));
 
-  const paginasBlog: MetadataRoute.Sitemap = ARTICULOS_BLOG_SEO.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: fechaActual,
-    changeFrequency: 'monthly',
-    priority: 0.8,
+  const blogPosts = [
+    'primera-cabalgata',
+    'mansos-briosos',
+    'ropa-cabalgata',
+    'integracion-empresas-cartagena-cabalgatas',
+    'mitos-y-verdades-sobre-montar-a-caballo',
+    'tradicion-naturaleza-y-aventura-asi-se-vive-diciembre-en-cabalgata-1',
+    'el-lenguaje-secreto-de-los-caballos-como-se-comunican-entre-ellos-y-con-nosotros',
+    'cabalgatas-una-actividad-perfecta-para-desconectarte-de-la-rutina',
+  ].map((slug) => ({
+    url: `${baseUrl}/blog/${slug}`,
+    lastModified,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
   }));
 
-  return [...paginasPrincipales, ...paginasSEO, ...paginasBlog];
+  return [
+    ...mainPages.map((p) => ({ ...p, lastModified })),
+    ...intentLandings,
+    { url: `${baseUrl}/blog`, lastModified, changeFrequency: 'weekly' as const, priority: 0.8 },
+    ...blogPosts,
+  ];
 }

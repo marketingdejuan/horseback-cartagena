@@ -1,16 +1,14 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = 'https://horsebackcartagena.com';
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: [
-        '/admin',     // Bloquea la ruta principal
-        '/admin/*',   // Bloquea TODAS las subrutas que puedan existir dentro del admin
-        '/api/'       // Bloquea las rutas de la API interna (Google no necesita indexar llamadas a bases de datos)
-      ], 
+      disallow: ['/api/', '/_next/'],
     },
-    sitemap: 'https://cabalgatamedellin.com/sitemap.xml',
-  }
+    sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
+  };
 }
