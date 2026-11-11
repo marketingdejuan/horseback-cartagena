@@ -4,20 +4,29 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://horsebackcartagena.com'),
-  title: 'Horseback Riding Cartagena | Manzanillo del Mar Beach Tours',
+  title: 'Horseback Riding Cartagena | Private Beach & Sunset Tours (Manzanillo)',
   description:
-    'Book the best beach horseback riding in Cartagena, Colombia. Private and group tours in Manzanillo del Mar (North Zone), 20 mins from the Walled City. Zero tolls.',
+    'Top-rated beach horseback riding in Cartagena, Colombia. Ride gentle Paso Fino horses in Manzanillo del Mar, just 20 mins from the Walled City & Bocagrande. No tolls, VIP hotel pickup & bilingual guides.',
+  keywords: [
+    'horseback riding cartagena',
+    'cartagena horseback riding beach',
+    'sunset horseback riding cartagena',
+    'manzanillo del mar horseback riding',
+    'things to do in cartagena colombia',
+    'cabalgatas en cartagena',
+  ],
   alternates: {
     canonical: 'https://horsebackcartagena.com',
     languages: {
       'en-US': 'https://horsebackcartagena.com',
       'es-CO': 'https://horsebackcartagena.com/es',
+      'x-default': 'https://horsebackcartagena.com',
     },
   },
   openGraph: {
-    title: 'Horseback Riding Cartagena | Beach & Mangrove Tours',
+    title: 'Horseback Riding Cartagena | Private Caribbean Beach Tours',
     description:
-      'Ride gentle Paso Fino horses along the beaches of Manzanillo del Mar, just 20 minutes from Bocagrande and the Historic Center. No tolls.',
+      'Uncrowded beach & mangrove horseback rides in Manzanillo del Mar. 20 minutes from the Walled City with zero tolls.',
     url: 'https://horsebackcartagena.com',
     siteName: 'Horseback Cartagena',
     locale: 'en_US',
@@ -25,13 +34,14 @@ export const metadata: Metadata = {
   },
 };
 
+// Pilar 7: @graph con LocalBusiness, TouristAttraction, SportsActivityLocation, GeoCoordinates, Offer, AggregateRating y FAQPage
 const globalSchema = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': ['LocalBusiness', 'TouristAttraction', 'SportsActivityLocation'],
       '@id': 'https://horsebackcartagena.com/#organization',
-      name: 'Horseback Cartagena',
+      name: 'Horseback Cartagena — Beach & Mangrove Tours',
       url: 'https://horsebackcartagena.com',
       telephone: '+573000000000',
       priceRange: '$$',
@@ -52,6 +62,44 @@ const globalSchema = {
         ratingValue: '4.9',
         reviewCount: '184',
       },
+      offers: {
+        '@type': 'Offer',
+        name: '2-Hour Caribbean Beach Horseback Ride',
+        price: '150000',
+        priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+        url: 'https://horsebackcartagena.com',
+      },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': 'https://horsebackcartagena.com/#faq',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Where can you go horseback riding on the beach in Cartagena?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Our ranch operates in Manzanillo del Mar (North Zone of Cartagena), offering wide, uncrowded Caribbean beaches and mangrove trails just 20 minutes from the Walled City and Bocagrande with zero highway tolls.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Do you offer private hotel pickup from the Walled City, Getsemaní, or Bocagrande?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, we offer optional VIP round-trip door-to-door transportation in air-conditioned vehicles directly from your hotel or Airbnb in the Historic Center, Getsemaní, Bocagrande, and Morros.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is horseback riding in Cartagena suitable for beginners and kids?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. We match each rider with gentle, well-cared-for Colombian horses, provide bilingual guide assistance, and include medical insurance for all riders starting from age 3.',
+          },
+        },
+      ],
     },
   ],
 };
